@@ -10,22 +10,22 @@ namespace Assets.Scripts.InGameScripts.Interfaces
     {
         public int Id { get; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
-        public uint Health { get; }
+        public int Health { get; set; }
 
-        public uint Experience { get; }
+        public int Experience { get; set; }
 
-        public uint Damage { get; }
+        public int Damage { get; set; }
 
-        public uint Armor { get; }
+        public int Armor { get; set; }
 
-        public uint Stamina { get; }
+        public int Stamina { get; set; }
 
-        public uint Hunger { get; }
+        public int Hunger { get; set; }
 
-        public uint Thirst { get; }
+        public int Thirst { get; set; }
     }
 }

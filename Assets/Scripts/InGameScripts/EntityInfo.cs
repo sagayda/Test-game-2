@@ -9,19 +9,19 @@ namespace Assets.Scripts.InGameScripts
 {
     public class EntityInfo : IEntityInfo
     {
-        public int Id { get; }
+        public int Id { get; set; }
 
-        public bool IsLoaded { get; }
+        public bool IsLoaded { get; set; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
-        public uint Health { get; }
+        public int Health { get; set; }
 
-        public uint Experience { get; }
+        public int Experience { get; set; }
 
-        public EntityInfo(int id, string name, string description, uint health, uint experience, bool isLoaded = false)
+        public EntityInfo(int id, string name, string description, int health, int experience, bool isLoaded = false)
         {
             Id = id;
             IsLoaded = isLoaded;

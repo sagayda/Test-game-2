@@ -9,51 +9,64 @@ namespace Assets.Scripts.InGameScripts
 {
     public class CleverEntityInfo : ICleverEntityInfo
     {
-        public uint Damage { 
+        public int Damage { 
+            get;
+            set;
+        }
+
+        public int Armor
+        {
+            get;
+            set;
+        }
+
+        public int Stamina {
+            get;
+            set;
+        }
+
+        public int Hunger {
             get; 
+            set;
         }
 
-        public uint Armor{
+        public int Thirst {
             get;
+            set;
         }
 
-        public uint Stamina {
+        public int Id
+        {
             get;
-        }
-
-        public uint Hunger {
-            get;
-        }
-
-        public uint Thirst {
-            get;
-        }
-
-        public int Id{
-            get;
+            set;
         }
 
         public bool IsLoaded {
             get;
+            set;
         }
 
         public string Name {
             get;
+            set;
         }
 
         public string Description {
             get;
+            set;
         }
 
-        public uint Health {
+        public int Health {
             get;
+            set;
         }
 
-        public uint Experience {
+        public int Experience {
             get;
+            set;
         }
 
-        public CleverEntityInfo(int id, string name, string description, uint health, uint experience, bool isLoaded = false)
+        public CleverEntityInfo(int id, string name, string description, int health, int experience, bool isLoaded = false)
         {
             Id = id;
             IsLoaded = isLoaded;

@@ -14,12 +14,27 @@ namespace Assets.Scripts.InGameScripts
 
         public string Name { get; }
 
+        public List<Player> Players { get; set; } = new List<Player>();
+
         public World(int id, string name)
         {
             Id = id;
             Name = name;
         }
 
+        public World(int id, string name, Player player)
+        {
+            Id = id;
+            Name = name;
+            Players.Add(player);
+        }
+
+        public World(int id, string name, List<Player> players)
+        {
+            Id = id;
+            Name = name;
+            Players.AddRange(players);
+        }
 
     }
 }

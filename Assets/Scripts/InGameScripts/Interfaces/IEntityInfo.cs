@@ -10,14 +10,14 @@ namespace Assets.Scripts.InGameScripts.Interfaces
     {
         public int Id { get; }
 
-        public bool IsLoaded { get; }
+        public bool IsLoaded { get; set; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
-        public uint Health { get; }
+        public int Health { get; set; }
 
-        public uint Experience { get; }
+        public int Experience { get; set; }
     }
 }

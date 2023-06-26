@@ -8,14 +8,14 @@ namespace Assets.Scripts.InGameScripts.Interfaces
 {
     public interface ICleverEntityInfo : IEntityInfo
     {
-        public uint Damage { get; }
+        public int Damage { get; set; }
 
-        public uint Armor { get; }
+        public int Armor { get; set; }
 
-        public uint Stamina { get; }
+        public int Stamina { get; set; }
 
-        public uint Hunger { get; }
+        public int Hunger { get; set; }
 
-        public uint Thirst { get; }
+        public int Thirst { get; set; }
     }
 }
