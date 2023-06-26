@@ -16,6 +16,8 @@ namespace Assets.Scripts.InGameScripts.Interfaces
 
         public string Description { get; set; }
 
+        public int MaxHealth { get; set; }
+
         public int Health { get; set; }
 
         public int Experience { get; set; }

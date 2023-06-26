@@ -1,18 +1,21 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using Assets.Scripts.InGameScripts;
 using Assets.Scripts.InGameScripts.Interfaces;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class TextQuest : MonoBehaviour
 {
     [SerializeField] private TMP_Text _gameText;
     [SerializeField] private Button[] _actionButtons;
     [SerializeField] private TMP_Text[] _actionButtonsText;
+    [SerializeField] private StatsController _statsController;
 
     public void Start()
     {
-        _actionButtonsText[0].text += "asd";
+        World world = CreateWorld();
+
+        _statsController.SetStats(world.Players[0].PlayerInfo);
     }
 
     private World CreateWorld()
@@ -22,7 +25,7 @@ public class TextQuest : MonoBehaviour
 
     private IPlayerInfo CreatePlayerInfo()
     {
-        return new PlayerInfo(0, "TestPlayer", "TEST", 100, 50, 1, 0, 100, 100, 100);
+        return new PlayerInfo(0, "TestPlayer", "TEST", 100, 85, 50, 1, 0, 100, 100, 100, 10, 200, 100);
     }
 
     private Player CreatePlayer()

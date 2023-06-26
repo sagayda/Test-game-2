@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Assets.Scripts.InGameScripts.Interfaces
+﻿namespace Assets.Scripts.InGameScripts.Interfaces
 {
     public interface IPlayerInfo
     {
@@ -14,6 +8,8 @@ namespace Assets.Scripts.InGameScripts.Interfaces
 
         public string Description { get; set; }
 
+        public int MaxHealth { get; set; }
+
         public int Health { get; set; }
 
         public int Experience { get; set; }
@@ -22,9 +18,15 @@ namespace Assets.Scripts.InGameScripts.Interfaces
 
         public int Armor { get; set; }
 
+        public int MaxStamina { get; set; }
+
         public int Stamina { get; set; }
 
+        public int MaxHunger { get; set; }
+
         public int Hunger { get; set; }
+
+        public int MaxThirst { get; set; }
 
         public int Thirst { get; set; }
     }

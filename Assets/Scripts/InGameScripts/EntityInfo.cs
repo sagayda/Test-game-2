@@ -17,16 +17,19 @@ namespace Assets.Scripts.InGameScripts
 
         public string Description { get; set; }
 
+        public int MaxHealth { get; set; }
+
         public int Health { get; set; }
 
         public int Experience { get; set; }
 
-        public EntityInfo(int id, string name, string description, int health, int experience, bool isLoaded = false)
+        public EntityInfo(int id, string name, string description, int maxHealth, int health, int experience, bool isLoaded = false)
         {
             Id = id;
             IsLoaded = isLoaded;
             Name = name;
             Description = description;
+            MaxHealth = maxHealth;
             Health = health;
             Experience = experience;
         }
