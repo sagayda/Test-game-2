@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.InGameScripts.Events.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace Assets.Scripts.InGameScripts
         public string Name { get; }
 
         public List<Player> Players { get; set; } = new List<Player>();
+
+        public List<IWorldInstantGameEvent> instantGameEvents { get; set; } = new();
 
         public World(int id, string name)
         {
@@ -35,6 +38,18 @@ namespace Assets.Scripts.InGameScripts
             Name = name;
             Players.AddRange(players);
         }
+
+        public void TimeTickStep()
+        {
+            foreach (var gameEvent in instantGameEvents) 
+            {
+                CurrentTimeTick++;
+                gameEvent.Start();
+            }
+
+        }
+
+
 
     }
 }

@@ -1,4 +1,5 @@
 using Assets.Scripts.InGameScripts;
+using Assets.Scripts.InGameScripts.Events;
 using Assets.Scripts.InGameScripts.Interfaces;
 using TMPro;
 using UnityEngine;
@@ -11,16 +12,26 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
 
+    private World _world;
+
     public void Start()
     {
-        World world = CreateWorld();
+        _world = CreateWorld();
 
-        _statsController.SetStats(world.Players[0].PlayerInfo);
+        _statsController.SetStats(_world.Players[0].PlayerInfo);
+    }
+
+    public void NextTimeTick()
+    {
+        _world.TimeTickStep();
+        _statsController.UpdateStats();
     }
 
     private World CreateWorld()
     {
-        return new World(0, "FirstWorld", CreatePlayer());
+        var world = new World(0, "FirstWorld", CreatePlayer());
+        world.instantGameEvents.Add(new TestWorldInstantGameEvent(world));
+        return world;
     }
 
     private IPlayerInfo CreatePlayerInfo()
