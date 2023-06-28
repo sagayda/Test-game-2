@@ -7,19 +7,32 @@ namespace Assets.Scripts.InGameScripts
         public int Id { get; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public int MaxHealth { get; set; }
-        public int Health { get; set; }
-        public int Experience { get; set; }
-        public int Damage { get; set; }
-        public int Armor { get; set; }
-        public int MaxStamina { get; set; }
-        public int Stamina { get; set; }
-        public int MaxHunger { get; set; }
-        public int Hunger { get; set; }
-        public int MaxThirst { get; set; }
-        public int Thirst { get; set; }
+        public float MaxHealth { get; set; }
+        public float Health { get; set; }
+        public float Experience { get; set; }
+        public float Damage { get; set; }
+        public float Armor { get; set; }
+        public float MaxStamina { get; set; }
+        public float Stamina { get; set; }
+        public float MaxHunger { get; set; }
+        public float Hunger { get; set; }
+        public float MaxThirst { get; set; }
+        public float Thirst { get; set; }
 
-        public PlayerInfo(int id, string name, string description, int maxHealth, int health, int experience, int damage, int armour, int maxStamina, int stamina, int maxHunger, int hunger, int maxThirst, int thirst)
+        public PlayerInfo(int id,
+                          string name,
+                          string description,
+                          float maxHealth,
+                          float health,
+                          float experience,
+                          float damage,
+                          float armour,
+                          float maxStamina,
+                          float stamina,
+                          float maxHunger,
+                          float hunger,
+                          float maxThirst,
+                          float thirst)
         {
             Id = id;
             Name = name;

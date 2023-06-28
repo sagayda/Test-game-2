@@ -10,60 +10,60 @@ namespace Assets.Scripts.InGameScripts
             set;
         }
 
-        public int MaxHealth
+        public float MaxHealth
         {
             get;
             set;
         }
 
-        public int Health
+        public float Health
         {
             get;
             set;
         }
 
-        public int Damage
+        public float Damage
         {
             get;
             set;
         }
 
-        public int Armor
+        public float Armor
         {
             get;
             set;
         }
-        public int MaxStamina
-        {
-            get;
-            set;
-        }
-
-        public int Stamina
+        public float MaxStamina
         {
             get;
             set;
         }
 
-        public int MaxHunger
+        public float Stamina
         {
             get;
             set;
         }
 
-        public int Hunger
+        public float MaxHunger
         {
             get;
             set;
         }
 
-        public int MaxThirst
+        public float Hunger
         {
             get;
             set;
         }
 
-        public int Thirst
+        public float MaxThirst
+        {
+            get;
+            set;
+        }
+
+        public float Thirst
         {
             get;
             set;
@@ -87,14 +87,14 @@ namespace Assets.Scripts.InGameScripts
             set;
         }
 
-        public int Experience
+        public float Experience
         {
             get;
             set;
         }
 
         //not all properties added
-        public CleverEntityInfo(int id, string name, string description, int maxHealth, int health, int experience, bool isLoaded = false)
+        public CleverEntityInfo(int id, string name, string description, float maxHealth, float health, float experience, bool isLoaded = false)
         {
             Id = id;
             IsLoaded = isLoaded;

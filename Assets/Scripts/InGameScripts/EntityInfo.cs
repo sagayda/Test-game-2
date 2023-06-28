@@ -1,9 +1,4 @@
 ﻿using Assets.Scripts.InGameScripts.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assets.Scripts.InGameScripts
 {
@@ -17,13 +12,13 @@ namespace Assets.Scripts.InGameScripts
 
         public string Description { get; set; }
 
-        public int MaxHealth { get; set; }
+        public float MaxHealth { get; set; }
 
-        public int Health { get; set; }
+        public float Health { get; set; }
 
-        public int Experience { get; set; }
+        public float Experience { get; set; }
 
-        public EntityInfo(int id, string name, string description, int maxHealth, int health, int experience, bool isLoaded = false)
+        public EntityInfo(int id, string name, string description, float maxHealth, float health, float experience, bool isLoaded = false)
         {
             Id = id;
             IsLoaded = isLoaded;
