@@ -3,24 +3,22 @@ using System;
 
 namespace Assets.Scripts.InGameScripts.Events
 {
-    public class TestWorldInstantGameEvent : IWorldInstantGameEvent
+    public class TestInstantGameEvent : IInstantGameEvent
     {
         public int Id { get; }
-
         public World World { get; }
-
-        public string Name { get; private set; }
-        public string Info { get; private set; }
+        public string Name => "TEST EVENT";
+        public string Info => "THIS IS TEST EVENT FOR -10hp FOR ALL PLAYERS";
         public bool IsDead { get; private set; } = false;
 
-        public TestWorldInstantGameEvent(World world)
+        public TestInstantGameEvent(World world)
         {
             World = world;
         }
 
         public void Break()
         {
-            throw new NotImplementedException();
+            IsDead = true;
         }
 
         public bool Start()

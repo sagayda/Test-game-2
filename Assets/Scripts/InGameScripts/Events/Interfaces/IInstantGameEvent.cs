@@ -1,6 +1,6 @@
 ﻿namespace Assets.Scripts.InGameScripts.Events.Interfaces
 {
-    public interface IWorldInstantGameEvent
+    public interface IInstantGameEvent
     {
         public int Id { get; }
 

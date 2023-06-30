@@ -17,7 +17,7 @@ namespace Assets.Scripts.InGameScripts
 
         public List<Player> Players { get; set; } = new List<Player>();
 
-        public List<IWorldInstantGameEvent> instantGameEvents { get; set; } = new();
+        public List<IInstantGameEvent> instantGameEvents { get; set; } = new();
 
         public World(int id, string name)
         {

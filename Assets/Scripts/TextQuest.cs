@@ -30,7 +30,7 @@ public class TextQuest : MonoBehaviour
     private World CreateWorld()
     {
         var world = new World(0, "FirstWorld", CreatePlayer());
-        world.instantGameEvents.Add(new TestWorldInstantGameEvent(world));
+        world.instantGameEvents.Add(new TestInstantGameEvent(world));
         return world;
     }
 
