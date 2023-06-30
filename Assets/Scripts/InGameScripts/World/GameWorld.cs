@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.InGameScripts
 {
-    public class World
+    public class GameWorld
     {
         int Id { get; }
 
@@ -19,20 +19,20 @@ namespace Assets.Scripts.InGameScripts
 
         public List<IInstantGameEvent> instantGameEvents { get; set; } = new();
 
-        public World(int id, string name)
+        public GameWorld(int id, string name)
         {
             Id = id;
             Name = name;
         }
 
-        public World(int id, string name, Player player)
+        public GameWorld(int id, string name, Player player)
         {
             Id = id;
             Name = name;
             Players.Add(player);
         }
 
-        public World(int id, string name, List<Player> players)
+        public GameWorld(int id, string name, List<Player> players)
         {
             Id = id;
             Name = name;

@@ -1,7 +1,9 @@
 ﻿using Assets.Scripts.InGameScripts.Interfaces;
+using System;
 
 namespace Assets.Scripts.InGameScripts
 {
+    [Serializable]
     internal class PlayerInfo : IPlayerInfo
     {
         public int Id { get; }
@@ -42,11 +44,11 @@ namespace Assets.Scripts.InGameScripts
             Experience = experience;
             Damage = damage;
             Armor = armour;
-            MaxStamina = stamina;
+            MaxStamina = maxStamina;
             Stamina = stamina;
             MaxHunger = maxHunger;
             Hunger = hunger;
-            MaxThirst = thirst;
+            MaxThirst = maxThirst;
             Thirst = thirst;
         }
     }

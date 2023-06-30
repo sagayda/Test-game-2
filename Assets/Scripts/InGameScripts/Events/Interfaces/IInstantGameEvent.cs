@@ -4,7 +4,7 @@
     {
         public int Id { get; }
 
-        public World World { get; }
+        public GameWorld World { get; }
 
         public string Name { get; }
 

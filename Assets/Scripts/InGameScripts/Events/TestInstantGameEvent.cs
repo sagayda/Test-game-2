@@ -6,12 +6,12 @@ namespace Assets.Scripts.InGameScripts.Events
     public class TestInstantGameEvent : IInstantGameEvent
     {
         public int Id { get; }
-        public World World { get; }
+        public GameWorld World { get; }
         public string Name => "TEST EVENT";
         public string Info => "THIS IS TEST EVENT FOR -10hp FOR ALL PLAYERS";
         public bool IsDead { get; private set; } = false;
 
-        public TestInstantGameEvent(World world)
+        public TestInstantGameEvent(GameWorld world)
         {
             World = world;
         }
@@ -28,7 +28,7 @@ namespace Assets.Scripts.InGameScripts.Events
 
             foreach (var player in World.Players)
             {
-                player.PlayerInfo.Health -= 10;
+                player.Info.Health -= 10;
             }
 
             IsDead = true;
