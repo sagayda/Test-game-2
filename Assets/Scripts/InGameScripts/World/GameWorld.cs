@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.InGameScripts.Events.Interfaces;
+using Assets.Scripts.InGameScripts.World.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,9 @@ namespace Assets.Scripts.InGameScripts
         public List<Player> Players { get; set; } = new List<Player>();
 
         public List<IInstantGameEvent> instantGameEvents { get; set; } = new();
+
+        public int WorldSize => World.Length;
+        public IWorldLocation[,] World { get; set; }
 
         public GameWorld(int id, string name)
         {
@@ -45,6 +49,11 @@ namespace Assets.Scripts.InGameScripts
             {
                 CurrentTimeTick++;
                 gameEvent.Start();
+
+                foreach (var player in Players)
+                {
+                    player.TimeStep();
+                }
             }
 
         }

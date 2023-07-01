@@ -10,6 +10,9 @@ namespace Assets.Scripts.InGameScripts.World.Interfaces
     {
         public int Id { get; }
 
+        public int X { get; set; }
+        public int Y { get; set; }
+
         public string Name { get; }
 
         public string Description { get; }
@@ -17,6 +20,8 @@ namespace Assets.Scripts.InGameScripts.World.Interfaces
         public IWorldSublocation Sublocation { get; set; }
 
         public IWorldLocation[] NeighbourLocations { get; set; }
+
+        public IWorldLocationConnector[] Connectors { get; set; }
 
     }
 }

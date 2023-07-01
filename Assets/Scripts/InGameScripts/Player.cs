@@ -19,7 +19,8 @@ namespace Assets.Scripts.InGameScripts
 
         public void TimeStep()
         {
-            Info.Health -= 1;
+            Info.Hunger -= 1;
+            Info.Thirst -= 2;
         }
 
         public void GoToLocation(IWorldLocation location)

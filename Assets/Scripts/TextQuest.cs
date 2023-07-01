@@ -7,6 +7,7 @@ using Assets.Scripts.InGameScripts.World.Interfaces;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,11 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private Button[] _actionButtons;
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
+    [SerializeField] private GameObject _map;
+    [SerializeField] private GridLayoutGroup _mapLayoutGroup;
+    [SerializeField] private GameObject _wastelandPrefab;
+    [SerializeField] private GameObject _emptyPrefab;
+    [SerializeField] private GameObject _mapComponent;
 
     private GameWorld _world;
     private Player _player;
@@ -24,7 +30,19 @@ public class TextQuest : MonoBehaviour
     {
         var pl = CreatePlayer();
 
-        Load(CreateWorld(pl), pl);
+        Load(CreateWorld(pl,16), pl);
+        CreateMap();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.M))
+        {
+            if(_map.activeSelf)
+                _map.SetActive(false);
+            else
+                _map.SetActive(true);
+        }
     }
 
     public void SaveGame()
@@ -93,15 +111,215 @@ public class TextQuest : MonoBehaviour
         _statsController.UpdateStats();
     }
 
-    private GameWorld CreateWorld(Player player)
+    private void CreateMap()
+    {
+        if (_world == null)
+            return;
+
+        _mapLayoutGroup.constraintCount = _world.World.GetLength(0);
+
+        for (int i = 0; i < _world.World.GetLength(0); i++)
+        {
+            for (int j = 0; j < _world.World.GetLength(1); j++)
+            {
+                if (_world.World[i, j] == null)
+                {
+                    Instantiate(_emptyPrefab, _mapComponent.transform);
+                    continue;
+                }
+
+                Instantiate(_wastelandPrefab, _mapComponent.transform);
+            }
+        }
+    }
+
+    private GameWorld CreateWorld(Player player, byte size)
     {
         var world = new GameWorld(0, "FirstWorld", player);
         world.instantGameEvents.Add(new TestInstantGameEvent(world));
         world.instantGameEvents.Add(new TestInstantGameEvent(world));
         world.instantGameEvents.Add(new TestInstantGameEvent(world));
 
+        world.World = CreateWorldMap(size);
+
         return world;
     }
+
+    private IWorldLocation[,] CreateWorldMap(int size)
+    {
+        IWorldLocation[,] map = new IWorldLocation[size, size];
+
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                if (UnityEngine.Random.Range(0, 100) >= 80)
+                    continue;
+
+                map[i, j] = new WorldLocation_Wasteland();
+                map[i,j].X = i;
+                map[i,j].Y = j;
+            }
+        }
+
+        for (int i = 0; i < size-1; i++)
+        {
+            for (int j = 0; j < size-1; j++)
+            {
+                if (map[i, j] == null)
+                    continue;
+
+                IWorldLocationConnector[] connectors;
+
+                if (i == 0 &&  j == 0)
+                {
+                    connectors = new IWorldLocationConnector[2];
+
+                    if(map[0, 1] != null)
+                        connectors[0] = new WorldLocationConnector_Free(map[0, 0], map[0, 1]);
+
+                    if (map[1,0] != null)
+                        connectors[1] = new WorldLocationConnector_Free(map[0, 0], map[1, 0]);
+
+                    map[0,0].Connectors = connectors;
+                    continue;
+                }
+
+                if(i== 0)
+                {
+                    if(UnityEngine.Random.Range(0,100) >= 95)
+                    {
+                        connectors = new IWorldLocationConnector[2];
+                    }
+                    else
+                    {
+                        connectors = new IWorldLocationConnector[3];
+                    }
+
+                    if(map[i, j - 1]!= null)
+                        connectors[0] = new WorldLocationConnector_Free(map[i,j], map[i,j-1]);
+                    if (map[i, j + 1] != null)
+                        connectors[1] = new WorldLocationConnector_Free(map[i, j], map[i, j + 1]);
+
+                    if(connectors.Length > 2)
+                    {
+                        if (map[i + 1, j] != null)
+                            connectors[2] = new WorldLocationConnector_Free(map[i, j], map[i + 1, j]);
+                    }
+
+                    map[i,j].Connectors = connectors;
+                    continue;
+                }
+
+                if (j == 0)
+                {
+                    if (UnityEngine.Random.Range(0, 100) >= 95)
+                    {
+                        connectors = new IWorldLocationConnector[2];
+                    }
+                    else
+                    {
+                        connectors = new IWorldLocationConnector[3];
+                    }
+
+                    if (map[i - 1, j] != null)
+                        connectors[0] = new WorldLocationConnector_Free(map[i, j], map[i - 1, j]);
+
+
+                    if (map[i + 1, j] != null)
+                        connectors[1] = new WorldLocationConnector_Free(map[i, j], map[i + 1, j]);
+
+                    if (connectors.Length > 2)
+                    {
+                        if (map[i, j + 1] != null)
+                            connectors[2] = new WorldLocationConnector_Free(map[i, j], map[i, j + 1]);
+                    }
+
+                    map[i, j].Connectors = connectors;
+                    continue;
+                }
+
+                if (UnityEngine.Random.Range(0, 100) >= 95)
+                {
+                    connectors = new IWorldLocationConnector[3];
+                }
+                else
+                {
+                    connectors = new IWorldLocationConnector[4];
+                }
+
+                if (map[i - 1, j] != null)
+                    connectors[0] = new WorldLocationConnector_Free(map[i, j], map[i - 1, j]);
+                if (map[i + 1, j] != null)
+                    connectors[1] = new WorldLocationConnector_Free(map[i, j], map[i + 1, j]);
+                if (map[i, j + 1] != null)
+                    connectors[2] = new WorldLocationConnector_Free(map[i, j], map[i, j + 1]);
+
+                if(connectors.Length > 3)
+                {
+                    if (map[i, j - 1] != null)
+                        connectors[3] = new WorldLocationConnector_Free(map[i, j], map[i, j - 1]);
+                }
+
+                map[i,j].Connectors = connectors;
+            }
+        }
+
+        return map;
+    }
+
+
+    //private IWorldLocation[] CreateWorldLevel(int level, IWorldLocation[] previousLevel)
+    //{
+    //    if(level<1)
+    //        return null;
+
+    //    int prevLevelLocationsCount = 0;
+    //    int maxConnectorsCount = 0;
+
+    //    foreach(var location in previousLevel)
+    //    {
+    //        if(location == null)
+    //            continue;
+
+    //        prevLevelLocationsCount++;
+
+    //        if (math.abs(location.X) == math.abs(location.Y))
+    //            maxConnectorsCount += 2;
+    //        else
+    //            maxConnectorsCount++;
+    //    }
+
+    //    int locationsCount = UnityEngine.Random.Range(level * 6, level * 8);
+
+    //    IWorldLocation[] worldLevel = new IWorldLocation[locationsCount];
+    //    int locationsToSkip = level * 8 - locationsCount;
+
+    //    for (int i = 0; i < worldLevel.Length; i++)
+    //    {
+    //        if (UnityEngine.Random.Range(0, 100) > 85)
+    //        {
+    //            if (locationsToSkip > 0)
+    //            {
+    //                locationsToSkip--;
+    //                continue;
+    //            }
+    //        }
+
+    //        worldLevel[i] = new WorldLocation_Wasteland();
+
+    //        if(i < )
+
+    //        float ortantCoeff = (((float)(8 * level) )/ 4);
+    //        float ortant = i / ortantCoeff;
+    //        if (ortant < ortantCoeff)
+    //        {
+    //            //1
+
+    //        }
+    //    }
+
+    //}
 
     private IPlayerInfo CreatePlayerInfo()
     {

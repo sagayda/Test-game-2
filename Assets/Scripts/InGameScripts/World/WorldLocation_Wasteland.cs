@@ -12,10 +12,14 @@ namespace Assets.Scripts.InGameScripts.World
     {
         public int Id => 0;
 
+        public int X {  get; set; }
+        public int Y { get; set; }
+
         public string Name { get => "Wasteland"; }
         public string Description { get => "This is wasteland"; }
         public IWorldSublocation Sublocation { get; set; }
         public IWorldLocation[] NeighbourLocations { get; set; } = new IWorldLocation[4];
+        public IWorldLocationConnector[] Connectors { get; set; }
 
         public bool IsHasPlayer => PlayerId != -1;
 
