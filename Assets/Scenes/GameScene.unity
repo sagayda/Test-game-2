@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 20034686}
   - component: {fileID: 20034685}
   - component: {fileID: 20034687}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,7 +261,7 @@ GameObject:
   - component: {fileID: 196730428}
   - component: {fileID: 196730427}
   - component: {fileID: 196730426}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: NextTickButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -395,7 +395,7 @@ GameObject:
   - component: {fileID: 240558403}
   - component: {fileID: 240558402}
   - component: {fileID: 240558404}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HungerBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -520,7 +520,7 @@ GameObject:
   - component: {fileID: 436469279}
   - component: {fileID: 436469280}
   - component: {fileID: 436469281}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -653,7 +653,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 464463335}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Thirst
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -752,7 +752,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.19215688, g: 0.4745098, b: 0.23878227, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -766,10 +766,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 100
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -812,7 +812,7 @@ GameObject:
   - component: {fileID: 524663613}
   - component: {fileID: 524663612}
   - component: {fileID: 524663614}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Avtion3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -934,7 +934,7 @@ GameObject:
   - component: {fileID: 526343153}
   - component: {fileID: 526343152}
   - component: {fileID: 526343154}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: StaminaBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1152,7 +1152,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 619394800}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -13.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1171,7 +1171,7 @@ GameObject:
   - component: {fileID: 674040338}
   - component: {fileID: 674040337}
   - component: {fileID: 674040339}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Avtion1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1292,7 +1292,7 @@ GameObject:
   - component: {fileID: 688755242}
   - component: {fileID: 688755243}
   - component: {fileID: 688755244}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1428,7 +1428,7 @@ GameObject:
   - component: {fileID: 858303368}
   - component: {fileID: 858303367}
   - component: {fileID: 858303369}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Avtion4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1549,7 +1549,7 @@ GameObject:
   - component: {fileID: 864101351}
   - component: {fileID: 864101353}
   - component: {fileID: 864101352}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1689,7 +1689,7 @@ GameObject:
   m_Component:
   - component: {fileID: 971046317}
   - component: {fileID: 971046318}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: MenuLayout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1757,7 +1757,7 @@ GameObject:
   - component: {fileID: 987123393}
   - component: {fileID: 987123395}
   - component: {fileID: 987123394}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1831,7 +1831,7 @@ GameObject:
   - component: {fileID: 1000983073}
   - component: {fileID: 1000983072}
   - component: {fileID: 1000983071}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: PlayerInfoCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1924,6 +1924,67 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &1019375284
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1019375285}
+  - component: {fileID: 1019375286}
+  m_Layer: 0
+  m_Name: TileMap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1019375285
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019375284}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1362545658}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1019375286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019375284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 100, y: 100}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 2
+  m_ConstraintCount: 2
 --- !u!1 &1059048321
 GameObject:
   m_ObjectHideFlags: 0
@@ -1936,7 +1997,7 @@ GameObject:
   - component: {fileID: 1059048325}
   - component: {fileID: 1059048324}
   - component: {fileID: 1059048322}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ThirstBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2061,7 +2122,7 @@ GameObject:
   - component: {fileID: 1076966073}
   - component: {fileID: 1076966074}
   - component: {fileID: 1076966075}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: GameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2196,7 +2257,7 @@ GameObject:
   - component: {fileID: 1145273377}
   - component: {fileID: 1145273379}
   - component: {fileID: 1145273378}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2270,7 +2331,7 @@ GameObject:
   - component: {fileID: 1151976415}
   - component: {fileID: 1151976414}
   - component: {fileID: 1151976413}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: LoadButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2403,7 +2464,7 @@ GameObject:
   - component: {fileID: 1246927074}
   - component: {fileID: 1246927076}
   - component: {fileID: 1246927075}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2538,7 +2599,7 @@ GameObject:
   - component: {fileID: 1296716672}
   - component: {fileID: 1296716674}
   - component: {fileID: 1296716673}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ThirstText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2714,6 +2775,44 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1362545657
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1362545658}
+  m_Layer: 0
+  m_Name: Minimap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1362545658
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362545657}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1408241553}
+  - {fileID: 1019375285}
+  m_Father: {fileID: 1986222423}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1392665215
 GameObject:
   m_ObjectHideFlags: 0
@@ -2755,6 +2854,11 @@ MonoBehaviour:
   - {fileID: 688755244}
   - {fileID: 2020201185}
   _statsController: {fileID: 1308601656}
+  _map: {fileID: 1362545657}
+  _mapLayoutGroup: {fileID: 1019375286}
+  _wastelandPrefab: {fileID: 933756347531459389, guid: 8c8ebb96919b5a740adb0d1571538cc9, type: 3}
+  _emptyPrefab: {fileID: 2256323337061277664, guid: c39db10ce0c3b034fb38ff7146b951a1, type: 3}
+  _mapComponent: {fileID: 1019375284}
 --- !u!4 &1392665217
 Transform:
   m_ObjectHideFlags: 0
@@ -2781,7 +2885,7 @@ GameObject:
   - component: {fileID: 1406387079}
   - component: {fileID: 1406387081}
   - component: {fileID: 1406387080}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2905,6 +3009,79 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1406387078}
   m_CullTransparentMesh: 1
+--- !u!1 &1408241552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1408241553}
+  - component: {fileID: 1408241555}
+  - component: {fileID: 1408241554}
+  m_Layer: 0
+  m_Name: BG
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1408241553
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408241552}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1362545658}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1408241554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408241552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0.9290045, b: 0.6264151, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &1408241555
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408241552}
+  m_CullTransparentMesh: 1
 --- !u!1 &1445527192
 GameObject:
   m_ObjectHideFlags: 0
@@ -2916,7 +3093,7 @@ GameObject:
   - component: {fileID: 1445527193}
   - component: {fileID: 1445527194}
   - component: {fileID: 1445527195}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3051,7 +3228,7 @@ GameObject:
   - component: {fileID: 1590458882}
   - component: {fileID: 1590458884}
   - component: {fileID: 1590458883}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: BG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3124,7 +3301,7 @@ GameObject:
   - component: {fileID: 1606369920}
   - component: {fileID: 1606369922}
   - component: {fileID: 1606369921}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3198,7 +3375,7 @@ GameObject:
   - component: {fileID: 1608168217}
   - component: {fileID: 1608168216}
   - component: {fileID: 1608168218}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Avtion2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3319,7 +3496,7 @@ GameObject:
   - component: {fileID: 1632488690}
   - component: {fileID: 1632488692}
   - component: {fileID: 1632488691}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HungerText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3452,7 +3629,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1693252059}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Hunger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3492,7 +3669,7 @@ GameObject:
   - component: {fileID: 1776026872}
   - component: {fileID: 1776026874}
   - component: {fileID: 1776026873}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: BG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3565,7 +3742,7 @@ GameObject:
   - component: {fileID: 1854641256}
   - component: {fileID: 1854641258}
   - component: {fileID: 1854641257}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: StaminaText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3698,7 +3875,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1934933229}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Stamina
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3739,7 +3916,7 @@ GameObject:
   - component: {fileID: 1986222426}
   - component: {fileID: 1986222425}
   - component: {fileID: 1986222424}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3765,6 +3942,7 @@ RectTransform:
   - {fileID: 196730425}
   - {fileID: 1992771915}
   - {fileID: 1151976412}
+  - {fileID: 1362545658}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3789,7 +3967,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
 --- !u!114 &1986222425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3822,8 +4000,8 @@ Canvas:
   m_GameObject: {fileID: 1986222422}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -3845,7 +4023,7 @@ GameObject:
   - component: {fileID: 1991079379}
   - component: {fileID: 1991079381}
   - component: {fileID: 1991079380}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3981,7 +4159,7 @@ GameObject:
   - component: {fileID: 1992771918}
   - component: {fileID: 1992771917}
   - component: {fileID: 1992771916}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: SaveButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4114,7 +4292,7 @@ GameObject:
   - component: {fileID: 2020201187}
   - component: {fileID: 2020201186}
   - component: {fileID: 2020201185}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4249,7 +4427,7 @@ GameObject:
   - component: {fileID: 2087832628}
   - component: {fileID: 2087832630}
   - component: {fileID: 2087832629}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HealthText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4382,7 +4560,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2144393295}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
