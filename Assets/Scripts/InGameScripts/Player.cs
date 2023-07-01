@@ -1,5 +1,5 @@
 ﻿using Assets.Scripts.InGameScripts.Interfaces;
-using Assets.Scripts.InGameScripts.World.Interfaces;
+using Assets.Scripts.InGameScripts.World.Absctract;
 using System;
 
 namespace Assets.Scripts.InGameScripts
@@ -9,9 +9,9 @@ namespace Assets.Scripts.InGameScripts
     {
         public IPlayerInfo Info { get; }
 
-        public IWorldLocation Location { get; set; }
+        public WorldLocation Location { get; set; }
 
-        public Player(IPlayerInfo playerInfo, IWorldLocation playerLocation)
+        public Player(IPlayerInfo playerInfo, WorldLocation playerLocation)
         {
             Info = playerInfo;
             Location = playerLocation;
@@ -23,11 +23,11 @@ namespace Assets.Scripts.InGameScripts
             Info.Thirst -= 2;
         }
 
-        public void GoToLocation(IWorldLocation location)
+        public void GoToLocation(WorldLocation location)
         {
-            foreach (var neighbourLocation in Location.NeighbourLocations)
+            foreach (var connector in Location.Connectors)
             {
-                if (neighbourLocation == location)
+                if ((connector.ToLocation) == location)
                 {
                     Location = location;
                     break;

@@ -1,5 +1,5 @@
 ﻿using Assets.Scripts.InGameScripts;
-using Assets.Scripts.InGameScripts.World.Interfaces;
+using Assets.Scripts.InGameScripts.World.Absctract;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +13,7 @@ namespace Assets.Scripts
 {
     public static class SaveManager
     {
-        public static void SaveLocation(IWorldLocation worldLocation)
+        public static void SaveLocation(WorldLocation worldLocation)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
@@ -24,13 +24,13 @@ namespace Assets.Scripts
 
         }
 
-        public static IWorldLocation LoadLocation()
+        public static WorldLocation LoadLocation()
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
             using (FileStream fs = new("Location.bs", FileMode.OpenOrCreate))
             {
-                return (IWorldLocation)binaryFormatter.Deserialize(fs);
+                return (WorldLocation)binaryFormatter.Deserialize(fs);
             }
 
         }
@@ -55,6 +55,26 @@ namespace Assets.Scripts
                 return (Player)binaryFormatter.Deserialize(fs);
             }
 
+        }
+
+        public static void SaveGameWorld(GameWorld gameWorld)
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+            using (FileStream fs = new("World.bs", FileMode.OpenOrCreate))
+            {
+                binaryFormatter.Serialize(fs, gameWorld);
+            }
+        }
+
+        public static GameWorld LoadGameWorld()
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+            using (FileStream fs = new("World.bs", FileMode.OpenOrCreate))
+            {
+                return (GameWorld)binaryFormatter.Deserialize(fs);
+            }
         }
     }
 }

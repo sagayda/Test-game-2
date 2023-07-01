@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.InGameScripts.World.Interfaces;
+﻿using Assets.Scripts.InGameScripts.World.Absctract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,27 +8,15 @@ using System.Threading.Tasks;
 namespace Assets.Scripts.InGameScripts.World
 {
     [Serializable]
-    public class WorldSublocation_Wasteland : IWorldSublocation
+    public class WorldSublocation_Wasteland : WorldSublocation
     {
-        public int Id => 0;
-
-        public string Name => "Wasteland sublocation";
-
-        public IWorldLocation ParentLocation { get; }
-
-        public IWorldSublocation[] NeighbourSublocations { get; set; } = new IWorldSublocation[4];
+        public override int Id => 0;
+        public override string Name => "Wasteland sublocation";
 
         public WorldSublocation_Wasteland()
         {
             
         }
 
-        public WorldSublocation_Wasteland(IWorldLocation parentLocation)
-        {
-            if(parentLocation == null) 
-                throw new ArgumentNullException(nameof(parentLocation));
-            
-            ParentLocation = parentLocation;
-        }
     }
 }

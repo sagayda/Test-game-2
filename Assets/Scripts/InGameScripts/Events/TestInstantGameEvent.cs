@@ -3,6 +3,7 @@ using System;
 
 namespace Assets.Scripts.InGameScripts.Events
 {
+    [Serializable]
     public class TestInstantGameEvent : IInstantGameEvent
     {
         public int Id { get; }
