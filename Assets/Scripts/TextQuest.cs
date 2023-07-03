@@ -58,7 +58,6 @@ public class TextQuest : MonoBehaviour
     {
         var player = SaveManager.LoadPlayer();
         var world = SaveManager.LoadGameWorld();
-        //хцпнйх асдср дсакхпнбюрэяъ, хан лхп янупюмъеряъ ян яохяйнл хцпнйнб
         world.AddPlayer(player);
 
         Load(world, player);

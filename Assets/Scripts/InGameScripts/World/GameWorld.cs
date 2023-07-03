@@ -88,5 +88,11 @@ namespace Assets.Scripts.InGameScripts
         {
             Players.AddRange(players);
         }
+
+        public void ClearPlayers()
+        {
+            Players.Clear();
+        }
+
     }
 }

@@ -59,6 +59,8 @@ namespace Assets.Scripts
 
         public static void SaveGameWorld(GameWorld gameWorld)
         {
+            gameWorld.ClearPlayers();
+
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
             using (FileStream fs = new("World.bs", FileMode.OpenOrCreate))
