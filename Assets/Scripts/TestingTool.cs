@@ -49,7 +49,7 @@ namespace Assets.Scripts
                     if (UnityEngine.Random.Range(0, 100) >= 80)
                         continue;
 
-                    map[i, j] = new WorldLocation_Wasteland(i,j);
+                    map[i, j] = CreateRandomLocation(i,j);
                 }
             }
 
@@ -117,6 +117,21 @@ namespace Assets.Scripts
             }
 
             return map;
+        }
+
+        public static WorldLocation CreateRandomLocation(int x, int y)
+        {
+            int rnd = UnityEngine.Random.Range (0, 2);
+
+            switch (rnd)
+            {
+                case 0:
+                    return new WorldLocation_Wasteland(x, y);
+                case 1:
+                    return new WorldLocation_Plain(x, y);
+                default:
+                    return new WorldLocation_Wasteland(x, y);
+            }
         }
 
     }

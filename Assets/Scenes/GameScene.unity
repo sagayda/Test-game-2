@@ -2856,9 +2856,8 @@ MonoBehaviour:
   _statsController: {fileID: 1308601656}
   _map: {fileID: 1362545657}
   _mapLayoutGroup: {fileID: 1019375286}
-  _wastelandPrefab: {fileID: 933756347531459389, guid: 8c8ebb96919b5a740adb0d1571538cc9, type: 3}
-  _emptyPrefab: {fileID: 2256323337061277664, guid: c39db10ce0c3b034fb38ff7146b951a1, type: 3}
   _mapComponent: {fileID: 1019375284}
+  _locationPrefab: {fileID: 1194370585989949848, guid: c85f8f57103bbd642b1c447a790d946b, type: 3}
 --- !u!4 &1392665217
 Transform:
   m_ObjectHideFlags: 0

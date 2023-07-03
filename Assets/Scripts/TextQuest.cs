@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using TMPro;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,9 +21,8 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private StatsController _statsController;
     [SerializeField] private GameObject _map;
     [SerializeField] private GridLayoutGroup _mapLayoutGroup;
-    [SerializeField] private GameObject _wastelandPrefab;
-    [SerializeField] private GameObject _emptyPrefab;
     [SerializeField] private GameObject _mapComponent;
+    [SerializeField] private GameObject _locationPrefab;
 
     private GameWorld _world;
     private Player _player;
@@ -88,6 +88,8 @@ public class TextQuest : MonoBehaviour
 
             _actionButtons[i].gameObject.SetActive(true);
             _actionButtonsText[i].text = $"Go to [{connector.ToLocation.Name}]";
+
+            _actionButtons[i].onClick.RemoveAllListeners();
             _actionButtons[i].onClick.AddListener(() => MovePlayer(connector.ToLocation));
 
             i++;
@@ -137,13 +139,19 @@ public class TextQuest : MonoBehaviour
             {
                 if (_world.World[i, j] == null)
                 {
-                    Instantiate(_emptyPrefab, _mapComponent.transform);
+                    InstantiateMapLocation(Color.white);
                     continue;
                 }
 
-                Instantiate(_wastelandPrefab, _mapComponent.transform);
+                InstantiateMapLocation(_world.World[i, j].Color);
             }
         }
+    }
+
+    private void InstantiateMapLocation(Color color)
+    {
+        var location = Instantiate(_locationPrefab, _mapComponent.transform);
+        location.GetComponentInChildren<Image>().color = color;
     }
 
 }

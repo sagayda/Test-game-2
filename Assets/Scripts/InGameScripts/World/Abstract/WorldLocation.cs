@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.InGameScripts.World.Absctract
 {
@@ -9,6 +10,7 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
         public abstract int Id { get; }
         public abstract string Name { get; }
         public abstract string Description { get; }
+        public abstract Color Color { get; }
 
         public int X { get; }
         public int Y { get; }
