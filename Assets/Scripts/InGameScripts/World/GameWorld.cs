@@ -19,7 +19,7 @@ namespace Assets.Scripts.InGameScripts
 
         public List<IInstantGameEvent> instantGameEvents { get; set; } = new();
 
-        public int WorldSize => World.Length;
+        public int WorldSize => World.GetLength(0);
         public WorldLocation[,] World { get; }
 
         public GameWorld(int id, string name, WorldLocation[,] world)

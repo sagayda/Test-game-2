@@ -19,7 +19,7 @@ namespace Assets.Scripts
             return new Player(CreatePlayerInfo(), playerLocation);
         }
 
-        public static GameWorld CreateWorld(int seed, float zoom, byte size)
+        public static GameWorld CreateWorld(int seed, float zoom, int size)
         {
             var world = new GameWorld(0, "FirstWorld", CreateWorldMap(seed, zoom, size));
             world.instantGameEvents.Add(new TestInstantGameEvent(world));
