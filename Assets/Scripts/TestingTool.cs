@@ -1,13 +1,9 @@
-﻿using Assets.Scripts.InGameScripts.Interfaces;
-using Assets.Scripts.InGameScripts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Assets.Scripts.InGameScripts.World.Absctract;
+﻿using Assets.Scripts.InGameScripts;
 using Assets.Scripts.InGameScripts.Events;
+using Assets.Scripts.InGameScripts.Interfaces;
 using Assets.Scripts.InGameScripts.World;
+using Assets.Scripts.InGameScripts.World.Absctract;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -23,9 +19,9 @@ namespace Assets.Scripts
             return new Player(CreatePlayerInfo(), playerLocation);
         }
 
-        public static GameWorld CreateWorld(byte size)
+        public static GameWorld CreateWorld(int seed, float zoom, byte size)
         {
-            var world = new GameWorld(0, "FirstWorld", CreateWorldMap(size));
+            var world = new GameWorld(0, "FirstWorld", CreateWorldMap(seed, zoom, size));
             world.instantGameEvents.Add(new TestInstantGameEvent(world));
             world.instantGameEvents.Add(new TestInstantGameEvent(world));
             world.instantGameEvents.Add(new TestInstantGameEvent(world));
@@ -33,7 +29,7 @@ namespace Assets.Scripts
             return world;
         }
 
-        public static WorldLocation[,] CreateWorldMap(int size)
+        public static WorldLocation[,] CreateWorldMap(int seed, float zoom, int size)
         {
             WorldLocation[,] map = new WorldLocation[size, size];
 
@@ -44,12 +40,10 @@ namespace Assets.Scripts
                     if (i == 0 && j == 0)
                     {
                         map[i, j] = new WorldLocation_Wasteland(i, j);
+                        continue;
                     }
 
-                    if (UnityEngine.Random.Range(0, 100) >= 80)
-                        continue;
-
-                    map[i, j] = CreateRandomLocation(i,j);
+                    map[i, j] = CreateRandomLocation(seed, zoom, i, j);
                 }
             }
 
@@ -59,8 +53,6 @@ namespace Assets.Scripts
                 {
                     if (map[i, j] == null)
                         continue;
-
-                    WorldLocationConnector[] connectors;
 
                     if (i == 0 && j == 0)
                     {
@@ -75,9 +67,9 @@ namespace Assets.Scripts
                         map[i, j].TryConnect(map[i, j - 1], new WorldLocationConnector_Free());
                         map[i, j].TryConnect(map[i, j + 1], new WorldLocationConnector_Free());
 
-                        if (UnityEngine.Random.Range(0, 100) >= 90)
+                        if (UnityEngine.Random.Range(0, 100) <= 95)
                         {
-                            map[i, j].TryConnect(map[i+1, j], new WorldLocationConnector_Free());
+                            map[i, j].TryConnect(map[i + 1, j], new WorldLocationConnector_Free());
                         }
 
                         continue;
@@ -88,7 +80,7 @@ namespace Assets.Scripts
                         map[i, j].TryConnect(map[i - 1, j], new WorldLocationConnector_Free());
                         map[i, j].TryConnect(map[i + 1, j], new WorldLocationConnector_Free());
 
-                        if (UnityEngine.Random.Range(0, 100) >= 90)
+                        if (UnityEngine.Random.Range(0, 100) <= 95)
                         {
                             map[i, j].TryConnect(map[i, j + 1], new WorldLocationConnector_Free());
                         }
@@ -96,20 +88,11 @@ namespace Assets.Scripts
                         continue;
                     }
 
-                    if (UnityEngine.Random.Range(0, 100) >= 95)
-                    {
-                        connectors = new WorldLocationConnector[3];
-                    }
-                    else
-                    {
-                        connectors = new WorldLocationConnector[4];
-                    }
-
                     map[i, j].TryConnect(map[i - 1, j], new WorldLocationConnector_Free());
                     map[i, j].TryConnect(map[i + 1, j], new WorldLocationConnector_Free());
                     map[i, j].TryConnect(map[i, j + 1], new WorldLocationConnector_Free());
 
-                    if (UnityEngine.Random.Range(0, 100) >= 95)
+                    if (UnityEngine.Random.Range(0, 100) <= 95)
                     {
                         map[i, j].TryConnect(map[i, j - 1], new WorldLocationConnector_Free());
                     }
@@ -119,19 +102,30 @@ namespace Assets.Scripts
             return map;
         }
 
-        public static WorldLocation CreateRandomLocation(int x, int y)
+        public static WorldLocation CreateRandomLocation(int seed, float zoom, int x, int y)
         {
-            int rnd = UnityEngine.Random.Range (0, 2);
 
-            switch (rnd)
+            float noise = Mathf.PerlinNoise(((x) + seed) / zoom, ((y) + seed) / zoom);
+
+            WorldLocation loc;
+
+            if (noise <= 0.5f)
             {
-                case 0:
-                    return new WorldLocation_Wasteland(x, y);
-                case 1:
-                    return new WorldLocation_Plain(x, y);
-                default:
-                    return new WorldLocation_Wasteland(x, y);
+                loc = new WorldLocation_Wasteland(x, y);
             }
+            else if (noise > 0.5f && noise <= 0.85f)
+            {
+                loc =  new WorldLocation_Plain(x, y);
+            }
+            else
+            {
+                loc = null;
+            }
+
+            if(loc != null)
+                loc.Noise = noise;
+
+            return loc;
         }
 
     }

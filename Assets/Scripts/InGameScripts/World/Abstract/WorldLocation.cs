@@ -15,6 +15,9 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
         public int X { get; }
         public int Y { get; }
 
+        //testing
+        public float Noise { get; set; }
+
         public WorldSublocation Sublocation { get; protected set; }
 
         public List<WorldLocationConnector> Connectors { get; protected set; } = new List<WorldLocationConnector>();

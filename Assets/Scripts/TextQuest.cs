@@ -1,14 +1,8 @@
 using Assets.Scripts;
 using Assets.Scripts.InGameScripts;
-using Assets.Scripts.InGameScripts.Events;
-using Assets.Scripts.InGameScripts.Interfaces;
-using Assets.Scripts.InGameScripts.World;
 using Assets.Scripts.InGameScripts.World.Absctract;
-using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using TMPro;
-using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,18 +14,27 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
     [SerializeField] private GameObject _map;
-    [SerializeField] private GridLayoutGroup _mapLayoutGroup;
-    [SerializeField] private GameObject _mapComponent;
+    [SerializeField] private GridLayoutGroup _locationsLayoutGroup;
+    [SerializeField] private GridLayoutGroup _connectorsLayoutGroup;
+    [SerializeField] private GameObject _mapComponent_Locations;
+    [SerializeField] private GameObject _mapComponent_Connectors;
     [SerializeField] private GameObject _locationPrefab;
+    [SerializeField] private GameObject _connectorPrefab;
+    [SerializeField] private Sprite[] _connectorsTextures;
+
+    [SerializeField] private SpriteRenderer _sprtRend;
 
     private GameWorld _world;
     private Player _player;
 
     public void Start()
     {
-        var world = TestingTool.CreateWorld(16);
+        int seed = 0;
+        float zoom = 10f;
 
-        var player = TestingTool.CreatePlayer(world.World[0,0]);
+        var world = TestingTool.CreateWorld(seed, zoom, 64);
+
+        var player = TestingTool.CreatePlayer(world.World[0, 0]);
 
         world.AddPlayer(player);
 
@@ -42,7 +45,7 @@ public class TextQuest : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.M))
         {
-            if(_map.activeSelf)
+            if (_map.activeSelf)
                 _map.SetActive(false);
             else
                 _map.SetActive(true);
@@ -87,7 +90,7 @@ public class TextQuest : MonoBehaviour
                 continue;
 
             _actionButtons[i].gameObject.SetActive(true);
-            _actionButtonsText[i].text = $"Go to [{connector.ToLocation.Name}]";
+            _actionButtonsText[i].text = $"Go to {connector.ToLocation.Name} ({connector.Direction.HumanName()})";
 
             _actionButtons[i].onClick.RemoveAllListeners();
             _actionButtons[i].onClick.AddListener(() => MovePlayer(connector.ToLocation));
@@ -104,12 +107,12 @@ public class TextQuest : MonoBehaviour
 
     private void ClearActions()
     {
-        foreach(var actionBtn in _actionButtons)
+        foreach (var actionBtn in _actionButtons)
         {
             actionBtn.gameObject.SetActive(false);
         }
 
-        foreach(var actionBtnText in _actionButtonsText)
+        foreach (var actionBtnText in _actionButtonsText)
         {
             actionBtnText.text = string.Empty;
         }
@@ -123,7 +126,12 @@ public class TextQuest : MonoBehaviour
 
     private void CreateMap()
     {
-        foreach (Transform child in _mapComponent.transform)
+        foreach (Transform child in _mapComponent_Locations.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Transform child in _mapComponent_Connectors.transform)
         {
             Destroy(child.gameObject);
         }
@@ -131,7 +139,12 @@ public class TextQuest : MonoBehaviour
         if (_world == null)
             return;
 
-        _mapLayoutGroup.constraintCount = _world.World.GetLength(0);
+        _locationsLayoutGroup.constraintCount = _world.World.GetLength(0);
+        _connectorsLayoutGroup.constraintCount = _world.World.GetLength(0);
+
+        Vector2 cellSize = new(1080f / _world.World.GetLength(0), 1000f / _world.World.GetLength(0));
+        _locationsLayoutGroup.cellSize = cellSize;
+        _connectorsLayoutGroup.cellSize = cellSize;
 
         for (int i = 0; i < _world.World.GetLength(0); i++)
         {
@@ -139,19 +152,111 @@ public class TextQuest : MonoBehaviour
             {
                 if (_world.World[i, j] == null)
                 {
-                    InstantiateMapLocation(Color.white);
+                    InstantiateMapLocation(Color.white, i, j);
+                    InstantiateMapConnector(Color.white, null);
                     continue;
                 }
 
-                InstantiateMapLocation(_world.World[i, j].Color);
+                InstantiateMapLocation(_world.World[i, j].Color, i, j);
+                InstantiateMapConnector(_world.World[i, j].Color, _world.World[i, j]);
+
             }
         }
     }
 
-    private void InstantiateMapLocation(Color color)
+    private Sprite GetConnectorSprite(WorldLocation location)
     {
-        var location = Instantiate(_locationPrefab, _mapComponent.transform);
-        location.GetComponentInChildren<Image>().color = color;
+        if (location == null)
+            return _connectorsTextures[15];
+
+        List<string> directions = new List<string>();
+
+        foreach (var connector in location.Connectors)
+        {
+            directions.Add(connector.Direction.HumanName());
+        }
+
+        directions.Sort();
+
+        string direction = string.Empty;
+
+        foreach (string directionName in directions)
+        {
+            direction += directionName;
+        }
+
+        switch (direction)
+        {
+            case "EastSouthWest"://North
+                return _connectorsTextures[0];
+            case "NorthSouthWest"://East
+                return _connectorsTextures[1];
+            case "EastNorthWest"://South
+                return _connectorsTextures[2];
+            case "EastNorthSouth"://West
+                return _connectorsTextures[3];
+            case "SouthWest"://EastNorth
+                return _connectorsTextures[4];
+            case "EastWest"://NorthSouth
+                return _connectorsTextures[5];
+            case "EastSouth"://NorthWest
+                return _connectorsTextures[6];
+            case "NorthWest"://EastSouth
+                return _connectorsTextures[7];
+            case "NorthSouth"://EastWest
+                return _connectorsTextures[8];
+            case "EastNorth"://SouthWest
+                return _connectorsTextures[9];
+            case "West"://EastNorthSouth
+                return _connectorsTextures[10];
+            case "South"://EastNorthWest
+                return _connectorsTextures[11];
+            case "East"://NorthSouthWest
+                return _connectorsTextures[12];
+            case "North"://EastSouthWest
+                return _connectorsTextures[13];
+            case "":
+                return _connectorsTextures[14];
+            case "EastNothSouthWest":
+                return _connectorsTextures[15];
+            default:
+                return null;
+        }
     }
+
+    private void InstantiateMapLocation(Color color, int x, int y)
+    {
+        var location = Instantiate(_locationPrefab, _mapComponent_Locations.transform);
+        location.GetComponentInChildren<Image>().color = color;
+        var locButton = location.GetComponentInChildren<Button>();
+        locButton.onClick.AddListener(() => PrintLocationInfo(x, y));
+    }
+    private void InstantiateMapConnector(Color color, WorldLocation location)
+    {
+        var sprite = GetConnectorSprite(location);
+
+        var connector = Instantiate(_connectorPrefab, _mapComponent_Connectors.transform);
+
+        var conImage = connector.GetComponent<Image>();
+        conImage.sprite = sprite;
+        conImage.color = color;
+    }
+
+    private void PrintLocationInfo(int x, int y)
+    {
+        string res = string.Empty;
+
+        res += "Locations: ";
+
+        foreach (var item in _world.World[x, y].Connectors)
+        {
+            res += item.Direction.HumanName() + ", ";
+        }
+
+        res += $"\nNoise : {_world.World[x, y].Noise}";
+
+        Debug.Log(res);
+    }
+
 
 }

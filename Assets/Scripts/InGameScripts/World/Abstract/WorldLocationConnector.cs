@@ -15,6 +15,8 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
 
         public WorldLocation ToLocation { get; protected set; }
 
+        public Direction Direction => GetDirection();
+
         public WorldLocationConnector()
         {
 
@@ -31,5 +33,31 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
             FromLocation = fromLocation;
             ToLocation = toLocation;
         }
+
+        public Direction GetDirection()
+        {
+            if (FromLocation == null || ToLocation == null)
+                throw new ArgumentNullException("Locations are empty!");
+
+            if (FromLocation.Y - ToLocation.Y == 1)
+                return Direction.North;
+            else if (FromLocation.Y - ToLocation.Y == -1)
+                return Direction.South;
+            else if (FromLocation.X - ToLocation.X == 1)
+                return Direction.West;
+            else if (FromLocation.X - ToLocation.X == -1)
+                return Direction.East;
+            else
+                throw new ArgumentException("Can't get direction!");
+
+        }
+    }
+
+    public enum Direction 
+    {
+        North,
+        East,
+        South,
+        West,
     }
 }
