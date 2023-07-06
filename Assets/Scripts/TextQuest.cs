@@ -1,7 +1,6 @@
 using Assets.Scripts;
 using Assets.Scripts.InGameScripts;
 using Assets.Scripts.InGameScripts.World.Absctract;
-using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -169,20 +168,6 @@ public class TextQuest : MonoBehaviour
         return _world;
     }
 
-    private void PrintLocationInfo(int x, int y)
-    {
-        string res = string.Empty;
 
-        res += "Locations: ";
-
-        foreach (var item in _world.World[x, y].Connectors)
-        {
-            res += item.Direction.HumanName() + ", ";
-        }
-
-        res += $"\nNoise : {_world.World[x, y].Noise}";
-
-        Debug.Log(res);
-    }
 
 }

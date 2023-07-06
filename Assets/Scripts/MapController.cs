@@ -1,4 +1,6 @@
 using Assets.Scripts.InGameScripts;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MapController : MonoBehaviour
@@ -40,28 +42,39 @@ public class MapController : MonoBehaviour
 
         if (_mapEnabled)
         {
+            #region cameraMoving
             float horizontalMovement = Input.GetAxis("Horizontal");
             float verticalMovement = Input.GetAxis("Vertical");
 
 
-            if (horizontalMovement > 0 && _mapCamera.transform.localPosition.x >= _borders.x)
+            if (horizontalMovement > 0 && _mapCamera.transform.localPosition.x - 50 >= _borders.x)
                 horizontalMovement = 0;
-            else if (horizontalMovement < 0 && _mapCamera.transform.localPosition.x <= _borders.x * -1)
+            else if (horizontalMovement < 0 && _mapCamera.transform.localPosition.x - 50 <= _borders.x * -1)
                 horizontalMovement = 0;
 
-            if (verticalMovement > 0 && _mapCamera.transform.localPosition.y >= _borders.y)
+            if (verticalMovement > 0 && _mapCamera.transform.localPosition.y + 50 >= _borders.y)
                 verticalMovement = 0;
-            else if (verticalMovement < 0 && _mapCamera.transform.localPosition.y <= _borders.y * -1)
+            else if (verticalMovement < 0 && _mapCamera.transform.localPosition.y + 50 <= _borders.y * -1)
                 verticalMovement = 0;
 
             Vector3 movement = new Vector3(horizontalMovement, verticalMovement, 0) * _moveSpeed * Time.deltaTime;
             _mapCamera.transform.Translate(movement);
 
-            // Приближение/отдаление камеры
             float zoomInput = Input.GetAxis("Mouse ScrollWheel");
             float zoomAmount = zoomInput * _zoomSpeed * Time.deltaTime;
-            _mapCamera.orthographicSize -= zoomAmount;
-            _mapCamera.orthographicSize = Mathf.Clamp(_mapCamera.orthographicSize, 1f, 10f);
+            _mapCamera.fieldOfView -= zoomAmount;
+            _mapCamera.fieldOfView = Mathf.Clamp(_mapCamera.fieldOfView, 5f, 60f);
+            #endregion
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                var mousePosition = Input.mousePosition;
+                mousePosition.z = 100;
+
+                var worldCoord = _mapCamera.ScreenToWorldPoint(mousePosition);
+                var gameCoords = WorldCoordinatesToGame(worldCoord);
+                PrintLocationInfo(gameCoords);
+            }
         }
     }
 
@@ -123,9 +136,9 @@ public class MapController : MonoBehaviour
         worldTexture.filterMode = FilterMode.Point;
         worldTexture.Apply();
 
-        Sprite sprite = Sprite.Create(worldTexture, new Rect(0, 0, worldSize, worldSize), new Vector2(0.5f, 0.5f));
+        Sprite sprite = Sprite.Create(worldTexture, new Rect(0, 0, worldSize, worldSize), new Vector2(0, 0));
 
-        _mapObject.transform.localScale = new Vector2(1000 / (worldSize / 100f), 1000 / (worldSize / 100f));
+        _mapObject.transform.localScale = new Vector2((100f / worldSize) * 100f, (100f / worldSize) * 100f);
         _mapObject.GetComponent<SpriteRenderer>().sprite = sprite;
 
         _mapCreated = true;
@@ -142,5 +155,37 @@ public class MapController : MonoBehaviour
         _gameWorld = gameWorld;
         _worldLoaded = true;
         return true;
+    }
+
+    private Vector2 WorldCoordinatesToGame(Vector2 worldCoords)
+    {
+        Vector2 gameCoords = new();
+
+        gameCoords.x = math.floor(worldCoords.x / (100f / _gameWorld.WorldSize));
+        gameCoords.y = math.floor((worldCoords.y * -1) / (100f / _gameWorld.WorldSize));
+
+        return gameCoords;
+    }
+
+    private void PrintLocationInfo(Vector2 coords)
+    {
+        int x = (int)math.floor(coords.x);
+        int y = (int)math.floor(coords.y);
+
+        string res = string.Empty;
+
+        res += $"Name: {_gameWorld.World[x, y].Name}";
+        res += $"\nX: {coords.x} Y:{coords.y}";
+
+        res += "\nConnectors: ";
+
+        foreach (var item in _gameWorld.World[x, y].Connectors)
+        {
+            res += item.Direction.HumanName() + ", ";
+        }
+
+        res += $"\nNoise : {_gameWorld.World[x, y].Noise}";
+
+        Debug.Log(res);
     }
 }
