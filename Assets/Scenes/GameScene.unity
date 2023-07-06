@@ -2434,7 +2434,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 1
   far clip plane: 100
   field of view: 34
   orthographic: 0
@@ -3024,8 +3024,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveSpeed: 50
-  _zoomSpeed: 2500
-  _borders: {x: 43, y: 46.5}
+  _zoomSpeed: 3000
+  _borders: {x: 46, y: 48}
   _textQuest: {fileID: 1392665216}
   _mainCamera: {fileID: 519420031}
   _mainCanvas: {fileID: 1986222426}

@@ -21,6 +21,9 @@ public class MapController : MonoBehaviour
 
     [SerializeField] private Sprite[] _connectorsTextures;
 
+    private float cameraMinFov = 5f;
+    private float cameraMaxFow = 60;
+
     private bool _mapEnabled = false;
     private bool _mapCreated = false;
 
@@ -63,7 +66,7 @@ public class MapController : MonoBehaviour
             float zoomInput = Input.GetAxis("Mouse ScrollWheel");
             float zoomAmount = zoomInput * _zoomSpeed * Time.deltaTime;
             _mapCamera.fieldOfView -= zoomAmount;
-            _mapCamera.fieldOfView = Mathf.Clamp(_mapCamera.fieldOfView, 5f, 60f);
+            _mapCamera.fieldOfView = Mathf.Clamp(_mapCamera.fieldOfView, cameraMinFov, cameraMaxFow);
             #endregion
 
             if (Input.GetMouseButtonDown(0))
@@ -116,6 +119,10 @@ public class MapController : MonoBehaviour
                 return false;
 
         int worldSize = _gameWorld.WorldSize;
+
+        _mapCamera.farClipPlane = worldSize*2;
+        cameraMinFov = worldSize / 80f;
+        cameraMaxFow = worldSize / 4f;
 
         Texture2D worldTexture = new(worldSize, worldSize);
 
