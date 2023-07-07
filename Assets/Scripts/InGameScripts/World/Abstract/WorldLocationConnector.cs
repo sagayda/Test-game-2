@@ -17,6 +17,20 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
 
         public Direction Direction => GetDirection();
 
+        public bool IsBidirectional 
+        { get
+            {
+                if(FromLocation == null || ToLocation == null)
+                    return false;
+
+                foreach (var toLocationConnector in ToLocation.Connectors)
+                    if(toLocationConnector.ToLocation == FromLocation)
+                        return true;
+
+                return false;
+            } 
+        }
+
         public WorldLocationConnector()
         {
 

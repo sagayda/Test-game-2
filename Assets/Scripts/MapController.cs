@@ -5,9 +5,15 @@ using UnityEngine;
 
 public class MapController : MonoBehaviour
 {
+    #region map settings
     [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] private float _zoomSpeed = 5f;
     [SerializeField] private Vector2 _borders = new Vector2(2.5f, 5f);
+    [SerializeField] private float cameraMinFov = 5f;
+    [SerializeField] private float cameraMaxFow = 60;
+
+    [SerializeField] private int _locationCellSize = 16;
+    #endregion
 
     [SerializeField] private TextQuest _textQuest;
 
@@ -21,8 +27,7 @@ public class MapController : MonoBehaviour
 
     [SerializeField] private Sprite[] _connectorsTextures;
 
-    private float cameraMinFov = 5f;
-    private float cameraMaxFow = 60;
+
 
     private bool _mapEnabled = false;
     private bool _mapCreated = false;
@@ -120,11 +125,48 @@ public class MapController : MonoBehaviour
 
         int worldSize = _gameWorld.WorldSize;
 
-        _mapCamera.farClipPlane = worldSize*2;
+        _mapCamera.farClipPlane = worldSize * 2;
         cameraMinFov = worldSize / 80f;
         cameraMaxFow = worldSize / 4f;
 
-        Texture2D worldTexture = new(worldSize, worldSize);
+        Texture2D worldTexture = new(worldSize * _locationCellSize, worldSize * _locationCellSize);
+
+        SetLocations(worldTexture);
+
+        //for (int i = 0; i < worldSize; i++)
+        //{
+        //    for (int j = 0; j < worldSize; j++)
+        //    {
+        //        if (_gameWorld.World[i, j] == null)
+        //        {
+        //            //worldTexture.SetPixel(i, j, Color.white);
+        //            SetCell(worldTexture, i, j, Color.white);
+        //            continue;
+        //        }
+
+        //        //worldTexture.SetPixel(i, j, _gameWorld.World[i, j].Color);
+        //        SetCell(worldTexture, i, j, _gameWorld.World[i, j].Color);
+        //    }
+        //}
+
+        worldTexture.filterMode = FilterMode.Point;
+        worldTexture.Apply();
+
+        Sprite sprite = Sprite.Create(worldTexture, new Rect(0, 0, worldSize * _locationCellSize, worldSize * _locationCellSize), new Vector2(0, 0));
+
+        _mapObject.transform.localScale = new Vector2((100f / (worldSize * _locationCellSize)) * 100f, (100f / (worldSize * _locationCellSize)) * 100f);
+        _mapObject.GetComponent<SpriteRenderer>().sprite = sprite;
+
+        _mapCreated = true;
+        return true;
+    }
+
+    private void SetLocations(Texture2D texture)
+    {
+        if (!_worldLoaded)
+            return;
+
+        int worldSize = _gameWorld.WorldSize;
 
         for (int i = 0; i < worldSize; i++)
         {
@@ -132,24 +174,61 @@ public class MapController : MonoBehaviour
             {
                 if (_gameWorld.World[i, j] == null)
                 {
-                    worldTexture.SetPixel(i, j, Color.white);
+                    //worldTexture.SetPixel(i, j, Color.white);
+                    SetCell(texture, i, j, Color.white);
                     continue;
                 }
 
-                worldTexture.SetPixel(i, j, _gameWorld.World[i, j].Color);
+                //worldTexture.SetPixel(i, j, _gameWorld.World[i, j].Color);
+                SetCell(texture, i, j, _gameWorld.World[i, j].Color);
             }
         }
 
-        worldTexture.filterMode = FilterMode.Point;
-        worldTexture.Apply();
+        void SetCell(Texture2D texture, int x, int y, Color color)
+        {
+            for (int i = x * _locationCellSize; i < (x * _locationCellSize) + _locationCellSize; i++)
+            {
+                for (int j = y * _locationCellSize; j < (y * _locationCellSize) + _locationCellSize; j++)
+                {
+                    texture.SetPixel(i, j, color);
+                }
+            }
 
-        Sprite sprite = Sprite.Create(worldTexture, new Rect(0, 0, worldSize, worldSize), new Vector2(0, 0));
+            texture.SetPixel(x * _locationCellSize, y * _locationCellSize, Color.black);
+        }
 
-        _mapObject.transform.localScale = new Vector2((100f / worldSize) * 100f, (100f / worldSize) * 100f);
-        _mapObject.GetComponent<SpriteRenderer>().sprite = sprite;
+    }
 
-        _mapCreated = true;
-        return true;
+    private void SetConnectors(Texture2D texture)
+    {
+        if (!_worldLoaded)
+            return;
+
+        int worldSize = _gameWorld.WorldSize;
+
+        for (int i = 0; i < worldSize; i++)
+        {
+            for (int j = 0; j < worldSize; j++)
+            {
+                if (_gameWorld.World[i, j] == null)
+                    continue;
+
+                SetConnectrCell(texture, i, j, _gameWorld.World[i, j].Color);
+            }
+        }
+
+        void SetConnectrCell(Texture2D texture, int x, int y, Color color)
+        {
+            for (int i = x * _locationCellSize; i < (x * _locationCellSize) + _locationCellSize; i++)
+            {
+                for (int j = y * _locationCellSize; j < (y * _locationCellSize) + _locationCellSize; j++)
+                {
+                    texture.SetPixel(i, j, color);
+                }
+            }
+
+            texture.SetPixel(x * _locationCellSize, y * _locationCellSize, Color.black);
+        }
     }
 
     private bool LoadWorld()
