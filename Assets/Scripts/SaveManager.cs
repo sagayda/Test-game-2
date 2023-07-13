@@ -7,7 +7,7 @@ namespace Assets.Scripts
 {
     public static class SaveManager
     {
-        public static void SaveLocation(WorldLocation worldLocation)
+        public static void SaveLocation(Location worldLocation)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
@@ -18,13 +18,13 @@ namespace Assets.Scripts
 
         }
 
-        public static WorldLocation LoadLocation()
+        public static Location LoadLocation()
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
 
             using (FileStream fs = new("Location.bs", FileMode.OpenOrCreate))
             {
-                return (WorldLocation)binaryFormatter.Deserialize(fs);
+                return (Location)binaryFormatter.Deserialize(fs);
             }
 
         }

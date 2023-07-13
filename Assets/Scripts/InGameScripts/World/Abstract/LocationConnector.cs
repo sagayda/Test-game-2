@@ -3,7 +3,7 @@
 namespace Assets.Scripts.InGameScripts.World.Absctract
 {
     [Serializable]
-    public abstract class WorldLocationConnector
+    public abstract class LocationConnector
     {
         public abstract int Id { get; }
 
@@ -11,38 +11,38 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
 
         public abstract string Description { get; }
 
-        public WorldLocation FromLocation { get; protected set; }
+        public Location FromLocation { get; protected set; }
 
-        public WorldLocation ToLocation { get; protected set; }
+        public Location ToLocation { get; protected set; }
 
         public Direction Direction => GetDirection();
 
-        public bool IsBidirectional 
-        { get
-            {
-                if(FromLocation == null || ToLocation == null)
-                    return false;
+        //public bool IsBidirectional 
+        //{ get
+        //    {
+        //        if(FromLocation == null || ToLocation == null)
+        //            return false;
 
-                foreach (var toLocationConnector in ToLocation.Connectors)
-                    if(toLocationConnector.ToLocation == FromLocation)
-                        return true;
+        //        foreach (var toLocationConnector in ToLocation.Connectors)
+        //            if(toLocationConnector.ToLocation == FromLocation)
+        //                return true;
 
-                return false;
-            } 
-        }
+        //        return false;
+        //    } 
+        //}
 
-        public WorldLocationConnector()
+        public LocationConnector()
         {
 
         }
 
-        public WorldLocationConnector(WorldLocation fromLocation, WorldLocation toLocation)
+        public LocationConnector(Location fromLocation, Location toLocation)
         {
             FromLocation = fromLocation;
             ToLocation = toLocation;
         }
 
-        public virtual void Connect(WorldLocation fromLocation, WorldLocation toLocation)
+        public virtual void Connect(Location fromLocation, Location toLocation)
         {
             FromLocation = fromLocation;
             ToLocation = toLocation;

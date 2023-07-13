@@ -9,9 +9,9 @@ namespace Assets.Scripts.InGameScripts
     {
         public IPlayerInfo Info { get; }
 
-        public WorldLocation Location { get; set; }
+        public Location Location { get; set; }
 
-        public Player(IPlayerInfo playerInfo, WorldLocation playerLocation)
+        public Player(IPlayerInfo playerInfo, Location playerLocation)
         {
             Info = playerInfo;
             Location = playerLocation;
@@ -23,16 +23,17 @@ namespace Assets.Scripts.InGameScripts
             Info.Thirst -= 2;
         }
 
-        public void GoToLocation(WorldLocation location)
+        //not working
+        public void GoToLocation(Location location)
         {
-            foreach (var connector in Location.Connectors)
-            {
-                if ((connector.ToLocation) == location)
-                {
-                    Location = location;
-                    break;
-                }
-            }
+            //foreach (var connector in Location.Connectors)
+            //{
+            //    if ((connector.ToLocation) == location)
+            //    {
+            //        Location = location;
+            //        break;
+            //    }
+            //}
         }
     }
 }

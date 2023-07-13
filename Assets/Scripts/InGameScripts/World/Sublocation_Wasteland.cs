@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace Assets.Scripts.InGameScripts.World
 {
     [Serializable]
-    public class WorldSublocation_Wasteland : WorldSublocation
+    public class Sublocation_Wasteland : Sublocation
     {
         public override int Id => 0;
         public override string Name => "Wasteland sublocation";
 
-        public WorldSublocation_Wasteland()
+        public Sublocation_Wasteland()
         {
             
         }

@@ -17,12 +17,12 @@ namespace Assets.Scripts.InGameScripts
 
         public List<Player> Players { get; private set; } = new List<Player>();
 
-        public List<IInstantGameEvent> instantGameEvents { get; set; } = new();
+        public List<IInstantGameEvent> InstantGameEvents { get; set; } = new();
 
         public int WorldSize => World.GetLength(0);
-        public WorldLocation[,] World { get; }
+        public Location[,] World { get; }
 
-        public GameWorld(int id, string name, WorldLocation[,] world)
+        public GameWorld(int id, string name, Location[,] world)
         {
             if(world == null)
                 throw new ArgumentNullException(nameof(world));
@@ -35,7 +35,7 @@ namespace Assets.Scripts.InGameScripts
             World = world;
         }
 
-        public GameWorld(int id, string name, WorldLocation[,] world, Player player)
+        public GameWorld(int id, string name, Location[,] world, Player player)
         {
             if (world == null)
                 throw new ArgumentNullException(nameof(world));
@@ -50,7 +50,7 @@ namespace Assets.Scripts.InGameScripts
             AddPlayer(player);
         }
 
-        public GameWorld(int id, string name, WorldLocation[,] world, List<Player> players)
+        public GameWorld(int id, string name, Location[,] world, List<Player> players)
         {
             if (world == null)
                 throw new ArgumentNullException(nameof(world));
@@ -67,7 +67,7 @@ namespace Assets.Scripts.InGameScripts
 
         public void TimeTickStep()
         {
-            foreach (var gameEvent in instantGameEvents) 
+            foreach (var gameEvent in InstantGameEvents) 
             {
                 CurrentTimeTick++;
                 gameEvent.Start();

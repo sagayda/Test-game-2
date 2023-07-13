@@ -91,7 +91,7 @@ public class TextQuest : MonoBehaviour
         }
     }
 
-    private void MovePlayer(WorldLocation location)
+    private void MovePlayer(Location location)
     {
         _player.GoToLocation(location);
         LoadActions();

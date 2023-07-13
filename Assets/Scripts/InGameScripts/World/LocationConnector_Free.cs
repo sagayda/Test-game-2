@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Assets.Scripts.InGameScripts.World
 {
     [Serializable]
-    public class WorldLocationConnector_Free : WorldLocationConnector
+    public class LocationConnector_Free : LocationConnector
     {
         public override int Id => 0;
 
@@ -16,12 +16,12 @@ namespace Assets.Scripts.InGameScripts.World
 
         public override string Description => "Player can move freely";
 
-        public WorldLocationConnector_Free() 
+        public LocationConnector_Free() 
         { 
         
         }
 
-        public WorldLocationConnector_Free(WorldLocation fromLocation, WorldLocation toLocation) : base(fromLocation, toLocation)
+        public LocationConnector_Free(Location fromLocation, Location toLocation) : base(fromLocation, toLocation)
         {
 
         }
