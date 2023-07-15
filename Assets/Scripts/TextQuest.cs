@@ -14,6 +14,7 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private Button[] _actionButtons;
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
+    [SerializeField] private WorldGenerator _worldGenerator;
 
     private GameWorld _world;
     private Player _player;
@@ -23,7 +24,7 @@ public class TextQuest : MonoBehaviour
         int seed = 0;
         float zoom = 10f;
 
-        var world = TestingTool.CreateWorld(seed, zoom, _worldSize);
+        var world = TestingTool.CreateWorld(_worldGenerator);
 
         var player = TestingTool.CreatePlayer(world.World[0, 0]);
 

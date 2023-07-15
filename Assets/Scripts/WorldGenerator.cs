@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.InGameScripts.World;
+using Assets.Scripts.InGameScripts.World.Absctract;
+using System;
+using System.Drawing;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -33,21 +37,29 @@ namespace Assets.Scripts
         [SerializeField] float heightZoom = 30f;
         [SerializeField] int heightSeedStep = 3000;
         [SerializeField][Range(0, 10)] float heightDensity = 1.0f;
-
+        [Space]
         [SerializeField] float additionalHeightZoom = 30f;
         [SerializeField] int additionalHeightSeedStep = 4000;
         [SerializeField][Range(0, 10)] float additionalHeightDensity = 1.0f;
-
-        [SerializeField][Range(0, 1)] float waterLevel = 0.35f;
         [SerializeField][Range(0, 100)] float layersMixStrength = 0.5f;
+        [Space]
+        [SerializeField][Range(0, 1)] float waterLevel = 0.35f;
+        [SerializeField] float riversSideLevel = 0.9f;
+
+        [Header("Rivers map settings")]
+        [SerializeField] float riversZoom = 30f;
+        [SerializeField] int riversSeedStep = 4000;
+        [SerializeField][Range(0, 10)] float riversDensity = 1.0f;
+        [SerializeField][Range(0,1)] float riversLevel = 0.5f;
+        [SerializeField][Range(0, 20)] float riversSharpness = 1f;
 
         [Header("Temperature map settings")]
         [SerializeField] float temperatureZoom = 30f;
         [SerializeField] int temperatureSeedStep = 3000;
         [SerializeField][Range(0, 10)] float temperatureDensity = 1.0f;
 
-        [SerializeField] float HoTImpactStrength = 30f;
-        [SerializeField] float HoTImpactSmoothing = 3.2f;
+        [SerializeField][Range(0.01f,200)] float HoTImpactStrength = 30f;
+        [SerializeField][Range(0.01f,10)] float HoTImpactSmoothing = 3.2f;
         [SerializeField][Range(0, 5)] float NoiseOnTemperatureImpact = 0.5f;
         [SerializeField][Range(-1, 1)] float Temperature = 0f;
 
@@ -89,13 +101,22 @@ namespace Assets.Scripts
 
         public float GetHeightValue(int x, int y)
         {
+            //main noise
             float noise = Mathf.PerlinNoise((x + worldSeed + heightSeedStep) / heightZoom, (y + worldSeed + heightSeedStep) / heightZoom);
             noise *= heightDensity;
 
+            //additional noise
             float additionalNoise = Mathf.PerlinNoise((x + worldSeed + additionalHeightSeedStep) / additionalHeightZoom, (y + worldSeed + additionalHeightSeedStep) / additionalHeightZoom);
             additionalNoise *= additionalHeightDensity;
-
             noise = (noise * layersMixStrength + additionalNoise) / (layersMixStrength + 1f);
+
+            //rivers noise
+            float riversNoise = GetRiversValue(x, y);
+
+            //float riverSideLevel = 0.9f;
+            
+            if(noise > waterLevel)
+                noise = noise - (riversNoise * ((noise - waterLevel) / riversSideLevel));
 
             return noise;
         }
@@ -137,21 +158,54 @@ namespace Assets.Scripts
             return temperatureNoise;
         }
 
+        public float GetRiversValue(int x, int y)
+        {
+            float rawNoise = Mathf.PerlinNoise((x + worldSeed + riversSeedStep) / riversZoom, (y + worldSeed + riversSeedStep) / riversZoom);
+
+            rawNoise -= riversLevel;
+
+            float noiseMax;
+
+            if (riversLevel < 0.5f)
+                noiseMax = riversLevel;
+            else
+                noiseMax = 1f - riversLevel;
+
+            float noise = rawNoise;
+            noise = Mathf.Abs(noise);
+            noise = Mathf.Clamp(noise, 0, noiseMax);
+
+            noise *= 1f / noiseMax;
+
+            noise = 1 - noise;
+            noise = Mathf.Pow(noise, riversSharpness);
+            noise *= riversDensity;
+
+            return noise;
+        }
+
         public float GetTestingValue(int x, int y)
         {
             float rawNoise = Mathf.PerlinNoise((x + worldSeed + testingSeedStep) / testingZoomX, (y + worldSeed + testingSeedStep) / testingZoomY);
-            rawNoise *= testingDensity;
 
             rawNoise -= testingMainLevel;
-            //rawNoise = Mathf.Abs(rawNoise);
 
-            float noise = testingMainLevel - rawNoise;
-            noise *= 1 / testingMainLevel;
+            float noiseMax;
 
-            //noise = 1 - noise;
+            if (testingMainLevel < 0.5f)
+                noiseMax = testingMainLevel;
+            else
+                noiseMax = 1f - testingMainLevel;
 
+            float noise = rawNoise;
+            noise = Mathf.Abs(noise);
+            noise = Mathf.Clamp(noise, 0, noiseMax);
+
+            noise *= 1f / noiseMax;
+
+            noise = 1 - noise;
             noise = Mathf.Pow(noise, testingSmoothing);
-
+            noise *= testingDensity;
 
             return noise;
         }
@@ -162,5 +216,101 @@ namespace Assets.Scripts
             noise *= testing1Density;
             return noise;
         }
+
+        public Location[,] CreateWorld()
+        {
+            Location[,] map = new Location[worldWidth, worldHeight];
+
+            for (int x = 0; x < worldWidth; x++)
+            {
+                for (int y = 0; y < worldHeight; y++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        map[x, y] = new Location_Wasteland(x, y);
+                        continue;
+                    }
+
+                    map[x, y] = GetLocation(x, y);
+                }
+            }
+
+            return map;
+        }
+        #region Map generation methods
+        private Location GetLocation(int x, int y)
+        {
+            float height = GetHeightValue(x, y);
+            float river = GetRiversValue(x, y);
+
+
+            if (height < waterLevel)
+            {
+                return GetWaterLocation(x, y, height);
+            }
+            else
+            {
+
+                if(river > 0.8f)
+                {
+                    return GetWaterLocation(x, y, height, true);
+                }
+                else
+                {
+                    return GetLandLocation(x, y, height);
+                }
+            }
+        }
+
+        private Location GetWaterLocation(int x, int y, float height, bool isRiver = false)
+        {
+            if(isRiver)
+            {
+                return new Location_River(x, y);
+            }
+
+            float temperature = GetTemperatureValue(x, y);
+
+            if(temperature < 0.3f)
+            {
+                return new Location_ArcticDesert(x, y);
+            }
+
+            if(height > waterLevel / 2f)
+            {
+                return new Location_Ocean(x, y);
+            }
+            else
+            {
+                return new Location_DeepOcean(x, y);
+            }
+        }
+
+        private Location GetLandLocation(int x, int y, float height)
+        {
+            float temperature = GetTemperatureValue(x, y);
+
+            if(height < waterLevel + 0.02f)
+            {
+                return new Location_SandBeach(x, y);
+            }
+
+            float heightStep = (1f - waterLevel) / 4f;
+
+            if(height < waterLevel + heightStep * 2)
+            {
+                return new Location_Plain(x, y);
+            }
+            else if (height < waterLevel + heightStep * 3)
+            {
+                return new Location_Foothills(x, y);
+            }
+            else
+            {
+                return new Location_Mountains(x, y);
+            }
+        }
+        #endregion
+
     }
 }

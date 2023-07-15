@@ -194,7 +194,7 @@ public class MapController : MonoBehaviour
                 }
             }
 
-            texture.SetPixel(x * _locationCellSize, y * _locationCellSize, Color.black);
+            //texture.SetPixel(x * _locationCellSize, y * _locationCellSize, Color.black);
         }
 
     }
