@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using Assets.Scripts.InGameScripts;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -17,6 +18,8 @@ public class MapController : MonoBehaviour
 
     [SerializeField] private TextQuest _textQuest;
 
+    [SerializeField] private GameObject _playerMarkPrefab;
+
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private Canvas _mainCanvas;
 
@@ -34,6 +37,8 @@ public class MapController : MonoBehaviour
 
     private bool _worldLoaded = false;
     private GameWorld _gameWorld;
+
+    private Transform _playerMarkTransform;
 
     private void Update()
     {
@@ -86,6 +91,11 @@ public class MapController : MonoBehaviour
         }
     }
 
+    private void MovePlayerMark()
+    {
+        _playerMarkTransform.position = GameCoordinatesToWorld(_gameWorld.Players[0].VectorPosition);
+    }
+
     private void EnableMap()
     {
         if (!_mapCreated)
@@ -99,6 +109,7 @@ public class MapController : MonoBehaviour
         _mapCamera.gameObject.SetActive(true);
         _mapCanvas.gameObject.SetActive(true);
 
+        Assets.Scripts.EventBus.playerPositionChanged += MovePlayerMark;
         _mapEnabled = true;
     }
 
@@ -114,6 +125,7 @@ public class MapController : MonoBehaviour
         _mainCamera.gameObject.SetActive(true);
         _mainCanvas.gameObject.SetActive(true);
 
+        Assets.Scripts.EventBus.playerPositionChanged -= MovePlayerMark;
         _mapEnabled = false;
     }
 
@@ -133,22 +145,6 @@ public class MapController : MonoBehaviour
 
         SetLocations(worldTexture);
 
-        //for (int i = 0; i < worldSize; i++)
-        //{
-        //    for (int j = 0; j < worldSize; j++)
-        //    {
-        //        if (_gameWorld.World[i, j] == null)
-        //        {
-        //            //worldTexture.SetPixel(i, j, Color.white);
-        //            SetCell(worldTexture, i, j, Color.white);
-        //            continue;
-        //        }
-
-        //        //worldTexture.SetPixel(i, j, _gameWorld.World[i, j].Color);
-        //        SetCell(worldTexture, i, j, _gameWorld.World[i, j].Color);
-        //    }
-        //}
-
         worldTexture.filterMode = FilterMode.Point;
         worldTexture.Apply();
 
@@ -156,6 +152,10 @@ public class MapController : MonoBehaviour
 
         _mapObject.transform.localScale = new Vector2((100f / (worldSize * _locationCellSize)) * 100f, (100f / (worldSize * _locationCellSize)) * 100f);
         _mapObject.GetComponent<SpriteRenderer>().sprite = sprite;
+
+        _playerMarkTransform = Instantiate(_playerMarkPrefab, _mapObject.transform).transform;
+
+        _playerMarkTransform.position = GameCoordinatesToWorld(_gameWorld.Players[0].VectorPosition);
 
         _mapCreated = true;
         return true;
@@ -251,6 +251,18 @@ public class MapController : MonoBehaviour
         gameCoords.y = math.floor((worldCoords.y * -1) / (100f / _gameWorld.WorldSize));
 
         return gameCoords;
+    }
+
+    private Vector2 GameCoordinatesToWorld(Vector2 gameCoords) 
+    {
+        Vector2 worldCoords = new();
+
+        float locationCellSize = 100f / _gameWorld.WorldSize;
+
+        worldCoords.x = gameCoords.x * locationCellSize + (locationCellSize / 2f);
+        worldCoords.y = gameCoords.y * -1 * locationCellSize - (locationCellSize / 2f);
+
+        return worldCoords;
     }
 
     private void PrintLocationInfo(Vector2 coords)

@@ -14,9 +14,9 @@ namespace Assets.Scripts
             return new PlayerInfo(0, "TestPlayer", "TEST", 100, 85, 50, 1, 0, 100, 100, 100, 10, 200, 100);
         }
 
-        public static Player CreatePlayer(Location playerLocation)
+        public static Player CreatePlayer(GameWorld world)
         {
-            return new Player(CreatePlayerInfo(), playerLocation);
+            return new Player(CreatePlayerInfo(), world);
         }
 
         public static GameWorld CreateWorld(WorldGenerator worldGenerator)

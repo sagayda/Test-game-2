@@ -1,6 +1,8 @@
 ﻿using Assets.Scripts.InGameScripts.Interfaces;
 using Assets.Scripts.InGameScripts.World.Absctract;
 using System;
+using System.Collections;
+using UnityEngine;
 
 namespace Assets.Scripts.InGameScripts
 {
@@ -9,12 +11,16 @@ namespace Assets.Scripts.InGameScripts
     {
         public IPlayerInfo Info { get; }
 
-        public Location Location { get; set; }
+        public PlayerPosition Position { get; }
 
-        public Player(IPlayerInfo playerInfo, Location playerLocation)
+        public Vector2 VectorPosition { get; private set; }
+
+        public GameWorld World { get; }
+
+        public Player(IPlayerInfo playerInfo, GameWorld world)
         {
             Info = playerInfo;
-            Location = playerLocation;
+            World = world;
         }
 
         public void TimeStep()
@@ -23,17 +29,13 @@ namespace Assets.Scripts.InGameScripts
             Info.Thirst -= 2;
         }
 
-        //not working
-        public void GoToLocation(Location location)
+        public void GoToCoordinates(Vector2 coordinates)
         {
-            //foreach (var connector in Location.Connectors)
-            //{
-            //    if ((connector.ToLocation) == location)
-            //    {
-            //        Location = location;
-            //        break;
-            //    }
-            //}
+            //VectorPosition = Vector2.MoveTowards(VectorPosition, coordinates, 1 * Time.deltaTime);
+            VectorPosition = coordinates;
+
+            EventBus.playerPositionChanged?.Invoke();
         }
+
     }
 }

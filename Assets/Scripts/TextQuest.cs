@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using Assets.Scripts.InGameScripts;
 using Assets.Scripts.InGameScripts.World.Absctract;
+using System.Collections;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 
 public class TextQuest : MonoBehaviour
 {
-    [SerializeField] private int _worldSize = 128;
+    //[SerializeField] private int _worldSize = 128;
 
     [SerializeField] private TMP_Text _gameText;
     [SerializeField] private Button[] _actionButtons;
@@ -21,16 +22,23 @@ public class TextQuest : MonoBehaviour
 
     public void Start()
     {
-        int seed = 0;
-        float zoom = 10f;
-
         var world = TestingTool.CreateWorld(_worldGenerator);
 
-        var player = TestingTool.CreatePlayer(world.World[0, 0]);
+        var player = TestingTool.CreatePlayer(world);
 
         world.AddPlayer(player);
 
         Load(world, player);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.W))
+        {
+            MovePlayer(_player.VectorPosition + new Vector2(2, 0));
+        }
+
+        Debug.Log(_player.VectorPosition);
     }
 
     public void SaveGame()
@@ -63,20 +71,20 @@ public class TextQuest : MonoBehaviour
         if (_player == null || _world == null)
             return;
 
-        int i = 0;
-        foreach (var connector in _player.Location.Connectors)
-        {
-            if (connector == null)
-                continue;
+        //int i = 0;
+        //foreach (var connector in _player.Location.Connectors)
+        //{
+        //    if (connector == null)
+        //        continue;
 
-            _actionButtons[i].gameObject.SetActive(true);
-            _actionButtonsText[i].text = $"Go to {connector.ToLocation.Name} ({connector.Direction.HumanName()})";
+        //    _actionButtons[i].gameObject.SetActive(true);
+        //    _actionButtonsText[i].text = $"Go to {connector.ToLocation.Name} ({connector.Direction.HumanName()})";
 
-            _actionButtons[i].onClick.RemoveAllListeners();
-            _actionButtons[i].onClick.AddListener(() => MovePlayer(connector.ToLocation));
+        //    _actionButtons[i].onClick.RemoveAllListeners();
+        //    _actionButtons[i].onClick.AddListener(() => MovePlayer(connector.ToLocation));
 
-            i++;
-        }
+        //    i++;
+        //}
     }
 
     private void ClearActions()
@@ -92,11 +100,33 @@ public class TextQuest : MonoBehaviour
         }
     }
 
-    private void MovePlayer(Location location)
+    //private void MovePlayer(Location location)
+    //{
+    //    _player.GoToLocation(location);
+    //    LoadActions();
+    //}
+
+    public void MovePlayer(Vector2 coords)
     {
-        _player.GoToLocation(location);
-        LoadActions();
+        StartCoroutine(MoveToLocation(coords));
+
+        IEnumerator MoveToLocation(Vector2 targetPosition)
+        {
+            // Задержка в 1 секунду
+            yield return new WaitForSeconds(0.5f);
+
+            _player.GoToCoordinates(targetPosition);
+
+            //// Перемещение игрока к указанным координатам
+            //while (VectorPosition != targetPosition)
+            //{
+            //    VectorPosition = Vector2.MoveTowards(VectorPosition, targetPosition, 1 * Time.deltaTime);
+            //    yield return null;
+            //}
+        }
     }
+
+
 
     public void NextTimeTick()
     {
@@ -104,71 +134,9 @@ public class TextQuest : MonoBehaviour
         _statsController.UpdateStats();
     }
 
-    //private Sprite GetConnectorSprite(WorldLocation location)
-    //{
-    //    if (location == null)
-    //        return _connectorsTextures[15];
-
-    //    List<string> directions = new List<string>();
-
-    //    foreach (var connector in location.Connectors)
-    //    {
-    //        directions.Add(connector.Direction.HumanName());
-    //    }
-
-    //    directions.Sort();
-
-    //    string direction = string.Empty;
-
-    //    foreach (string directionName in directions)
-    //    {
-    //        direction += directionName;
-    //    }
-
-    //    switch (direction)
-    //    {
-    //        case "EastSouthWest"://North
-    //            return _connectorsTextures[0];
-    //        case "NorthSouthWest"://East
-    //            return _connectorsTextures[1];
-    //        case "EastNorthWest"://South
-    //            return _connectorsTextures[2];
-    //        case "EastNorthSouth"://West
-    //            return _connectorsTextures[3];
-    //        case "SouthWest"://EastNorth
-    //            return _connectorsTextures[4];
-    //        case "EastWest"://NorthSouth
-    //            return _connectorsTextures[5];
-    //        case "EastSouth"://NorthWest
-    //            return _connectorsTextures[6];
-    //        case "NorthWest"://EastSouth
-    //            return _connectorsTextures[7];
-    //        case "NorthSouth"://EastWest
-    //            return _connectorsTextures[8];
-    //        case "EastNorth"://SouthWest
-    //            return _connectorsTextures[9];
-    //        case "West"://EastNorthSouth
-    //            return _connectorsTextures[10];
-    //        case "South"://EastNorthWest
-    //            return _connectorsTextures[11];
-    //        case "East"://NorthSouthWest
-    //            return _connectorsTextures[12];
-    //        case "North"://EastSouthWest
-    //            return _connectorsTextures[13];
-    //        case "":
-    //            return _connectorsTextures[14];
-    //        case "EastNothSouthWest":
-    //            return _connectorsTextures[15];
-    //        default:
-    //            return null;
-    //    }
-    //}
-
     public GameWorld GetGameWorld()
     {
         return _world;
     }
-
-
 
 }

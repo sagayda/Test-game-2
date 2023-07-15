@@ -19,7 +19,7 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
         public float Noise { get; set; }
         #endregion
 
-        public Sublocation Sublocation { get; protected set; }
+        public Sublocation[,] Sublocations { get; protected set; }
 
         public LocationBarriers Barriers { get; protected set; } = new LocationBarriers();
 
@@ -27,13 +27,29 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
 
         public Location(int x, int y)
         {
+            Sublocations = new Sublocation[10,10];
+
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    Sublocations[i,j] = new Sublocation_Default();
+                }
+            } 
+
             X = x;
             Y = y;
         }
 
-        public Location(int x, int y, Sublocation sublocation)
+        public Location(int x, int y, Sublocation[,] sublocations)
         {
-            Sublocation = sublocation;
+            if(sublocations == null)
+                throw new ArgumentNullException(nameof(sublocations));
+
+            if (sublocations.GetLength(0) != 10 || sublocations.GetLength(1) != 10)
+                throw new ArgumentException("Invalid sublocation array size!");
+
+            Sublocations = sublocations;
 
             X = x;
             Y = y;
@@ -46,52 +62,6 @@ namespace Assets.Scripts.InGameScripts.World.Absctract
             X = x;
             Y = y;
         }
-
-        //public WorldLocation(int x, int y, WorldSublocation sublocation, List<WorldLocationConnector> connectors)
-        //{
-        //    if (sublocation == null)
-        //        throw new ArgumentNullException(nameof(sublocation));
-
-        //    if (connectors == null)
-        //        throw new ArgumentNullException(nameof(connectors));
-
-        //    X = x;
-        //    Y = y;
-        //    Connectors = connectors;
-        //    Sublocation = sublocation;
-        //}
-
-        //public bool IsNeighbour(WorldLocation location)
-        //{
-        //    foreach (var connector in Connectors)
-        //    {
-        //        if (connector.ToLocation == location)
-        //            return true;
-        //    }
-
-        //    return false;
-        //}
-
-        //public void SetConnectors(List<WorldLocationConnector> connectors)
-        //{
-        //    if (connectors == null)
-        //        throw new ArgumentNullException(nameof(connectors));
-
-        //    Connectors = connectors;
-        //}
-
-        //public bool TryConnect(WorldLocation location, WorldLocationConnector connector)
-        //{
-        //    if (location == null || connector == null)
-        //        return false;
-
-        //    if (Math.Abs(X - location.X) > 1 || Math.Abs(Y - location.Y) > 1)
-        //        return false;
-
-        //    connector.Connect(this, location);
-        //    Connectors.Add(connector);
-        //    return true;
-        //}
 
     }
 }

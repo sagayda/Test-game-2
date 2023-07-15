@@ -17,7 +17,7 @@ namespace Assets.Scripts.InGameScripts.World
         {
         }
 
-        public Location_SandBeach(int x, int y, Sublocation sublocation) : base(x, y, sublocation)
+        public Location_SandBeach(int x, int y, Sublocation[,] sublocations) : base(x, y, sublocations)
         {
         }
 

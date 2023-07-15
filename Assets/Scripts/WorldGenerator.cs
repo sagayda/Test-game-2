@@ -264,19 +264,21 @@ namespace Assets.Scripts
 
         private Location GetWaterLocation(int x, int y, float height, bool isRiver = false)
         {
-            if(isRiver)
-            {
-                return new Location_River(x, y);
-            }
+
 
             float temperature = GetTemperatureValue(x, y);
 
-            if(temperature < 0.3f)
+            if(temperature < 0.15f)
             {
                 return new Location_ArcticDesert(x, y);
             }
 
-            if(height > waterLevel / 2f)
+            if (isRiver)
+            {
+                return new Location_River(x, y);
+            }
+
+            if (height > waterLevel / 2f)
             {
                 return new Location_Ocean(x, y);
             }
@@ -290,7 +292,12 @@ namespace Assets.Scripts
         {
             float temperature = GetTemperatureValue(x, y);
 
-            if(height < waterLevel + 0.02f)
+            if(temperature < 0.15f)
+            {
+                return new Location_ArcticDesert(x, y);
+            }
+
+            if (height < waterLevel + 0.02f)
             {
                 return new Location_SandBeach(x, y);
             }

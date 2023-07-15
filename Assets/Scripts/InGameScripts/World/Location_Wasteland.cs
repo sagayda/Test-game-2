@@ -13,7 +13,7 @@ namespace Assets.Scripts.InGameScripts.World
         public override int Id => 0;
         public override Color Color => Color.yellow;
 
-        public Location_Wasteland(int x, int y, Sublocation sublocation) : base(x, y, sublocation)
+        public Location_Wasteland(int x, int y, Sublocation[,] sublocations) : base(x, y, sublocations)
         {
 
         }

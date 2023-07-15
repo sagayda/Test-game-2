@@ -22,7 +22,7 @@ namespace Assets.Scripts.InGameScripts.World
         {
         }
 
-        public Location_Mountains(int x, int y, Sublocation sublocation) : base(x, y, sublocation)
+        public Location_Mountains(int x, int y, Sublocation[,] sublocations) : base(x, y, sublocations)
         {
         }
 
