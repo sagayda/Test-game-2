@@ -434,14 +434,14 @@ public class MapController : MonoBehaviour
 
         return new Vector2(worldCoordinates.x - spacing.x, worldCoordinates.y - spacing.y);
     }
-
+    //updated
     private Vector2 ScreenCoordinatesToWorld(Vector3 screenCoordinates)
     {
         screenCoordinates.z = Mathf.Abs(_mapCamera.transform.position.z) + Mathf.Abs(_mapCanvas.transform.position.z);
 
         return _mapCamera.ScreenToWorldPoint(screenCoordinates);
     }
-
+    //updated
     private Vector2Int WorldCoordinatesToGame(Vector2 worldCoords)
     {
         if (_gameWorld.Width > _gameWorld.Height)
