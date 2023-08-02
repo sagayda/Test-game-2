@@ -33,12 +33,11 @@ public class TextQuest : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.W))
-        {
-            MovePlayer(_player.VectorPosition + new Vector2(2, 0));
-        }
+        //if (Input.GetKeyUp(KeyCode.W))
+        //{
+        //    MovePlayer(_player.VectorPosition + new Vector2(2, 0));
+        //}
 
-        Debug.Log(_player.VectorPosition);
     }
 
     public void SaveGame()

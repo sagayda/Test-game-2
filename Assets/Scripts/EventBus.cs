@@ -8,6 +8,14 @@ namespace Assets.Scripts
 {
     public static class EventBus
     {
-        public static Action playerPositionChanged;
+        public static class WorldEvents
+        {
+            public static Action onPlayerPositionChanged;
+        }
+
+        public static class MapEvents
+        {
+            public static Action onMapScaleChanged;
+        }
     }
 }

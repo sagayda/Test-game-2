@@ -34,7 +34,7 @@ namespace Assets.Scripts.InGameScripts
             //VectorPosition = Vector2.MoveTowards(VectorPosition, coordinates, 1 * Time.deltaTime);
             VectorPosition = coordinates;
 
-            EventBus.playerPositionChanged?.Invoke();
+            EventBus.WorldEvents.onPlayerPositionChanged?.Invoke();
         }
 
     }

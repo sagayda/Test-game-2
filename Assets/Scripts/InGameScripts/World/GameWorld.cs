@@ -2,9 +2,6 @@
 using Assets.Scripts.InGameScripts.World.Absctract;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assets.Scripts.InGameScripts
 {
@@ -19,7 +16,9 @@ namespace Assets.Scripts.InGameScripts
 
         public List<IInstantGameEvent> InstantGameEvents { get; set; } = new();
 
-        public int WorldSize => World.GetLength(0);
+        public int WorldWidth => World.GetLength(0);
+        public int WorldHeight => World.GetLength(1);
+
         public Location[,] World { get; }
 
         public GameWorld(int id, string name, Location[,] world)
