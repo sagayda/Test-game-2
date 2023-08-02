@@ -3721,8 +3721,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldSeed: 585
-  worldWidth: 128
-  worldHeight: 128
+  worldWidth: 256
+  worldHeight: 256
   progressZoom: 70
   progressSeedStep: 1000
   progressDensity: 0.7
