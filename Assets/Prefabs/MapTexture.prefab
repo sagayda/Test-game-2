@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2415344805471804180}
+  - component: {fileID: 7301357717859821977}
   - component: {fileID: 2415344805471804181}
   m_Layer: 0
   m_Name: MapTexture
@@ -17,7 +17,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2415344805471804180
+--- !u!4 &7301357717859821977
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

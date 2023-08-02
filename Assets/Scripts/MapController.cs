@@ -9,7 +9,7 @@ public class MapController : MonoBehaviour
 {
     [SerializeField] private float _cameraMoveSpeed = 50f;
     [SerializeField] private float _cameraZoomSpeed = 4000f;
-    [SerializeField] private Vector2 _borders = new Vector2(2.5f, 5f);
+    [SerializeField] private Vector2 _borders = new(10f,10f);
 
     [SerializeField] private TextQuest _textQuest;
 
@@ -68,40 +68,37 @@ public class MapController : MonoBehaviour
         if (IsMapEnabled)
         {
             #region cameraMoving
-            float horizontalMovement = Input.GetAxis("Horizontal");
-            float verticalMovement = Input.GetAxis("Vertical");
-
-
-            if (horizontalMovement > 0 && _mapCamera.transform.localPosition.x - 50 >= _borders.x)
-                horizontalMovement = 0;
-            else if (horizontalMovement < 0 && _mapCamera.transform.localPosition.x - 50 <= _borders.x * -1)
-                horizontalMovement = 0;
-
-            if (verticalMovement > 0 && _mapCamera.transform.localPosition.y + 50 >= _borders.y)
-                verticalMovement = 0;
-            else if (verticalMovement < 0 && _mapCamera.transform.localPosition.y + 50 <= _borders.y * -1)
-                verticalMovement = 0;
-
-            Vector3 movement = _cameraMoveSpeed * Time.deltaTime * new Vector3(horizontalMovement, verticalMovement, 0);
-            _mapCamera.transform.Translate(movement);
-
             float zoomAmount = Input.GetAxis("Mouse ScrollWheel") * _cameraZoomSpeed * Time.deltaTime;
             _mapCamera.fieldOfView -= zoomAmount;
             _mapCamera.fieldOfView = Mathf.Clamp(_mapCamera.fieldOfView, _cameraMinFov, _cameraMaxFov);
 
-            CheckScale();
+            //camera moving to cursor
+            if(zoomAmount != 0)
+            {
+                Vector3 mousePos = Input.mousePosition;
+                Vector3 targetPos = ScreenCoordinatesToWorld(mousePos);
+                _mapCamera.transform.position = Vector3.Lerp(_mapCamera.transform.position, targetPos, Time.deltaTime * Mathf.Pow(_cameraMaxFov - _mapCamera.fieldOfView, 1.2f));
+            }
 
+            float horizontalMovement = Input.GetAxis("Horizontal");
+            float verticalMovement = Input.GetAxis("Vertical");
+            
+            Vector3 movement = _cameraMoveSpeed * Time.deltaTime * new Vector3(horizontalMovement, verticalMovement, 0);
+
+            Vector3 position = _mapCamera.transform.position + movement;
+            position.x = Mathf.Clamp(position.x, _borders.x * -1, _borders.x);
+            position.y = Mathf.Clamp(position.y, _borders.y * -1, _borders.y);
+            _mapCamera.transform.position = position;
+
+            CheckScale();
             #endregion
 
             if (Input.GetMouseButtonDown(0))
             {
-                var mousePosition = Input.mousePosition;
-                mousePosition.z = 100;
+                var worldCoords = ScreenCoordinatesToWorld(Input.mousePosition);
+                var gameCoords = WorldCoordinatesToGame(worldCoords);
 
-                var worldCoords = _mapCamera.ScreenToWorldPoint(mousePosition);
-                var locationCoords = GetLocationCoordinates(worldCoords);
-
-                SelectLocation(locationCoords);
+                Debug.Log($"wCords\n\tx:{worldCoords.x}\n\ty:{worldCoords.y}\ngCords\n\tx:{gameCoords.x}\n\ty:{gameCoords.y} ");
             }
         }
     }
@@ -161,7 +158,6 @@ public class MapController : MonoBehaviour
         IsMapEnabled = false;
     }
 
-
     private bool LoadWorld()
     {
         GameWorld gameWorld = _textQuest.GetGameWorld();
@@ -186,11 +182,11 @@ public class MapController : MonoBehaviour
                 continue;
             }
 
-            int mapWidth = Mathf.RoundToInt(_gameWorld.WorldWidth * ((_maxScaleLevel - scaleLevel) * _minToMaxResolutionRatio));
-            int mapHeight = Mathf.RoundToInt(_gameWorld.WorldHeight * ((_maxScaleLevel - scaleLevel) * _minToMaxResolutionRatio));
+            int mapWidth = Mathf.RoundToInt(_gameWorld.Width * ((_maxScaleLevel - scaleLevel) * _minToMaxResolutionRatio));
+            int mapHeight = Mathf.RoundToInt(_gameWorld.Height * ((_maxScaleLevel - scaleLevel) * _minToMaxResolutionRatio));
 
             Texture2D texture = PaintMap(_gameWorld, mapWidth, mapHeight);
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
 
             GameObject mapObject = Instantiate(_mapSpriteObjectPrefab, _mapParentTransform);
 
@@ -211,13 +207,13 @@ public class MapController : MonoBehaviour
 
     private bool LoadSettings()
     {
-        _mapGrid.cellSize = new Vector3(100f / _gameWorld.WorldWidth, 100f / _gameWorld.WorldHeight);
+        _mapGrid.cellSize = new Vector3(100f / _gameWorld.Width, 100f / _gameWorld.Height);
 
-        int worldSize = _gameWorld.WorldWidth > _gameWorld.WorldHeight ? _gameWorld.WorldWidth : _gameWorld.WorldHeight;
+        int worldSize = _gameWorld.Width > _gameWorld.Height ? _gameWorld.Width : _gameWorld.Height;
 
         _mapCamera.farClipPlane = worldSize * 2;
         _cameraMinFov = 200f / worldSize;
-        _cameraMaxFov = _gameWorld.WorldWidth > _gameWorld.WorldHeight ? 34f : 61f;
+        _cameraMaxFov = _gameWorld.Width > _gameWorld.Height ? 34f : 61f;
         _mapCamera.fieldOfView = _cameraMaxFov;
 
         _maxScaleLevel = Mathf.CeilToInt(1f / _minToMaxResolutionRatio);
@@ -268,8 +264,8 @@ public class MapController : MonoBehaviour
     {
         Texture2D texture = new(width * LOCATION_CELL_SIZE, height * LOCATION_CELL_SIZE);
 
-        float horizontalRatio = world.WorldWidth / (float)width;
-        float verticalRatio = world.WorldHeight / (float)height;
+        float horizontalRatio = world.Width / (float)width;
+        float verticalRatio = world.Height / (float)height;
 
         Debug.Log($"width {width}, height {height}, ration h {horizontalRatio}, ration v {verticalRatio}");
 
@@ -429,7 +425,7 @@ public class MapController : MonoBehaviour
     {
         Debug.Log($"WC: {worldCoordinates.x}, {worldCoordinates.y}");
 
-        Vector2 locationCellSize = new Vector2(100f / _gameWorld.WorldWidth, 100f / _gameWorld.WorldHeight);
+        Vector2 locationCellSize = new Vector2(100f / _gameWorld.Width, 100f / _gameWorld.Height);
 
         Vector2 spacing = new Vector2(worldCoordinates.x % locationCellSize.x, worldCoordinates.y % locationCellSize.y);
 
@@ -441,17 +437,26 @@ public class MapController : MonoBehaviour
 
     private Vector2 ScreenCoordinatesToWorld(Vector3 screenCoordinates)
     {
-        screenCoordinates.z = Mathf.Abs(_mapCamera.transform.position.z - _mapSpriteObjectPrefab.transform.position.z);
+        screenCoordinates.z = Mathf.Abs(_mapCamera.transform.position.z) + Mathf.Abs(_mapCanvas.transform.position.z);
 
         return _mapCamera.ScreenToWorldPoint(screenCoordinates);
     }
 
-    private Vector2 WorldCoordinatesToGame(Vector2 worldCoords)
+    private Vector2Int WorldCoordinatesToGame(Vector2 worldCoords)
     {
-        Vector2 gameCoords = new()
+        if (_gameWorld.Width > _gameWorld.Height)
         {
-            x = math.floor(worldCoords.x / (100f / _gameWorld.WorldWidth)),
-            y = math.floor((worldCoords.y * -1) / (100f / _gameWorld.WorldWidth))
+            worldCoords.y *= _gameWorld.Width / _gameWorld.Height;
+        }
+        else if (_gameWorld.Width < _gameWorld.Height)
+        {
+            worldCoords.x *= _gameWorld.Height / _gameWorld.Width;
+        }
+
+        Vector2Int gameCoords = new()
+        {
+            x = Mathf.FloorToInt((_gameWorld.Width / 2f) + worldCoords.x * (_gameWorld.Width / 100f)),
+            y = Mathf.FloorToInt(_gameWorld.Height - ((_gameWorld.Height / 2f) + worldCoords.y * (_gameWorld.Height / 100f)))
         };
 
         return gameCoords;
@@ -461,7 +466,7 @@ public class MapController : MonoBehaviour
     {
         Vector2 worldCoords = new();
 
-        float locationCellSize = 100f / _gameWorld.WorldWidth;
+        float locationCellSize = 100f / _gameWorld.Width;
 
         worldCoords.x = gameCoords.x * locationCellSize + (locationCellSize / 2f);
         worldCoords.y = gameCoords.y * -1 * locationCellSize - (locationCellSize / 2f);

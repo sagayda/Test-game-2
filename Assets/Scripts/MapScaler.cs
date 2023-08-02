@@ -24,7 +24,7 @@ namespace Assets.Scripts
             World = world;
             Camera = camera;
 
-            int worldSize = World.WorldWidth > World.WorldHeight ? World.WorldWidth : World.WorldHeight;
+            int worldSize = World.Width > World.Height ? World.Width : World.Height;
 
             Camera.farClipPlane = worldSize * 2;
             CameraMinFov = worldSize / 100f;
@@ -74,7 +74,7 @@ namespace Assets.Scripts
             }
 
             ScaleLevel++;
-            MapGrid.cellSize = new Vector3(World.WorldWidth * (MaxScaleLevel - ScaleLevel) / 100f, World.WorldHeight * (MaxScaleLevel - ScaleLevel) / 100f);
+            MapGrid.cellSize = new Vector3(World.Width * (MaxScaleLevel - ScaleLevel) / 100f, World.Height * (MaxScaleLevel - ScaleLevel) / 100f);
             
             EventBus.MapEvents.onMapScaleChanged?.Invoke();
         }
@@ -88,7 +88,7 @@ namespace Assets.Scripts
 
             ScaleLevel--;
 
-            MapGrid.cellSize = new Vector3(World.WorldWidth / (MaxScaleLevel - ScaleLevel) / 100f, World.WorldHeight / (MaxScaleLevel - ScaleLevel) / 100f);
+            MapGrid.cellSize = new Vector3(World.Width / (MaxScaleLevel - ScaleLevel) / 100f, World.Height / (MaxScaleLevel - ScaleLevel) / 100f);
             //MapGrid.cellSize = new Vector3(World.WorldWidth / (MaxScaleLevel - ScaleLevel) / 100f, World.WorldHeight / (MaxScaleLevel - ScaleLevel) / 100f);
         
             EventBus.MapEvents.onMapScaleChanged?.Invoke();
