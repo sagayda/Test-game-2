@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class MapController : MonoBehaviour
+public class MapControllerOld : MonoBehaviour
 {
     [SerializeField] private float _cameraMoveSpeed = 50f;
     [SerializeField] private float _cameraZoomSpeed = 4000f;
@@ -29,9 +29,6 @@ public class MapController : MonoBehaviour
     [SerializeField] private Grid _mapGrid;
     [SerializeField] private AnimatedTile _playerMarkTile;
 
-    public bool IsMapEnabled { get; private set; } = false;
-    public bool IsMapLoaded { get; private set; } = false;
-
     private GameWorld _gameWorld;
 
     private int _scaleLevel;
@@ -41,9 +38,12 @@ public class MapController : MonoBehaviour
     private float _cameraMinFov;
     private float _cameraMaxFov;
 
-    private const int LOCATION_CELL_SIZE = 16;
+    private readonly int _locationCellSize = 16;
 
     private GameObject[] _mapSprites;
+
+    public bool IsMapEnabled { get; private set; } = false;
+    public bool IsMapLoaded { get; private set; } = false;
 
     private void Awake()
     {
@@ -262,7 +262,7 @@ public class MapController : MonoBehaviour
 
     private Texture2D PaintMap(GameWorld world, int width, int height)
     {
-        Texture2D texture = new(width * LOCATION_CELL_SIZE, height * LOCATION_CELL_SIZE);
+        Texture2D texture = new(width * _locationCellSize, height * _locationCellSize);
 
         float horizontalRatio = world.Width / (float)width;
         float verticalRatio = world.Height / (float)height;
@@ -340,9 +340,9 @@ public class MapController : MonoBehaviour
 
         void SetCell(Texture2D texture, int x, int y, Color color)
         {
-            for (int i = x * LOCATION_CELL_SIZE; i < (x * LOCATION_CELL_SIZE) + LOCATION_CELL_SIZE; i++)
+            for (int i = x * _locationCellSize; i < (x * _locationCellSize) + _locationCellSize; i++)
             {
-                for (int j = y * LOCATION_CELL_SIZE; j < (y * LOCATION_CELL_SIZE) + LOCATION_CELL_SIZE; j++)
+                for (int j = y * _locationCellSize; j < (y * _locationCellSize) + _locationCellSize; j++)
                 {
                     texture.SetPixel(i, j, color);
                 }

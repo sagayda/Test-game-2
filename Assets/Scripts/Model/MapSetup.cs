@@ -1,0 +1,62 @@
+﻿using Assets.Scripts.Presenter;
+using Assets.Scripts.View;
+using UnityEngine;
+
+namespace Assets.Scripts.Model
+{
+    public class MapSetup : MonoBehaviour
+    {
+        [SerializeField] private MapView _viev;
+
+        private MapPresenter _presenter;
+        private MapModel _model;
+
+        private bool _isEnabled = false;
+
+        private void Awake()
+        {
+            if (TextQuest.Instance.GetGameWorld() == null)
+            {
+                Debug.Log("World is null. Subscribe to event");
+                EventBus.WorldEvents.GameWorldLoaded += Init;
+                return;
+            }
+
+            Init();
+        }
+
+        private void Init()
+        {
+            _model = new MapModel(TextQuest.Instance.GetGameWorld());
+            _presenter = new MapPresenter(_viev, _model);
+            _viev.Init(_model.Scaling);
+
+            _model.RefreshViev();
+            _model.Scaling.RefreshViev();
+            EventBus.WorldEvents.GameWorldLoaded -= Init;
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                if (_isEnabled)
+                    Disable();
+                else
+                    Enable();
+            }
+        }
+
+        private void Enable()
+        {
+            _presenter.Enable();
+            _isEnabled = true;
+        }
+
+        private void Disable()
+        {
+            _presenter.Disable();
+            _isEnabled = false;
+        }
+    }
+}

@@ -3,22 +3,54 @@ using Assets.Scripts.InGameScripts;
 using Assets.Scripts.InGameScripts.World.Absctract;
 using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TextQuest : MonoBehaviour
 {
-    //[SerializeField] private int _worldSize = 128;
+    private static TextQuest _instance;
+
+    public static TextQuest Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<TextQuest>();
+                if (_instance == null)
+                {
+                    GameObject singletonObject = new GameObject();
+                    _instance = singletonObject.AddComponent<TextQuest>();
+                    singletonObject.name = "GameManagerSingleton";
+                }
+            }
+            return _instance;
+        }
+    }
 
     [SerializeField] private TMP_Text _gameText;
     [SerializeField] private Button[] _actionButtons;
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
     [SerializeField] private WorldGenerator _worldGenerator;
+    [SerializeField] private GameObject _mapView;
 
     private GameWorld _world;
     private Player _player;
+
+    private void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else if (_instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
 
     public void Start()
     {
@@ -33,6 +65,17 @@ public class TextQuest : MonoBehaviour
 
     private void Update()
     {
+        //if (Input.GetKeyDown(KeyCode.M))
+        //{
+        //    if (_mapView.activeSelf)
+        //    {
+        //        _mapView.SetActive(false);
+        //    }
+        //    else
+        //    {
+        //        _mapView.SetActive(true);
+        //    }
+        //}
         //if (Input.GetKeyUp(KeyCode.W))
         //{
         //    MovePlayer(_player.VectorPosition + new Vector2(2, 0));
@@ -61,6 +104,8 @@ public class TextQuest : MonoBehaviour
         _statsController.SetStats(player.Info);
 
         LoadActions();
+
+        EventBus.WorldEvents.GameWorldLoaded?.Invoke();
     }
 
     private void LoadActions()

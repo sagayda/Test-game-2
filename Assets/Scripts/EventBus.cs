@@ -10,6 +10,7 @@ namespace Assets.Scripts
     {
         public static class WorldEvents
         {
+            public static Action GameWorldLoaded;
             public static Action onPlayerPositionChanged;
         }
 
