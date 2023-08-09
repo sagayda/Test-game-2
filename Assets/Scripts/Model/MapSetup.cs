@@ -29,7 +29,7 @@ namespace Assets.Scripts.Model
         {
             _model = new MapModel(TextQuest.Instance.GetGameWorld());
             _presenter = new MapPresenter(_viev, _model);
-            _viev.Init(_model.Scaling);
+            _viev.Init(_model.MapPainting);
 
             _model.RefreshViev();
             _model.Scaling.RefreshViev();

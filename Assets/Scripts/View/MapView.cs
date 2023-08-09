@@ -6,9 +6,9 @@ namespace Assets.Scripts.View
 {
     public class MapView : MonoBehaviour
     {
-        public Action<float> Zoom;
-        public Action<Vector2> MoveInDirection;
-        public Action<Vector2> TranslateToPosition;
+        public event Action<float> Zoom;
+        public event Action<Vector2> MoveInDirection;
+        public event Action<Vector2> TranslateToPosition;
 
         [SerializeField] private Camera _mapCamera;
         [SerializeField] private Canvas _mapCanvas;
@@ -55,14 +55,16 @@ namespace Assets.Scripts.View
             }
         }
 
-        public void Init(MapScaling scaling)
+        public void Init(IMapTextureGeneratingStrategy textureGeneratingStrategy)
         {
-            _sprites = new MapSpritesWrapper(_mapCanvas.transform, scaling.MaxScaleLevel);
+            _sprites = textureGeneratingStrategy.GenerateAndWrapMapTextures(_mapCanvas.transform);
 
-            for (int scaleLevel = 1; scaleLevel <= scaling.MaxScaleLevel; scaleLevel++)
-            {
-                _sprites.AddSprite(scaling.CreateMapTexture(scaleLevel), scaleLevel);
-            }
+            //_sprites = new MapSpritesWrapper(_mapCanvas.transform, scaling.MaxScaleLevel);
+
+            //for (int scaleLevel = 1; scaleLevel <= scaling.MaxScaleLevel; scaleLevel++)
+            //{
+            //    _sprites.AddSprite(scaling.CreateMapTexture(scaleLevel), scaleLevel);
+            //}
         }
 
         public void UpdatePosition(Vector2 position)

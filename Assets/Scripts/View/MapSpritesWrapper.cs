@@ -28,7 +28,9 @@ namespace Assets.Scripts.View
 
             int i = scaleLevel - 1;
 
-            GameObject gameObject = UnityEngine.Object.Instantiate(new GameObject(), _parent);
+            GameObject gameObject = new();
+            gameObject.transform.SetParent(_parent);
+            gameObject.name = $"[{texture.width}x{texture.height}] Scale: {scaleLevel}";
 
             _sprites[i] = gameObject.AddComponent<MapSprite>();
             _sprites[i].Init(scaleLevel, texture);

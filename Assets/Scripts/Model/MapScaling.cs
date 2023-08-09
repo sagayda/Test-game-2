@@ -7,9 +7,9 @@ namespace Assets.Scripts.Model
 {
     public class MapScaling
     {
-        public Action<int> ScaleLevelChanged;
-        public Action<Vector2> GridCellSizeChanged;
-        public Action<float> FovChanged;
+        public event Action<int> ScaleLevelChanged;
+        public event Action<Vector2> GridCellSizeChanged;
+        public event Action<float> FovChanged;
 
         private readonly GameWorld _world;
 
@@ -42,6 +42,7 @@ namespace Assets.Scripts.Model
         public float Fov => (_maxFov - _minFov) * (1f - _zoomPercentage) + _minFov;
         public int MaxScaleLevel => _maxScaleLevel;
         public float ZoomPercentage => _zoomPercentage;
+        public float ResolutionRatio => RESOLUTION_RATIO;
 
         public Texture2D CreateMapTexture(int scaleLevel)
         {
