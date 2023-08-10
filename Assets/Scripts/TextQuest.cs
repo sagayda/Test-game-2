@@ -1,7 +1,6 @@
+using System.Collections;
 using Assets.Scripts;
 using Assets.Scripts.InGameScripts;
-using Assets.Scripts.InGameScripts.World.Absctract;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,7 +32,6 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
     [SerializeField] private WorldGenerator _worldGenerator;
-    [SerializeField] private GameObject _mapView;
 
     private GameWorld _world;
     private Player _player;

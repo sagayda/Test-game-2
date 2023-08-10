@@ -13,7 +13,7 @@ namespace Assets.Scripts.Model
         private readonly GameWorld _world;
         private readonly MapScaling _scaling;
 
-        private IMapTextureGeneratingStrategy _textureGeneratingStrategy;
+        private readonly IMapTextureGeneratingStrategy _textureGeneratingStrategy;
 
         private readonly float _deltaX = 50f;
         private readonly float _deltaY = 50f;
@@ -48,6 +48,7 @@ namespace Assets.Scripts.Model
         }
 
         public MapScaling Scaling => _scaling;
+
         public IMapTextureGeneratingStrategy MapPainting => _textureGeneratingStrategy;
 
         public void MoveInDirection(Vector2 direction)

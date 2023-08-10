@@ -1,7 +1,5 @@
-﻿using Assets.Scripts.InGameScripts.Interfaces;
-using Assets.Scripts.InGameScripts.World.Absctract;
-using System;
-using System.Collections;
+﻿using System;
+using Assets.Scripts.InGameScripts.Interfaces;
 using UnityEngine;
 
 namespace Assets.Scripts.InGameScripts

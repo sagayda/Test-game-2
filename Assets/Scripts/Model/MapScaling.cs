@@ -14,7 +14,6 @@ namespace Assets.Scripts.Model
         private readonly GameWorld _world;
 
         private const float RESOLUTION_RATIO = 0.25f;
-        private const int CELL_SIZE = 16;
         private const float ZOOM_SPEED = 250f;
 
         private readonly int _maxScaleLevel;
@@ -43,99 +42,6 @@ namespace Assets.Scripts.Model
         public int MaxScaleLevel => _maxScaleLevel;
         public float ZoomPercentage => _zoomPercentage;
         public float ResolutionRatio => RESOLUTION_RATIO;
-
-        public Texture2D CreateMapTexture(int scaleLevel)
-        {
-            if (scaleLevel <= 0 || scaleLevel > _maxScaleLevel)
-                throw new ArgumentException("Scale level must be greater than zero and not greater than the maximum value");
-
-            Vector2Int size = CalculateMapSizeByLevel(scaleLevel);
-
-            Texture2D texture = new(size.x * CELL_SIZE, size.y * CELL_SIZE);
-
-            float horizontalRatio = _world.Width / (float)size.x;
-            float verticalRatio = _world.Height / (float)size.y;
-
-            for (int i = 0; i < size.x; i++)
-            {
-                for (int j = 0; j < size.y; j++)
-                {
-                    int xStart = Mathf.RoundToInt(i * horizontalRatio);
-                    int yStart = Mathf.RoundToInt(j * verticalRatio);
-
-                    int xFinish = Mathf.RoundToInt((i + 1) * horizontalRatio) - 1;
-                    int yFinish = Mathf.RoundToInt((j + 1) * verticalRatio) - 1;
-
-                    Color color = GetColorInSquare(xStart, yStart, xFinish, yFinish);
-
-                    if (i == size.y - 1)
-                    {
-                        SetCell(texture, i, j, Color.black);
-                    }
-
-                    SetCell(texture, i, j, color);
-                }
-            }
-
-            texture.filterMode = FilterMode.Point;
-            texture.Apply();
-
-            return texture;
-
-            Color GetColorInSquare(int xStart, int yStart, int xFinish, int yFinish)
-            {
-                Dictionary<Color, float> colorCounts = new Dictionary<Color, float>();
-
-                for (int i = xStart; i <= xFinish; i++)
-                {
-                    for (int j = yStart; j <= yFinish; j++)
-                    {
-                        Color locationColor = _world.World[i, j] == null ? Color.white : _world.World[i, j].Color;
-
-                        float increment = 1f;
-
-                        if (_world.World[i, j].Id == 3)
-                            increment = 3.5f;
-
-                        if (colorCounts.ContainsKey(locationColor))
-                        {
-                            colorCounts[locationColor] += increment;
-                        }
-                        else
-                        {
-                            colorCounts[locationColor] = increment;
-                        }
-                    }
-
-                }
-
-                Color resultColor = Color.black;
-                float maxCount = 0;
-
-                foreach (var pair in colorCounts)
-                {
-                    if (pair.Value > maxCount)
-                    {
-                        resultColor = pair.Key;
-                        maxCount = pair.Value;
-                    }
-                }
-
-                return resultColor;
-
-            }
-
-            void SetCell(Texture2D texture, int x, int y, Color color)
-            {
-                for (int i = x * CELL_SIZE; i < (x * CELL_SIZE) + CELL_SIZE; i++)
-                {
-                    for (int j = y * CELL_SIZE; j < (y * CELL_SIZE) + CELL_SIZE; j++)
-                    {
-                        texture.SetPixel(i, j, color);
-                    }
-                }
-            }
-        }
 
         public void Zoom(float zoom)
         {

@@ -8,8 +8,11 @@ namespace Assets.Scripts.Model
     {
         [SerializeField] private MapView _viev;
 
+        [SerializeField] private DynamicMarkerData _playerMarkerData;
+
         private MapPresenter _presenter;
         private MapModel _model;
+        private MarkerModel _markerModel;
 
         private bool _isEnabled = false;
 
@@ -28,7 +31,8 @@ namespace Assets.Scripts.Model
         private void Init()
         {
             _model = new MapModel(TextQuest.Instance.GetGameWorld());
-            _presenter = new MapPresenter(_viev, _model);
+            _markerModel = new MarkerModel(_playerMarkerData);
+            _presenter = new MapPresenter(_viev, _model, _markerModel);
             _viev.Init(_model.MapPainting);
 
             _model.RefreshViev();

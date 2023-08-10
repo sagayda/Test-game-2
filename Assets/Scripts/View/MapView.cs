@@ -13,7 +13,6 @@ namespace Assets.Scripts.View
         [SerializeField] private Camera _mapCamera;
         [SerializeField] private Canvas _mapCanvas;
         [SerializeField] private Grid _mapGrid;
-
         [SerializeField] private GameObject _mainGameObject;
 
         private MapSpritesWrapper _sprites;
@@ -53,18 +52,16 @@ namespace Assets.Scripts.View
 
                 TranslateToPosition.Invoke(cameraPosition);
             }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+
+            }
         }
 
         public void Init(IMapTextureGeneratingStrategy textureGeneratingStrategy)
         {
             _sprites = textureGeneratingStrategy.GenerateAndWrapMapTextures(_mapCanvas.transform);
-
-            //_sprites = new MapSpritesWrapper(_mapCanvas.transform, scaling.MaxScaleLevel);
-
-            //for (int scaleLevel = 1; scaleLevel <= scaling.MaxScaleLevel; scaleLevel++)
-            //{
-            //    _sprites.AddSprite(scaling.CreateMapTexture(scaleLevel), scaleLevel);
-            //}
         }
 
         public void UpdatePosition(Vector2 position)

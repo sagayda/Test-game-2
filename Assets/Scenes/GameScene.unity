@@ -3690,7 +3690,6 @@ MonoBehaviour:
   - {fileID: 2020201185}
   _statsController: {fileID: 1308601656}
   _worldGenerator: {fileID: 1392665220}
-  _mapView: {fileID: 0}
 --- !u!4 &1392665217
 Transform:
   m_ObjectHideFlags: 0
@@ -3749,9 +3748,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81e24f589745abe4cbbe93da80e729f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldSeed: 300
-  worldWidth: 300
-  worldHeight: 100
+  TextSeed: sagayda
+  worldSeed: 898898
+  worldWidth: 256
+  worldHeight: 256
   progressZoom: 70
   progressSeedStep: 1000
   progressDensity: 0.7

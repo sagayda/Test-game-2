@@ -8,6 +8,8 @@ namespace Assets.Scripts
 {
     public class WorldGenerator : MonoBehaviour
     {
+        public string TextSeed = String.Empty;
+
         public int WorldSeed { get => worldSeed; }
         public int WorldWidth { get => worldWidth; }
         public int WorldHeight { get => worldHeight;}
@@ -77,6 +79,18 @@ namespace Assets.Scripts
         [SerializeField] float testing1Zoom = 30f;
         [SerializeField] int testing1SeedStep = 3000;
         [SerializeField][Range(0, 10)] float testing1Density = 1.0f;
+
+        private void Awake()
+        {
+            int seed = 0;
+
+            foreach (var item in TextSeed)
+            {
+                seed += item;
+            }
+
+            worldSeed = seed;
+        }
 
         public float GetProgressValue(int x, int y)
         {

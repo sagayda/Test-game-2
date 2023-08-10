@@ -8,11 +8,13 @@ namespace Assets.Scripts.Presenter
     {
         private readonly MapModel _model;
         private readonly MapView _view;
+        private readonly MarkerModel _marker;
 
-        public MapPresenter(MapView view, MapModel model)
+        public MapPresenter(MapView view, MapModel model, MarkerModel marker)
         {
             _view = view;
             _model = model;
+            _marker = marker;
         }
 
         public void Enable()
