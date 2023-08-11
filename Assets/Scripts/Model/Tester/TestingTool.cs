@@ -19,7 +19,7 @@ namespace Assets.Scripts
             return new Player(CreatePlayerInfo(), world);
         }
 
-        public static GameWorld CreateWorld(WorldGenerator worldGenerator)
+        public static GameWorld CreateWorld(WorldGeneratorOld worldGenerator)
         {
             //var world = new GameWorld(0, "FirstWorld", CreateWorldMap(seed, zoom, size));
             var world = new GameWorld(0, "FirstWorld", worldGenerator.CreateWorld());

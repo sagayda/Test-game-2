@@ -31,7 +31,7 @@ public class TextQuest : MonoBehaviour
     [SerializeField] private Button[] _actionButtons;
     [SerializeField] private TMP_Text[] _actionButtonsText;
     [SerializeField] private StatsController _statsController;
-    [SerializeField] private WorldGenerator _worldGenerator;
+    [SerializeField] private WorldGeneratorOld _worldGenerator;
 
     private GameWorld _world;
     private Player _player;
@@ -48,7 +48,6 @@ public class TextQuest : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
 
     public void Start()
     {

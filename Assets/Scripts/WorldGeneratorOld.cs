@@ -1,18 +1,17 @@
-﻿using Assets.Scripts.InGameScripts.World;
+﻿using System;
+using Assets.Scripts.InGameScripts.World;
 using Assets.Scripts.InGameScripts.World.Absctract;
-using System;
-using System.Drawing;
 using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class WorldGenerator : MonoBehaviour
+    public class WorldGeneratorOld : MonoBehaviour
     {
         public string TextSeed = String.Empty;
 
         public int WorldSeed { get => worldSeed; }
         public int WorldWidth { get => worldWidth; }
-        public int WorldHeight { get => worldHeight;}
+        public int WorldHeight { get => worldHeight; }
         public float WaterLevel { get => waterLevel; }
 
         [Header("World settings")]
@@ -23,7 +22,7 @@ namespace Assets.Scripts
         [Header("Progress map settings")]
         [SerializeField] float progressZoom = 30f;
         [SerializeField] int progressSeedStep = 1000;
-        [SerializeField][Range(0,10)] float progressDensity = 1.0f;
+        [SerializeField][Range(0, 10)] float progressDensity = 1.0f;
 
         [Header("Polution map settings")]
         [SerializeField] float polutionZoom = 30f;
@@ -52,7 +51,7 @@ namespace Assets.Scripts
         [SerializeField] float riversZoom = 30f;
         [SerializeField] int riversSeedStep = 4000;
         [SerializeField][Range(0, 10)] float riversDensity = 1.0f;
-        [SerializeField][Range(0,1)] float riversLevel = 0.5f;
+        [SerializeField][Range(0, 1)] float riversLevel = 0.5f;
         [SerializeField][Range(0, 20)] float riversSharpness = 1f;
 
         [Header("Temperature map settings")]
@@ -60,8 +59,8 @@ namespace Assets.Scripts
         [SerializeField] int temperatureSeedStep = 3000;
         [SerializeField][Range(0, 10)] float temperatureDensity = 1.0f;
 
-        [SerializeField][Range(0.01f,200)] float HoTImpactStrength = 30f;
-        [SerializeField][Range(0.01f,10)] float HoTImpactSmoothing = 3.2f;
+        [SerializeField][Range(0.01f, 200)] float HoTImpactStrength = 30f;
+        [SerializeField][Range(0.01f, 10)] float HoTImpactSmoothing = 3.2f;
         [SerializeField][Range(0, 5)] float NoiseOnTemperatureImpact = 0.5f;
         [SerializeField][Range(-1, 1)] float Temperature = 0f;
 
@@ -72,7 +71,7 @@ namespace Assets.Scripts
         [SerializeField] int testingSeedStep = 3000;
         [SerializeField][Range(0, 10)] float testingDensity = 1.0f;
         [SerializeField] float testingSmoothing = 1f;
-        [SerializeField][Range(0,1)] float testingMainLevel = 0.5f;
+        [SerializeField][Range(0, 1)] float testingMainLevel = 0.5f;
 
         [Space]
         [Header("Testing map settings")]
@@ -128,8 +127,8 @@ namespace Assets.Scripts
             float riversNoise = GetRiversValue(x, y);
 
             //float riverSideLevel = 0.9f;
-            
-            if(noise > waterLevel)
+
+            if (noise > waterLevel)
                 noise = noise - (riversNoise * ((noise - waterLevel) / riversSideLevel));
 
             return noise;
@@ -265,7 +264,7 @@ namespace Assets.Scripts
             else
             {
 
-                if(river > 0.8f)
+                if (river > 0.8f)
                 {
                     return GetWaterLocation(x, y, height, true);
                 }
@@ -282,7 +281,7 @@ namespace Assets.Scripts
 
             float temperature = GetTemperatureValue(x, y);
 
-            if(temperature < 0.15f)
+            if (temperature < 0.15f)
             {
                 return new Location_ArcticDesert(x, y);
             }
@@ -306,7 +305,7 @@ namespace Assets.Scripts
         {
             float temperature = GetTemperatureValue(x, y);
 
-            if(temperature < 0.15f)
+            if (temperature < 0.15f)
             {
                 return new Location_ArcticDesert(x, y);
             }
@@ -318,7 +317,7 @@ namespace Assets.Scripts
 
             float heightStep = (1f - waterLevel) / 4f;
 
-            if(height < waterLevel + heightStep * 2)
+            if (height < waterLevel + heightStep * 2)
             {
                 return new Location_Plain(x, y);
             }
