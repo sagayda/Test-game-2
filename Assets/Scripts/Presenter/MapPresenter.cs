@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Model;
+﻿using Assets.Scripts.Model.Map;
 using Assets.Scripts.View;
 using UnityEngine;
 

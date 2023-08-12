@@ -1,5 +1,5 @@
 ﻿using System;
-using Assets.Scripts.Model;
+using Assets.Scripts.Model.Map;
 using UnityEngine;
 
 namespace Assets.Scripts.View

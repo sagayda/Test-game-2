@@ -1,4 +1,6 @@
 ﻿using System;
+using Assets.Scripts.InGameScripts.World;
+using Assets.Scripts.InGameScripts.World.Absctract;
 using UnityEngine;
 
 namespace Assets.Scripts.Model.WorldGeneration
@@ -7,18 +9,18 @@ namespace Assets.Scripts.Model.WorldGeneration
     {
         private static GeneratorParameters _parameters;
 
-        private static GeneratorParameters Parameters 
-        { 
+        private static GeneratorParameters Parameters
+        {
             get
             {
                 if (_parameters == null)
                     throw new InvalidOperationException("World generator parameters is not set!");
-                
+
                 return _parameters;
             }
             set
             {
-                if(value == null) 
+                if (value == null)
                     throw new ArgumentNullException(nameof(Parameters), "World generator parameters can not be null!");
 
                 _parameters = value;
@@ -36,18 +38,18 @@ namespace Assets.Scripts.Model.WorldGeneration
 
         public static float GetProgressValue(int x, int y)
         {
-            return GetBaseNoiseValue(x, y, Parameters.Progress);
+            return GetBaseNoiseValue(x, y, Parameters.Progress.BaseNoise);
         }
 
         public static float GetPolutionValue(int x, int y)
         {
             float noiseProgress = GetProgressValue(x, y);
 
-            float noisePolution = GetBaseNoiseValue(x,y, Parameters.Polution);
+            float noisePolution = GetBaseNoiseValue(x, y, Parameters.Polution.BaseNoise);
 
             float polutionMultiplyer = Mathf.Pow(noiseProgress * Parameters.Polution.ProgressImpactMultiplyer, Parameters.Polution.ProgressImpactStrength);
             polutionMultiplyer = Mathf.Clamp(polutionMultiplyer, Parameters.Polution.ProgressImpactBottom, Parameters.Polution.ProgressImpactTop);
-            
+
             noisePolution *= polutionMultiplyer;
 
             return noisePolution;
@@ -56,7 +58,7 @@ namespace Assets.Scripts.Model.WorldGeneration
         public static float GetHeightValue(int x, int y)
         {
             //main noise
-            float noise = GetBaseNoiseValue(x, y, Parameters.Height);
+            float noise = GetBaseNoiseValue(x, y, Parameters.Height.BaseNoise);
 
             //additional noise
             float additionalNoise = GetBaseNoiseValue(x, y, Parameters.Height.AdditionalNoise);
@@ -77,7 +79,7 @@ namespace Assets.Scripts.Model.WorldGeneration
         {
             float noiseHight = GetHeightValue(x, y);
 
-            float rawNoiseTemperature = GetBaseNoiseValue(x,y, Parameters.Temperature);
+            float rawNoiseTemperature = GetBaseNoiseValue(x, y, Parameters.Temperature.BaseNoise);
 
             //adaptation to latitude
             rawNoiseTemperature -= 0.5f;
@@ -88,7 +90,7 @@ namespace Assets.Scripts.Model.WorldGeneration
             float temperatureNoise = distanceFromEquator;
             temperatureNoise += Parameters.Temperature.GlobalTemperature;
 
-            temperatureNoise += rawNoiseTemperature * Parameters.Temperature.NoiseOnTemperatureImpact;
+            temperatureNoise += rawNoiseTemperature * Parameters.Temperature.NoiseImpact;
 
             temperatureNoise = 1 - temperatureNoise;
 
@@ -112,9 +114,41 @@ namespace Assets.Scripts.Model.WorldGeneration
             return temperatureNoise;
         }
 
+        //public static float GetRiversValue(int x, int y)
+        //{
+        //    float rawNoise = Mathf.PerlinNoise((x + Parameters.Seed + Parameters.Rivers.BaseNoise.SeedStep) / Parameters.Rivers.BaseNoise.Zoom, (y + Parameters.Seed + Parameters.Rivers.BaseNoise.SeedStep) / Parameters.Rivers.BaseNoise.Zoom);
+        //    rawNoise += GetBaseNoiseValue(x, y, Parameters.Rivers.AdditionalNoise);
+        //    rawNoise /= 2f;
+
+        //    rawNoise -= Parameters.Rivers.Level;
+
+        //    float noiseMax;
+
+        //    if (Parameters.Rivers.Level < 0.5f)
+        //        noiseMax = Parameters.Rivers.Level;
+        //    else
+        //        noiseMax = 1f - Parameters.Rivers.Level;
+
+        //    float noise = rawNoise;
+        //    noise = Mathf.Abs(noise);
+        //    noise = Mathf.Clamp(noise, 0, noiseMax);
+
+        //    noise *= 1f / noiseMax;
+
+        //    noise = 1 - noise;
+        //    noise = Mathf.Pow(noise, Parameters.Rivers.Sharpness);
+        //    noise *= Parameters.Rivers.BaseNoise.Density;
+
+        //    return noise;
+        //}
+
         public static float GetRiversValue(int x, int y)
         {
-            float rawNoise = Mathf.PerlinNoise((x + Parameters.Seed + Parameters.Rivers.SeedStep) / Parameters.Rivers.Zoom, (y + Parameters.Seed + Parameters.Rivers.SeedStep) / Parameters.Rivers.Zoom);
+            float rawNoise = Mathf.PerlinNoise((x + Parameters.Seed + Parameters.Rivers.BaseNoise.SeedStep) / Parameters.Rivers.BaseNoise.Zoom, (y + Parameters.Seed + Parameters.Rivers.BaseNoise.SeedStep) / Parameters.Rivers.BaseNoise.Zoom);
+            rawNoise -= GetBaseNoiseValue(x, y, Parameters.Rivers.AdditionalNoise);
+
+            //rawNoise -= Mathf.PerlinNoise((x + Parameters.Seed + Parameters.Rivers.AdditionalNoise.SeedStep) / Parameters.Rivers.AdditionalNoise.Zoom, (y + Parameters.Seed + Parameters.Rivers.AdditionalNoise.SeedStep) / Parameters.Rivers.AdditionalNoise.Zoom);
+            rawNoise = Mathf.Clamp(rawNoise, 0, 1);
 
             rawNoise -= Parameters.Rivers.Level;
 
@@ -133,7 +167,7 @@ namespace Assets.Scripts.Model.WorldGeneration
 
             noise = 1 - noise;
             noise = Mathf.Pow(noise, Parameters.Rivers.Sharpness);
-            noise *= Parameters.Rivers.Density;
+            noise *= Parameters.Rivers.BaseNoise.Density;
 
             return noise;
         }
@@ -144,5 +178,108 @@ namespace Assets.Scripts.Model.WorldGeneration
             noise *= parameters.Density;
             return noise;
         }
+
+        public static Location[,] CreateWorld()
+        {
+            Location[,] map = new Location[WorldWidth, WorldHeight];
+
+            for (int x = 0; x < WorldWidth; x++)
+            {
+                for (int y = 0; y < WorldHeight; y++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        map[x, y] = new Location_Wasteland(x, y);
+                        continue;
+                    }
+
+                    map[x, y] = GetLocation(x, y);
+                }
+            }
+
+            return map;
+        }
+        #region Map generation methods
+        private static Location GetLocation(int x, int y)
+        {
+            float height = GetHeightValue(x, y);
+            float river = GetRiversValue(x, y);
+
+
+            if (height < WaterLevel)
+            {
+                return GetWaterLocation(x, y, height);
+            }
+            else
+            {
+
+                if (river > 0.8f)
+                {
+                    return GetWaterLocation(x, y, height, true);
+                }
+                else
+                {
+                    return GetLandLocation(x, y, height);
+                }
+            }
+        }
+
+        private static Location GetWaterLocation(int x, int y, float height, bool isRiver = false)
+        {
+
+
+            float temperature = GetTemperatureValue(x, y);
+
+            if (temperature < 0.15f)
+            {
+                return new Location_ArcticDesert(x, y);
+            }
+
+            if (isRiver)
+            {
+                return new Location_River(x, y);
+            }
+
+            if (height > WaterLevel / 2f)
+            {
+                return new Location_Ocean(x, y);
+            }
+            else
+            {
+                return new Location_DeepOcean(x, y);
+            }
+        }
+
+        private static Location GetLandLocation(int x, int y, float height)
+        {
+            float temperature = GetTemperatureValue(x, y);
+
+            if (temperature < 0.15f)
+            {
+                return new Location_ArcticDesert(x, y);
+            }
+
+            if (height < WaterLevel + 0.02f)
+            {
+                return new Location_SandBeach(x, y);
+            }
+
+            float heightStep = (1f - WaterLevel) / 4f;
+
+            if (height < WaterLevel + heightStep * 2)
+            {
+                return new Location_Plain(x, y);
+            }
+            else if (height < WaterLevel + heightStep * 3)
+            {
+                return new Location_Foothills(x, y);
+            }
+            else
+            {
+                return new Location_Mountains(x, y);
+            }
+        }
+        #endregion
+
     }
 }

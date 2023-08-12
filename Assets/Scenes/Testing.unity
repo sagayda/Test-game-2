@@ -792,6 +792,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2029337017}
   - component: {fileID: 2029337019}
+  - component: {fileID: 2029337020}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -826,7 +827,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61cf12730ada80e4d9419d2294c9e94b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _generatorParameters: {fileID: 0}
   _spriteRendererProgress: {fileID: 812820103}
   _spriteRendererPolution: {fileID: 114476231}
   _spriteRendererHeight: {fileID: 530218238}
@@ -839,4 +839,53 @@ MonoBehaviour:
   _updatePolution: 0
   _updateHeight: 0
   _updateTemperature: 0
-  _updateRivers: 0
+  _updateRivers: 1
+--- !u!114 &2029337020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029337016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78432764aafb7054c8c13703e5ac3947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Seed: 468798
+  Width: 256
+  Height: 256
+  h_seedStep: 1000
+  h_zoom: 95
+  h_density: 1.05
+  h_a_seedStep: 2000
+  h_a_zoom: 15
+  h_a_density: 1
+  h_layersMixStrength: 4
+  h_waterLevel: 0.45
+  h_riversSideLevel: 1.7
+  t_seedStep: 3000
+  t_zoom: 30
+  t_density: 1
+  t_heightImpactStrength: 100
+  t_heightImpactSmoothing: 3.2
+  t_noiseImpact: 0.26
+  t_globalTemperature: 0
+  po_seedStep: 4000
+  po_zoom: 30
+  po_density: 1
+  po_progressImpactStrength: 1
+  po_progressImpactMultiplyer: 1
+  po_progressImpactBottom: 0.1
+  po_progressImpactTop: 2
+  pr_seedStep: 5000
+  pr_zoom: 70
+  pr_density: 0.7
+  r_seedStep: 6000
+  r_zoom: 33
+  r_density: 1
+  r_a_seedStep: 7000
+  r_a_zoom: 30
+  r_a_density: 1
+  r_level: 0.461
+  r_sharpness: 4.6

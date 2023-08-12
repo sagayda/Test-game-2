@@ -1,37 +1,33 @@
 ﻿using System;
-using UnityEngine;
 
 namespace Assets.Scripts.Model.WorldGeneration
 {
-    [CreateAssetMenu(fileName = "GeneratorParameters", menuName = "World generator/Create generator parameters")]
-    public class GeneratorParameters : ScriptableObject
+    [Serializable]
+    public class GeneratorParameters
     {
-        [SerializeField] private string _charSeed;
-        [SerializeField] private uint _worldWidth;
-        [SerializeField] private uint _worldHeight;
+        private readonly long _seed;
+        private readonly uint _worldWidth;
+        private readonly uint _worldHeight;
 
-        [SerializeField] private ProgressNoiseParameters _progress;
-        [SerializeField] private PolutionNoiseParameters _polution;
-        [SerializeField] private HeightNoiseParameters _height;
-        [SerializeField] private TemperatureNoiseParameters _temperature;
-        [SerializeField] private RiversNoiseParameters _rivers;
+        private readonly ProgressNoiseParameters _progress;
+        private readonly PolutionNoiseParameters _polution;
+        private readonly HeightsNoiseParameters _heights;
+        private readonly TemperatureNoiseParameters _temperature;
+        private readonly RiversNoiseParameters _rivers;
 
-        private void OnValidate()
+        public GeneratorParameters(long seed, uint width, uint height, ProgressNoiseParameters progress, PolutionNoiseParameters polution, HeightsNoiseParameters heights, TemperatureNoiseParameters temperature, RiversNoiseParameters rivers)
         {
-            string seed = string.Empty;
-
-            foreach (var ch in _charSeed)
-            {
-                seed += (int)ch;
-            }
-
-            Seed = 0;
-
-            if (int.TryParse(seed, out int s))
-                Seed = s;
+            _seed = seed;
+            _worldWidth = width;
+            _worldHeight = height;
+            _progress = progress;
+            _polution = polution;
+            _heights = heights;
+            _temperature = temperature;
+            _rivers = rivers;
         }
 
-        public int Seed { get; private set; }
+        public long Seed => _seed;
         public uint WorldWidth => _worldWidth;
         public uint WorldHeight => _worldHeight;
 
@@ -55,14 +51,14 @@ namespace Assets.Scripts.Model.WorldGeneration
                 return _polution;
             }
         }
-        public HeightNoiseParameters Height
+        public HeightsNoiseParameters Height
         {
             get
             {
-                if (_height == null)
+                if (_heights == null)
                     throw new InvalidOperationException("World generator parameter 'Height' is invalid!");
 
-                return _height;
+                return _heights;
             }
         }
         public TemperatureNoiseParameters Temperature

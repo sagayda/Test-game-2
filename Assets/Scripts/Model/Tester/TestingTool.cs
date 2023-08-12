@@ -3,9 +3,10 @@ using Assets.Scripts.InGameScripts.Events;
 using Assets.Scripts.InGameScripts.Interfaces;
 using Assets.Scripts.InGameScripts.World;
 using Assets.Scripts.InGameScripts.World.Absctract;
+using Assets.Scripts.Model.WorldGeneration;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Model.Tester
 {
     public static class TestingTool
     {
@@ -21,8 +22,9 @@ namespace Assets.Scripts
 
         public static GameWorld CreateWorld(WorldGeneratorOld worldGenerator)
         {
-            //var world = new GameWorld(0, "FirstWorld", CreateWorldMap(seed, zoom, size));
-            var world = new GameWorld(0, "FirstWorld", worldGenerator.CreateWorld());
+            WorldGenerator.SetParameters(new WorldGeneratorParametersFactory().Default);
+
+            var world = new GameWorld(0, "FirstWorld", WorldGenerator.CreateWorld());
             world.InstantGameEvents.Add(new TestInstantGameEvent(world));
             world.InstantGameEvents.Add(new TestInstantGameEvent(world));
             world.InstantGameEvents.Add(new TestInstantGameEvent(world));
@@ -116,14 +118,14 @@ namespace Assets.Scripts
             }
             else if (noise > 0.5f && noise <= 0.85f)
             {
-                loc =  new Location_Plain(x, y);
+                loc = new Location_Plain(x, y);
             }
             else
             {
                 loc = null;
             }
 
-            if(loc != null)
+            if (loc != null)
                 loc.Noise = noise;
 
             return loc;

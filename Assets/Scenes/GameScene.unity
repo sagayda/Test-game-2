@@ -3332,7 +3332,6 @@ GameObject:
   - component: {fileID: 1392665217}
   - component: {fileID: 1392665216}
   - component: {fileID: 1392665220}
-  - component: {fileID: 1392665221}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -3436,20 +3435,6 @@ MonoBehaviour:
   testing1Zoom: 30
   testing1SeedStep: 3000
   testing1Density: 1
---- !u!114 &1392665221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1392665215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d294d21ebe8ab2459d9e5959924e1bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _viev: {fileID: 132705019}
-  _playerMarkerData: {fileID: 0}
 --- !u!1 &1406387078
 GameObject:
   m_ObjectHideFlags: 0

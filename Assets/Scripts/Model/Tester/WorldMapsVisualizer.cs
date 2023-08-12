@@ -1,7 +1,7 @@
 ﻿using Assets.Scripts.Model.WorldGeneration;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Model.Tester
 {
     public class WorldMapsVisualizer : MonoBehaviour
     {
@@ -28,27 +28,27 @@ namespace Assets.Scripts
 
         private void OnValidate()
         {
-            if(_generatorParameters != null)
-                WorldGenerator.SetParameters(_generatorParameters);
+            //if(_generatorParameters != null)
+            //    WorldGenerator.SetParameters(_generatorParameters);
         }
 
         private void Update()
         {
-            if(_updateMaps)
+            if (_updateMaps)
             {
-                if(_updateProgress)
+                if (_updateProgress)
                     PaintProgressMap();
 
-                if(_updatePolution)
+                if (_updatePolution)
                     PaintPolutionMap();
 
-                if(_updateHeight)
+                if (_updateHeight)
                     PaintHeightMap();
 
-                if(_updateTemperature)
+                if (_updateTemperature)
                     PaintTemperatureMap();
 
-                if(_updateRivers)
+                if (_updateRivers)
                     PaintRiversMap();
             }
         }
@@ -115,9 +115,9 @@ namespace Assets.Scripts
                     if (noise <= waterLevel)
                         color = Color.Lerp(Color.black, new Color(0f, 0.4f, 1f), noise * (1 / waterLevel));
                     else if (noise <= waterLevel + landStep)
-                        color = Color.Lerp(Color.cyan, new Color(0,0.8f,0), (noise - waterLevel +0.01f) * 4);
+                        color = Color.Lerp(Color.cyan, new Color(0, 0.8f, 0), (noise - waterLevel + 0.01f) * 4);
                     else if (noise <= waterLevel + landStep * 2)
-                        color = Color.Lerp(new Color(0, 0.8f, 0), Color.yellow, (noise - (waterLevel + landStep - 0.05f )) * 4);
+                        color = Color.Lerp(new Color(0, 0.8f, 0), Color.yellow, (noise - (waterLevel + landStep - 0.05f)) * 4);
                     else
                         color = Color.Lerp(Color.yellow, Color.red, (noise - (waterLevel + landStep * 1.90f)) * 4);
 

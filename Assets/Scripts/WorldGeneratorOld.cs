@@ -256,7 +256,6 @@ namespace Assets.Scripts
             float height = GetHeightValue(x, y);
             float river = GetRiversValue(x, y);
 
-
             if (height < waterLevel)
             {
                 return GetWaterLocation(x, y, height);

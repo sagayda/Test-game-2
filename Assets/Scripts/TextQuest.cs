@@ -1,32 +1,14 @@
 using System.Collections;
 using Assets.Scripts;
 using Assets.Scripts.InGameScripts;
+using Assets.Scripts.Model;
+using Assets.Scripts.Model.Tester;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TextQuest : MonoBehaviour
+public class TextQuest : GenericSingleton<TextQuest>
 {
-    private static TextQuest _instance;
-
-    public static TextQuest Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<TextQuest>();
-                if (_instance == null)
-                {
-                    GameObject singletonObject = new GameObject();
-                    _instance = singletonObject.AddComponent<TextQuest>();
-                    singletonObject.name = "GameManagerSingleton";
-                }
-            }
-            return _instance;
-        }
-    }
-
     [SerializeField] private TMP_Text _gameText;
     [SerializeField] private Button[] _actionButtons;
     [SerializeField] private TMP_Text[] _actionButtonsText;
@@ -35,19 +17,6 @@ public class TextQuest : MonoBehaviour
 
     private GameWorld _world;
     private Player _player;
-
-    private void Awake()
-    {
-        if (_instance == null)
-        {
-            _instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else if (_instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-    }
 
     public void Start()
     {
@@ -58,26 +27,6 @@ public class TextQuest : MonoBehaviour
         world.AddPlayer(player);
 
         Load(world, player);
-    }
-
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.M))
-        //{
-        //    if (_mapView.activeSelf)
-        //    {
-        //        _mapView.SetActive(false);
-        //    }
-        //    else
-        //    {
-        //        _mapView.SetActive(true);
-        //    }
-        //}
-        //if (Input.GetKeyUp(KeyCode.W))
-        //{
-        //    MovePlayer(_player.VectorPosition + new Vector2(2, 0));
-        //}
-
     }
 
     public void SaveGame()
@@ -112,20 +61,6 @@ public class TextQuest : MonoBehaviour
         if (_player == null || _world == null)
             return;
 
-        //int i = 0;
-        //foreach (var connector in _player.Location.Connectors)
-        //{
-        //    if (connector == null)
-        //        continue;
-
-        //    _actionButtons[i].gameObject.SetActive(true);
-        //    _actionButtonsText[i].text = $"Go to {connector.ToLocation.Name} ({connector.Direction.HumanName()})";
-
-        //    _actionButtons[i].onClick.RemoveAllListeners();
-        //    _actionButtons[i].onClick.AddListener(() => MovePlayer(connector.ToLocation));
-
-        //    i++;
-        //}
     }
 
     private void ClearActions()
@@ -141,12 +76,6 @@ public class TextQuest : MonoBehaviour
         }
     }
 
-    //private void MovePlayer(Location location)
-    //{
-    //    _player.GoToLocation(location);
-    //    LoadActions();
-    //}
-
     public void MovePlayer(Vector2 coords)
     {
         StartCoroutine(MoveToLocation(coords));
@@ -158,16 +87,8 @@ public class TextQuest : MonoBehaviour
 
             _player.GoToCoordinates(targetPosition);
 
-            //// ѕеремещение игрока к указанным координатам
-            //while (VectorPosition != targetPosition)
-            //{
-            //    VectorPosition = Vector2.MoveTowards(VectorPosition, targetPosition, 1 * Time.deltaTime);
-            //    yield return null;
-            //}
         }
     }
-
-
 
     public void NextTimeTick()
     {
