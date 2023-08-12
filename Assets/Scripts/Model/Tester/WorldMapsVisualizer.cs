@@ -7,12 +7,15 @@ namespace Assets.Scripts.Model.Tester
     {
         [SerializeField] private GeneratorParameters _generatorParameters;
 
+        [SerializeField] private WorldGeneratorParametersEditorFactory _worldGeneratorParametersEditorFactory;
+
         [SerializeField] private SpriteRenderer _spriteRendererProgress;
         [SerializeField] private SpriteRenderer _spriteRendererPolution;
         [SerializeField] private SpriteRenderer _spriteRendererHeight;
         [SerializeField] private SpriteRenderer _spriteRendererTemperature;
         [SerializeField] private SpriteRenderer _spriteRendererRivers;
         [SerializeField] private SpriteRenderer _spriteRendererCombined;
+        [SerializeField] private SpriteRenderer _spriteRendererOctave;
         [SerializeField] private int _combinedMapCellSize;
         [Header("Update")]
         [SerializeField] private bool _updateMaps = true;
@@ -21,16 +24,14 @@ namespace Assets.Scripts.Model.Tester
         [SerializeField] private bool _updateHeight = false;
         [SerializeField] private bool _updateTemperature = false;
         [SerializeField] private bool _updateRivers = false;
+        [SerializeField] private bool _updateOctavesTest = false;
+
+        [SerializeField] private float _visualWaterLevel = 0.4f;
 
         private int width => (int)WorldGenerator.WorldWidth;
         private int height => (int)WorldGenerator.WorldHeight;
-        private float waterLevel => (int)WorldGenerator.WaterLevel;
-
-        private void OnValidate()
-        {
-            //if(_generatorParameters != null)
-            //    WorldGenerator.SetParameters(_generatorParameters);
-        }
+        //private float waterLevel => (int)WorldGenerator.WaterLevel;
+        private float waterLevel => _visualWaterLevel;
 
         private void Update()
         {
@@ -50,6 +51,9 @@ namespace Assets.Scripts.Model.Tester
 
                 if (_updateRivers)
                     PaintRiversMap();
+
+                if(_updateOctavesTest)
+                    PaintOctavesTestMap();
             }
         }
 
@@ -180,6 +184,43 @@ namespace Assets.Scripts.Model.Tester
 
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0, 0));
             _spriteRendererRivers.sprite = sprite;
+        }
+
+        private void PaintOctavesTestMap()
+        {
+            Texture2D texture = new(width, height);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    //float noise = WorldGenerator.GetHeightValue(x, y);
+                    float noise = OctavePerlinNoise.OctaveNoise(x, y, _worldGeneratorParametersEditorFactory.OctaveParameters);
+
+                    //if (noise < 0 || noise > 1)
+                    //    Debug.Log($"X:{x} Y:{y} noise : {noise}");
+
+                    float landSize = 1 - waterLevel;
+                    float landStep = landSize / 3;
+
+                    Color color;
+                    if (noise <= waterLevel)
+                        color = Color.Lerp(Color.black, new Color(0f, 0.4f, 1f), noise * (1 / waterLevel));
+                    else if (noise <= waterLevel + landStep)
+                        color = Color.Lerp(Color.cyan, new Color(0, 0.8f, 0), (noise - waterLevel + 0.01f) * 4);
+                    else if (noise <= waterLevel + landStep * 2)
+                        color = Color.Lerp(new Color(0, 0.8f, 0), Color.yellow, (noise - (waterLevel + landStep - 0.05f)) * 4);
+                    else
+                        color = Color.Lerp(Color.yellow, Color.red, (noise - (waterLevel + landStep * 1.90f)) * 4);
+
+                    texture.SetPixel(x, y, color);
+                }
+            }
+
+            texture.Apply();
+
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0, 0));
+            _spriteRendererOctave.sprite = sprite;
         }
     }
 }

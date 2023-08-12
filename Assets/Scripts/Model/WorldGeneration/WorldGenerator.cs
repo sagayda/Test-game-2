@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 using Assets.Scripts.InGameScripts.World;
 using Assets.Scripts.InGameScripts.World.Absctract;
 using UnityEngine;
@@ -177,6 +179,17 @@ namespace Assets.Scripts.Model.WorldGeneration
             float noise = Mathf.PerlinNoise((x + Parameters.Seed + parameters.SeedStep) / parameters.Zoom, (y + Parameters.Seed + parameters.SeedStep) / parameters.Zoom);
             noise *= parameters.Density;
             return noise;
+        }
+
+        private static void ComputeSeed(string seed, out float seedX, out float seedY)
+        {
+            using SHA256 sha256 = SHA256.Create();
+
+            byte[] hashX = sha256.ComputeHash(Encoding.UTF8.GetBytes("x" + seed));
+            byte[] hashY = sha256.ComputeHash(Encoding.UTF8.GetBytes("y" + seed));
+
+            seedX = BitConverter.ToInt16(hashX, 0);
+            seedY = BitConverter.ToInt16(hashY, 0);
         }
 
         public static Location[,] CreateWorld()

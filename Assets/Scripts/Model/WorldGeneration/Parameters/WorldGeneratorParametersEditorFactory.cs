@@ -62,6 +62,14 @@ namespace Assets.Scripts.Model.WorldGeneration
         [Space(5)]
         public float r_level = 0.5f;
         public float r_sharpness = 1f;
+        [Space(10)]
+        [Header("Octave noise parameters")]
+        public string o_seed;
+        public float o_seedStep;
+        public float o_zoom;
+        public float o_persistance;
+        public float o_lacunarity;
+        public int o_octaves;
 
         private GeneratorParameters _generatorParameters;
         private HeightsNoiseParameters _heightsNoiseParameters;
@@ -69,6 +77,8 @@ namespace Assets.Scripts.Model.WorldGeneration
         private PolutionNoiseParameters _polutionNoiseParameters;
         private ProgressNoiseParameters _progressNoiseParameters;
         private RiversNoiseParameters _riversNoiseParameters;
+
+        private OctaveNoiseParameters _octaveNoiseParameters;
 
         private WorldGeneratorParametersFactory _parametersFactory = new();
 
@@ -99,7 +109,7 @@ namespace Assets.Scripts.Model.WorldGeneration
 
             _generatorParameters = new(Seed, Width, Height, _progressNoiseParameters, _polutionNoiseParameters, _heightsNoiseParameters, _temperatureNoiseParameters, _riversNoiseParameters);
 
-            Debug.Log($"validate {_generatorParameters.WorldWidth}");
+            _octaveNoiseParameters = new OctaveNoiseParameters(o_seed, o_seedStep, o_zoom, o_octaves, o_persistance, o_lacunarity);
 
             WorldGenerator.SetParameters(_generatorParameters);
         }
@@ -136,5 +146,7 @@ namespace Assets.Scripts.Model.WorldGeneration
 
             WorldGenerator.SetParameters(defaultParams);
         }
+
+        public OctaveNoiseParameters OctaveParameters => _octaveNoiseParameters;
     }
 }
