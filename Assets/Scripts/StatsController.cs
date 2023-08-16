@@ -1,68 +1,71 @@
-using Assets.Scripts.InGameScripts.Interfaces;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using Assets.Scripts.Model.InGameScripts.Interfaces;
 
-public class StatsController : MonoBehaviour
+namespace Core
 {
-    public Slider healthBar;
-    public TMP_Text healthText;
-
-    public Slider staminaBar;
-    public TMP_Text staminaText;
-
-    public Slider hungerBar;
-    public TMP_Text hungerText;
-
-    public Slider thirstBar;
-    public TMP_Text thirstText;
-
-
-    private IPlayerInfo _playerInfo;
-
-    public void SetStats(IPlayerInfo playerInfo)
+    public class StatsController : MonoBehaviour
     {
-        this._playerInfo = playerInfo;
-        SetStats();
-    }
+        public Slider healthBar;
+        public TMP_Text healthText;
 
-    private void SetStats()
-    {
-        if (_playerInfo == null)
-            return;
+        public Slider staminaBar;
+        public TMP_Text staminaText;
 
-        healthBar.maxValue = _playerInfo.MaxHealth;
-        healthBar.value = _playerInfo.Health;
-        healthText.text = $"{_playerInfo.Health}/{_playerInfo.MaxHealth}";
+        public Slider hungerBar;
+        public TMP_Text hungerText;
 
-        staminaBar.maxValue = _playerInfo.MaxStamina;
-        staminaBar.value = _playerInfo.Stamina;
-        staminaText.text = $"{_playerInfo.Stamina}/{_playerInfo.MaxStamina}";
+        public Slider thirstBar;
+        public TMP_Text thirstText;
 
-        hungerBar.maxValue = _playerInfo.MaxHunger;
-        hungerBar.value = _playerInfo.Hunger;
-        hungerText.text = $"{_playerInfo.Hunger}/{_playerInfo.MaxHunger}";
 
-        thirstBar.maxValue = _playerInfo.MaxThirst;
-        thirstBar.value = _playerInfo.Thirst;
-        thirstText.text = $"{_playerInfo.Thirst}/{_playerInfo.MaxThirst}";
-    }
+        private IPlayerInfo _playerInfo;
 
-    public void UpdateStats()
-    {
-        if (_playerInfo == null)
-            return;
+        public void SetStats(IPlayerInfo playerInfo)
+        {
+            this._playerInfo = playerInfo;
+            SetStats();
+        }
 
-        healthBar.value = _playerInfo.Health;
-        healthText.text = $"{_playerInfo.Health}/{_playerInfo.MaxHealth}";
+        private void SetStats()
+        {
+            if (_playerInfo == null)
+                return;
 
-        staminaBar.value = _playerInfo.Stamina;
-        staminaText.text = $"{_playerInfo.Stamina}/{_playerInfo.MaxStamina}";
+            healthBar.maxValue = _playerInfo.MaxHealth;
+            healthBar.value = _playerInfo.Health;
+            healthText.text = $"{_playerInfo.Health}/{_playerInfo.MaxHealth}";
 
-        hungerBar.value = _playerInfo.Hunger;
-        hungerText.text = $"{_playerInfo.Hunger}/{_playerInfo.MaxHunger}";
+            staminaBar.maxValue = _playerInfo.MaxStamina;
+            staminaBar.value = _playerInfo.Stamina;
+            staminaText.text = $"{_playerInfo.Stamina}/{_playerInfo.MaxStamina}";
 
-        thirstBar.value = _playerInfo.Thirst;
-        thirstText.text = $"{_playerInfo.Thirst}/{_playerInfo.MaxThirst}";
+            hungerBar.maxValue = _playerInfo.MaxHunger;
+            hungerBar.value = _playerInfo.Hunger;
+            hungerText.text = $"{_playerInfo.Hunger}/{_playerInfo.MaxHunger}";
+
+            thirstBar.maxValue = _playerInfo.MaxThirst;
+            thirstBar.value = _playerInfo.Thirst;
+            thirstText.text = $"{_playerInfo.Thirst}/{_playerInfo.MaxThirst}";
+        }
+
+        public void UpdateStats()
+        {
+            if (_playerInfo == null)
+                return;
+
+            healthBar.value = _playerInfo.Health;
+            healthText.text = $"{_playerInfo.Health}/{_playerInfo.MaxHealth}";
+
+            staminaBar.value = _playerInfo.Stamina;
+            staminaText.text = $"{_playerInfo.Stamina}/{_playerInfo.MaxStamina}";
+
+            hungerBar.value = _playerInfo.Hunger;
+            hungerText.text = $"{_playerInfo.Hunger}/{_playerInfo.MaxHunger}";
+
+            thirstBar.value = _playerInfo.Thirst;
+            thirstText.text = $"{_playerInfo.Thirst}/{_playerInfo.MaxThirst}";
+        }
     }
 }
