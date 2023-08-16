@@ -22,9 +22,10 @@ namespace Assets.Scripts.Model.Tester
 
         public static GameWorld CreateWorld(WorldGeneratorOld worldGenerator)
         {
-            WorldGenerator.SetParameters(new WorldGeneratorParametersFactory().Default);
 
-            var world = new GameWorld(0, "FirstWorld", WorldGenerator.CreateWorld());
+            WorldGenerator worldGenerator1 = new(new NoiseParametersSave().Default);
+
+            var world = new GameWorld(0, "FirstWorld", worldGenerator1.CreateWorld());
             world.InstantGameEvents.Add(new TestInstantGameEvent(world));
             world.InstantGameEvents.Add(new TestInstantGameEvent(world));
             world.InstantGameEvents.Add(new TestInstantGameEvent(world));

@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using Assets.Scripts.InGameScripts;
 using Assets.Scripts.InGameScripts.World.Absctract;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Model
 {
     public static class SaveManager
     {

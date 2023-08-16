@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Assets.Scripts.Model.WorldGeneration
 {
     [Serializable]
     public class GeneratorParameters
     {
-        private readonly long _seed;
+        private readonly string _seed;
+        private readonly float _seedX;
+        private readonly float _seedY;
+
         private readonly uint _worldWidth;
         private readonly uint _worldHeight;
 
@@ -13,21 +18,43 @@ namespace Assets.Scripts.Model.WorldGeneration
         private readonly PolutionNoiseParameters _polution;
         private readonly HeightsNoiseParameters _heights;
         private readonly TemperatureNoiseParameters _temperature;
-        private readonly RiversNoiseParameters _rivers;
 
-        public GeneratorParameters(long seed, uint width, uint height, ProgressNoiseParameters progress, PolutionNoiseParameters polution, HeightsNoiseParameters heights, TemperatureNoiseParameters temperature, RiversNoiseParameters rivers)
+        public GeneratorParameters(string seed, uint width, uint height, ProgressNoiseParameters progress, PolutionNoiseParameters polution, HeightsNoiseParameters heights, TemperatureNoiseParameters temperature)
         {
             _seed = seed;
+            ComputeSeed(_seed, out _seedX, out _seedY);
+
             _worldWidth = width;
             _worldHeight = height;
             _progress = progress;
             _polution = polution;
             _heights = heights;
             _temperature = temperature;
-            _rivers = rivers;
+
+            SetSeedToParameters();
         }
 
-        public long Seed => _seed;
+        public GeneratorParameters(string seed, uint width, uint height)
+        {
+            _seed = seed;
+            ComputeSeed(_seed, out _seedX, out _seedY);
+
+            _worldWidth = width;
+            _worldHeight = height;
+
+            NoiseParametersSave parametersSave = new();
+
+            _progress = parametersSave.LoadNoiseParameters<ProgressNoiseParameters>();
+            _polution = parametersSave.LoadNoiseParameters<PolutionNoiseParameters>();
+            _temperature = parametersSave.LoadNoiseParameters<TemperatureNoiseParameters>();
+            _heights = parametersSave.LoadNoiseParameters<HeightsNoiseParameters>();
+
+            SetSeedToParameters();
+        }
+
+        public string Seed => _seed;
+        public float SeedX => _seedX;
+        public float SeedY => _seedY;
         public uint WorldWidth => _worldWidth;
         public uint WorldHeight => _worldHeight;
 
@@ -71,15 +98,24 @@ namespace Assets.Scripts.Model.WorldGeneration
                 return _temperature;
             }
         }
-        public RiversNoiseParameters Rivers
-        {
-            get
-            {
-                if (_rivers == null)
-                    throw new InvalidOperationException("World generator parameter 'Rivers' is invalid!");
 
-                return _rivers;
-            }
+        private void SetSeedToParameters()
+        {
+            _progress.Noise.SetSeed(_seedX, _seedY);
+            _polution.Noise.SetSeed(_seedX, _seedY);
+            _heights.Noise.SetSeed(_seedX, _seedY);
+            _temperature.Noise.SetSeed(_seedX, _seedY);
+        }
+
+        public static void ComputeSeed(string seed, out float seedX, out float seedY)
+        {
+            using SHA256 sha256 = SHA256.Create();
+
+            byte[] hashX = sha256.ComputeHash(Encoding.UTF8.GetBytes("x" + seed));
+            byte[] hashY = sha256.ComputeHash(Encoding.UTF8.GetBytes("y" + seed));
+
+            seedX = BitConverter.ToInt16(hashX, 0);
+            seedY = BitConverter.ToInt16(hashY, 0);
         }
 
     }

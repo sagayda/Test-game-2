@@ -4,7 +4,7 @@ namespace Assets.Scripts.Model.WorldGeneration
 {
     public static class OctavePerlinNoise
     {
-        public static float OctaveNoise(float x, float y, OctaveNoiseParameters parameters)
+        public static float Noise(float x, float y, OctaveNoiseParameters parameters)
         {
             x *= parameters.Zoom;
             y *= parameters.Zoom;
@@ -28,10 +28,15 @@ namespace Assets.Scripts.Model.WorldGeneration
                 frequency *= parameters.Lacunarity;
             }
 
-            //back to 0...1
+            //back to 0..1
             resultNoise /= amplitudeSum;
 
             return parameters.EasingStrategy.Ease(resultNoise);
+        }
+
+        public static float Noise(Vector2 position, OctaveNoiseParameters parameters)
+        {
+            return Noise(position.x, position.y, parameters);
         }
     }
 }

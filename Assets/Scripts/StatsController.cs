@@ -1,7 +1,4 @@
 using Assets.Scripts.InGameScripts.Interfaces;
-using System.Collections;
-using System.Collections.Generic;
-using System.Xml.Serialization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,7 +50,7 @@ public class StatsController : MonoBehaviour
 
     public void UpdateStats()
     {
-        if (_playerInfo == null) 
+        if (_playerInfo == null)
             return;
 
         healthBar.value = _playerInfo.Health;

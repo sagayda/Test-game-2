@@ -1,5 +1,5 @@
 ﻿using System;
-using Assets.Scripts.InGameScripts;
+using Assets.Scripts.Model.InGameScripts;
 using UnityEngine;
 
 namespace Assets.Scripts.Model.Map
@@ -31,11 +31,11 @@ namespace Assets.Scripts.Model.Map
 
             _textureGeneratingStrategy = new MapTextureGenerationgByScale(_world, _scaling.ResolutionRatio, _scaling.MaxScaleLevel);
 
-            if(_world.Width == _world.Height)
+            if (_world.Width == _world.Height)
             {
                 return;
             }
-            else if(_world.Width > _world.Height)
+            else if (_world.Width > _world.Height)
             {
                 float ratio = _world.Height / (float)_world.Width;
                 _deltaY *= ratio;
