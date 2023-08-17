@@ -1,117 +1,286 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.WorldGeneration.Core;
+using log4net.Util;
 using UnityEngine;
 
 namespace WorldGeneration.Core
 {
     public class RiversGenerator
     {
-        private OctaveNoiseParameters _noise;
-        private WorldGenerator _worldGenerator;
+        public PerlinWorms PerlinWorms;
 
-        private int _riversLength = 512;
-
+        private readonly RiversGeneratorParameters _parameters;
 
         public float[,] RiverMap { get; private set; }
 
-        public RiversGenerator(WorldGenerator worldGenerator, OctaveNoiseParameters noise)
+        public RiversGenerator(RiversGeneratorParameters parameters)
         {
-            _noise = noise;
-            _worldGenerator = worldGenerator;
+            _parameters = parameters;
 
-            RiverMap = new float[_worldGenerator.WorldWidth, _worldGenerator.WorldHeight];
+            RiverMap = new float[_parameters.WorldWidth, _parameters.WorldHeight];
         }
+
+        //public void GenerateRivers()
+        //{
+        //    var maximas = FindLocalMaximas();
+        //    var minimas = FindLocalMinimas();
+        //    float currentBottomLevel = 0.8f;
+
+        //    List<DirectedPerlinWormData> unfinishedRiversData = new();
+
+        //    foreach (var maxima in maximas)
+        //    {
+        //        unfinishedRiversData.Add(BuildRiverData(maxima, minimas, 0.1f));
+        //    }
+
+        //    while (unfinishedRiversData.Count > 0)
+        //    {
+        //        List<DirectedPerlinWormData> returnedRivers = new();
+
+        //        foreach(var riverData in unfinishedRiversData)
+        //        {
+        //            if(!CreateRiver(riverData,minimas, out DirectedPerlinWormData returnedRiver))
+        //            {
+        //                returnedRivers.Add(returnedRiver);
+        //            }
+        //        }
+
+        //        unfinishedRiversData.Clear();
+        //        unfinishedRiversData.AddRange(returnedRivers);
+
+        //        currentBottomLevel -= 0.05f;
+        //        minimas = minimas.FindAll((minima) => _worldGenerator.GetHeightValue(minima.x, minima.y) <= currentBottomLevel);
+        //    }
+        //}
+
+        //private DirectedPerlinWormData BuildRiverData(Vector2Int startPoint, List<Vector2Int> minimas, float thickness)
+        //{
+        //    Vector2Int endPoint = minimas.OrderBy(pos => Vector2.Distance(pos, startPoint)).First();
+
+        //    DirectedPerlinWormData wormData = new(startPoint, endPoint, thickness, new LinearThicken(), _riversLength);
+
+        //    return wormData;
+        //}
+
+        //private bool CreateRiver(DirectedPerlinWormData riverData, List<Vector2Int> minimas, out DirectedPerlinWormData unfinishedRiverData)
+        //{
+        //    Vector2Int endPoint = minimas.OrderBy(pos => Vector2.Distance(pos, riverData.Position)).First();
+
+        //    PerlinWorms perlinWorms = new(new(_noise));
+
+        //    riverData.ChangeEndPoint(endPoint);
+        //    riverData.SetThickness(riverData.Thickness + _thicknessStep);
+
+        //    var river = perlinWorms.CreateWorm(riverData);
+        //    AddRiver(river);
+
+        //    if (_worldGenerator.GetHeightValue(endPoint.x, endPoint.y) < _worldGenerator.WaterLevel)
+        //    {
+        //        unfinishedRiverData = null;
+        //        return true;
+        //    }
+
+        //    unfinishedRiverData = riverData;
+        //    return false;
+        //}
+
 
         public void GenerateRivers()
         {
-            var maximas = FindLocalMaximas();
+            var startMaximas = FindLocalMaximas(_parameters.MaximasButtom, 1f);
+            var startMinimas = FindLocalMinimas(0f, _parameters.MinimasTop);
 
-            var minimas = FindLocalMinimas();
+            UnityEngine.Random.InitState(_parameters.Seed);
 
-            HashSet<Vector2Int> riversStart = maximas.ToHashSet();
-
-            //List<Vector2Int> riversStart = maximas;
-            float currentBottomLevel = 0.8f;
-
-            while (riversStart.Count > 0 && minimas.Count > 0)
+            List<Vector2Int> selectedMaximas = new();
+            int maximasToSelect = startMaximas.Count / 2;
+            while (selectedMaximas.Count < maximasToSelect)
             {
-                HashSet<Vector2Int> unfinishedRivers = new();
-
-                foreach (var riverStart in riversStart)
+                int randomIndex = UnityEngine.Random.Range(0, startMaximas.Count);
+                if (!selectedMaximas.Contains(startMaximas[randomIndex]))
                 {
-                    var finish = CreateRiver(riverStart, minimas);
+                    selectedMaximas.Add(startMaximas[randomIndex]);
+                }
+            }
 
-                    if (finish != null)
-                        unfinishedRivers.Add(finish.Value);
+            List<Vector2Int> selectedMinimas = new();
+            int minimasToSelect = startMinimas.Count / 2;
+            while (selectedMinimas.Count < minimasToSelect)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, startMinimas.Count);
+                if (!selectedMinimas.Contains(startMinimas[randomIndex]))
+                {
+                    selectedMinimas.Add(startMinimas[randomIndex]);
+                }
+            }
+
+            List<WormSegment> unfinishedRivers = new();
+            foreach (var maxima in selectedMaximas)
+            {
+                Vector2Int endPoint = selectedMinimas.OrderBy(pos => Vector2.Distance(pos, maxima)).First();
+
+                //thikness step = 0.4f
+                if (CreateRiver(maxima, endPoint, Vector2.up, 0.1f, 0.5f, out WormSegment? lastSegment) == false)
+                {
+                    unfinishedRivers.Add(lastSegment.Value);
+                }
+            }
+
+            float minimaStep = 0.1f;
+            float thicknessStep = 0.4f;
+            float currentMinimaTop = _parameters.MinimasTop - minimaStep;
+
+            List<Vector2Int> minimas = FindLocalMinimas(0, currentMinimaTop);
+
+            while (unfinishedRivers.Count > 0 && minimas.Count > 0)
+            {
+                List<WormSegment> returnedRivers = new List<WormSegment>();
+
+                unfinishedRivers = MergeSegments(unfinishedRivers);
+
+                foreach (var item in unfinishedRivers)
+                {
+                    Vector2Int startPoint = new(Mathf.RoundToInt(item.Position.x), Mathf.RoundToInt(item.Position.y));
+
+                    var admissibleMinimas = FilterPoints(minimas, startPoint, item.Direction);
+
+                    Vector2Int endPoint;
+                    if (admissibleMinimas.Count > 0)
+                    {
+                        Debug.Log("Selected admissible minima");
+                        endPoint = admissibleMinimas.First();
+                    }
+                    else 
+                    {
+                        Debug.Log("No admissible minimas");
+                        endPoint = minimas.OrderBy(pos => Vector2.Distance(pos, item.Position)).First();
+                    }
+
+                    if (CreateRiver(startPoint, endPoint, item.Direction, item.Thickness, item.Thickness + thicknessStep, out WormSegment? lastSegment) == false)
+                    {
+                        returnedRivers.Add(lastSegment.Value);
+                    }
                 }
 
-                riversStart.Clear();
-
-                foreach (var river in unfinishedRivers)
-                {
-                    riversStart.Add(river);
-                }
-
-                currentBottomLevel -= 0.1f;
-
-                minimas = minimas.FindAll((minima) => _worldGenerator.GetHeightValue(minima.x, minima.y) <= currentBottomLevel);
+                currentMinimaTop -= minimaStep;
+                unfinishedRivers.Clear();
+                unfinishedRivers.AddRange(returnedRivers);
+                minimas = FindLocalMinimas(0, currentMinimaTop);
             }
         }
 
-        private Vector2Int? CreateRiver(Vector2Int startPoint, List<Vector2Int> minimas)
+        private List<WormSegment> MergeSegments(List<WormSegment> segments)
         {
-            PerlinWorms perlinWorms;
+            var mergedObjects = segments
+                .GroupBy(obj => new Vector2(Mathf.RoundToInt(obj.Position.x), Mathf.RoundToInt(obj.Position.y)))
+                .Select(group =>
+                {
+                    var mergedPosition = group.Key;
+                    var mergedDirection = Vector2.zero;
+                    var mergedThickness = 0f;
 
-            Vector2Int endPoint;
+                    foreach (var obj in group)
+                    {
+                        mergedDirection += obj.Direction;
+                        mergedThickness += obj.Thickness;
+                    }
 
-            endPoint = minimas.OrderBy(pos => Vector2.Distance(pos, startPoint)).First();
-            perlinWorms = new(new(_noise));
+                    return new WormSegment(mergedPosition, mergedDirection.normalized, mergedThickness);
+                })
+                .ToList();
 
-            DirectedPerlinWormData wormData = new(startPoint, endPoint, _riversLength);
-            var river = perlinWorms.CreateWorm(wormData);
+            return mergedObjects;
+        }
 
+        private List<Vector2Int> FilterPoints(List<Vector2Int> points, Vector2Int mainPoint, Vector2 direction)
+        {
+            float maxAngleDeviation = 60f; // Максимальное отклонение угла (в градусах)
+            float maxDistance = 64f; // Максимальное расстояние
+
+            List<Vector2Int> filteredPoints = new List<Vector2Int>();
+
+            direction.Normalize();
+
+            foreach (Vector2Int point in points)
+            {
+                Vector2 toPoint = point - mainPoint;
+                float angle = Vector2.Angle(direction, toPoint);
+
+                if (angle <= maxAngleDeviation && toPoint.magnitude <= maxDistance)
+                {
+                    filteredPoints.Add(point);
+                }
+            }
+
+            return filteredPoints;
+
+        }
+
+        private bool CreateRiver(Vector2Int start, Vector2Int end, Vector2 direction, float minThickness, float maxThickness, out WormSegment? lastSegment)
+        {
+            DirectedPerlinWormData wormData = new(start, end, minThickness, maxThickness);
+            wormData.SetDirection(direction);
+            var river = PerlinWorms.CreateWorm(wormData);
             AddRiver(river);
 
-            if (_worldGenerator.GetHeightValue(endPoint.x, endPoint.y) < _worldGenerator.WaterLevel)
-                return null;
+            float endHeight = _parameters.WorldGenerator.GetHeightValue(Mathf.RoundToInt(end.x), Mathf.RoundToInt(end.y));
 
-            return endPoint;
+            if (endHeight < _parameters.WorldGenerator.WaterLevel)
+            {
+                lastSegment = null;
+                return true;
+            }
+
+            lastSegment = river.Last();
+
+            return false;
         }
 
         private void AddRiver(List<WormSegment> river)
         {
-            foreach (var riverTile in river)
+            foreach (var riverSegment in river)
             {
-                if (riverTile.Position.x < 0 || riverTile.Position.x >= _worldGenerator.WorldWidth || riverTile.Position.y < 0 || riverTile.Position.y >= _worldGenerator.WorldHeight)
-                    break;
+                int x = Mathf.RoundToInt(riverSegment.Position.x);
+                int y = Mathf.RoundToInt(riverSegment.Position.y);
 
-                RiverMap[Mathf.FloorToInt(riverTile.Position.x), Mathf.FloorToInt(riverTile.Position.y)] = 1f;
+                if (CheckEntryIntoMap(x, y) == false)
+                    continue;
+
+                RiverMap[x, y] = 1f;
+                ThickenRiverPosition(x, y, riverSegment.Thickness);
             }
         }
 
-        private void AddRiver(List<Vector2Int> river)
+        private void ThickenRiverPosition(int x, int y, float thickness)
         {
-            foreach (var riverTile in river)
-            {
-                if (riverTile.x < 0 || riverTile.x >= _worldGenerator.WorldWidth || riverTile.y < 0 || riverTile.y >= _worldGenerator.WorldHeight)
-                    break;
+            Vector2Int center = new Vector2Int(x, y);
 
-                RiverMap[riverTile.x, riverTile.y] = 1f;
+            Vector2Int[] directions = GetDirectionsInRadius(thickness);
+
+            foreach (var direction in directions)
+            {
+                Vector2Int position = center + direction;
+
+                if (CheckEntryIntoMap(position) == false)
+                    continue;
+
+                RiverMap[position.x, position.y] = 1f;
             }
         }
 
-        public List<Vector2Int> FindLocalMaximas()
+        public List<Vector2Int> FindLocalMaximas(float buttom, float top)
         {
             List<Vector2Int> maximas = new List<Vector2Int>();
 
-            for (int i = 0; i < _worldGenerator.WorldWidth; i++)
+            for (int i = 0; i < _parameters.WorldWidth; i++)
             {
-                for (int j = 0; j < _worldGenerator.WorldHeight; j++)
+                for (int j = 0; j < _parameters.WorldHeight; j++)
                 {
-                    float height = _worldGenerator.GetHeightValue(i, j);
+                    float height = _parameters.WorldGenerator.GetHeightValue(i, j);
 
-                    if (height < 0.8f)
+                    if (height < buttom || height > top)
                         continue;
 
                     if (CheckNeighbours(i, j, (neighbourHeight) => neighbourHeight > height))
@@ -122,17 +291,17 @@ namespace WorldGeneration.Core
             return maximas;
         }
 
-        public List<Vector2Int> FindLocalMinimas()
+        public List<Vector2Int> FindLocalMinimas(float buttom, float top)
         {
             List<Vector2Int> minimas = new List<Vector2Int>();
 
-            for (int i = 0; i < _worldGenerator.WorldWidth; i++)
+            for (int i = 0; i < _parameters.WorldWidth; i++)
             {
-                for (int j = 0; j < _worldGenerator.WorldHeight; j++)
+                for (int j = 0; j < _parameters.WorldHeight; j++)
                 {
-                    float height = _worldGenerator.GetHeightValue(i, j);
+                    float height = _parameters.WorldGenerator.GetHeightValue(i, j);
 
-                    if (height > 0.8f)
+                    if (height < buttom || height > top)
                         continue;
 
                     if (CheckNeighbours(i, j, (neighbourHeight) => neighbourHeight < height))
@@ -145,14 +314,16 @@ namespace WorldGeneration.Core
 
         private bool CheckNeighbours(int x, int y, Func<float, bool> failCondition)
         {
-            foreach (var direction in _directionsBig)
-            {
-                Vector2Int neighbourPos = new Vector2Int(x, y) + direction;
+            Vector2Int[] directions = GetDirectionsInRadius(_parameters.Radius);
 
-                if (neighbourPos.x > _worldGenerator.WorldWidth || neighbourPos.x < 0 || neighbourPos.y > _worldGenerator.WorldHeight || neighbourPos.y < 0)
+            foreach (var direction in directions)
+            {
+                Vector2Int neighbourPosition = new Vector2Int(x, y) + direction;
+
+                if (CheckEntryIntoMap(neighbourPosition) == false)
                     continue;
 
-                float neighbourHeight = _worldGenerator.GetHeightValue(neighbourPos.x, neighbourPos.y);
+                float neighbourHeight = _parameters.WorldGenerator.GetHeightValue(neighbourPosition.x, neighbourPosition.y);
 
                 if (failCondition(neighbourHeight))
                     return false;
@@ -161,65 +332,46 @@ namespace WorldGeneration.Core
             return true;
         }
 
-        private static Vector2Int[] _directions = new Vector2Int[]
+        private bool CheckEntryIntoMap(Vector2Int position)
         {
-        new Vector2Int( 0, 1), //N
-        new Vector2Int( 1, 1), //NE
-        new Vector2Int( 1, 0), //E
-        new Vector2Int(-1, 1), //SE
-        new Vector2Int(-1, 0), //S
-        new Vector2Int(-1,-1), //SW
-        new Vector2Int( 0,-1), //W
-        new Vector2Int( 1,-1),  //NW
-        ////
-        //new Vector2Int( 0, 2), //N
-        //new Vector2Int( 2, 2), //NE
-        //new Vector2Int( 2, 0), //E
-        //new Vector2Int(-2, 2), //SE
-        //new Vector2Int(-2, 0), //S
-        //new Vector2Int(-2,-2), //SW
-        //new Vector2Int( 0,-2), //W
-        //new Vector2Int( 2,-2),  //NW
-        ////
-        //new Vector2Int(-1,-2),
-        //new Vector2Int(1,-2),
-        //new Vector2Int(2,-1),
-        //new Vector2Int(2,1),
-        //new Vector2Int(1,2),
-        //new Vector2Int(-1,2),
-        //new Vector2Int(-2,1),
-        //new Vector2Int(-2,-1),
-        };
+            if (position.x < 0 ||
+                position.x >= _parameters.WorldWidth ||
+                position.y < 0 ||
+                position.y >= _parameters.WorldHeight)
+                return false;
 
-        private static Vector2Int[] _directionsBig = new Vector2Int[]
+            return true;
+        }
+
+        private bool CheckEntryIntoMap(float x, float y)
         {
-        new Vector2Int( 0, 1), //N
-        new Vector2Int( 1, 1), //NE
-        new Vector2Int( 1, 0), //E
-        new Vector2Int(-1, 1), //SE
-        new Vector2Int(-1, 0), //S
-        new Vector2Int(-1,-1), //SW
-        new Vector2Int( 0,-1), //W
-        new Vector2Int( 1,-1),  //NW
-        //
-        new Vector2Int( 0, 2), //N
-        new Vector2Int( 2, 2), //NE
-        new Vector2Int( 2, 0), //E
-        new Vector2Int(-2, 2), //SE
-        new Vector2Int(-2, 0), //S
-        new Vector2Int(-2,-2), //SW
-        new Vector2Int( 0,-2), //W
-        new Vector2Int( 2,-2),  //NW
-        //
-        new Vector2Int(-1,-2),
-        new Vector2Int(1,-2),
-        new Vector2Int(2,-1),
-        new Vector2Int(2,1),
-        new Vector2Int(1,2),
-        new Vector2Int(-1,2),
-        new Vector2Int(-2,1),
-        new Vector2Int(-2,-1),
-        };
+            if (x < 0 ||
+                x >= _parameters.WorldWidth ||
+                y < 0 ||
+                y >= _parameters.WorldHeight)
+                return false;
 
+            return true;
+        }
+
+        private static Vector2Int[] GetDirectionsInRadius(float radius)
+        {
+            List<Vector2Int> result = new List<Vector2Int>();
+
+            int intRaduis = Mathf.RoundToInt(radius);
+
+            for (int i = -intRaduis; i <= intRaduis; i++)
+            {
+                for (int j = -intRaduis; j <= intRaduis; j++)
+                {
+                    Vector2Int offset = new Vector2Int(i, j);
+
+                    if (offset.magnitude <= radius)
+                        result.Add(offset);
+                }
+            }
+
+            return result.ToArray();
+        }
     }
 }

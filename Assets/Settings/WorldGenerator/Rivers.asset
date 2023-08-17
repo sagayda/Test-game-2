@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Seed: 
   SeedStep: 0
-  Zoom: 0.02
-  Octaves: 1
-  Persistance: 1
-  Lacunarity: 1
+  Zoom: 0.04
+  Octaves: 2
+  Persistance: 0.8
+  Lacunarity: 2
   Easing: 0

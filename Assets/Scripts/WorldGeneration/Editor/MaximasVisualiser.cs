@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.WorldGeneration.Core;
+using UnityEngine;
 using WorldGeneration.Core;
+using Core;
 
 namespace WorldGeneration.Editor
 {
@@ -17,13 +19,32 @@ namespace WorldGeneration.Editor
             _maximasRenderer.sprite = PaintMaximas();
             _minimasRenderer.sprite = PaintMinimas();
             _riversRenderer.sprite = PaintRivers();
+
+            BoundedVector2 test1 = new BoundedVector2(new Vector2(1, 2), new Vector2(0, 0), new Vector2(2, 2));
+
+            test1.ChangeBounds(new(10, 10), new(20, 20));
+            Debug.Log(test1);
+
+            //test1.Value = 1;
+            //Debug.Log(test1);
+            //test1.Value = -1;
+            //Debug.Log(test1);
+            //test1.Value = 50;
+            //Debug.Log(test1);
+
+            //Debug.Log(test1.IsOnMaximum);
+            //Debug.Log(test1.IsOnMinimum);
+            //test1.Minimise();
+            //Debug.Log(test1);
         }
 
         private Sprite PaintMaximas()
         {
-            RiversGenerator riversGenerator = new(_generator, _progressParametersBuilder.LastBuilded.Noise);
+            RiversGeneratorParameters riversGeneratorParameters = new(_generator, 1646, 256, 0.8f, 0.75f, 2);
 
-            var maximas = riversGenerator.FindLocalMaximas();
+            RiversGenerator riversGenerator = new(riversGeneratorParameters);
+
+            var maximas = riversGenerator.FindLocalMaximas(0.8f,1f);
 
             Texture2D texture = new((int)_generator.WorldWidth, (int)_generator.WorldHeight);
 
@@ -48,9 +69,11 @@ namespace WorldGeneration.Editor
 
         private Sprite PaintMinimas()
         {
-            RiversGenerator riversGenerator = new(_generator, _progressParametersBuilder.LastBuilded.Noise);
+            RiversGeneratorParameters riversGeneratorParameters = new(_generator, 1646, 256, 0.8f, 0.75f, 2);
 
-            var maximas = riversGenerator.FindLocalMinimas();
+            RiversGenerator riversGenerator = new(riversGeneratorParameters);
+
+            var maximas = riversGenerator.FindLocalMinimas(0f,0.75f);
 
             Texture2D texture = new((int)_generator.WorldWidth, (int)_generator.WorldHeight);
 
@@ -75,7 +98,10 @@ namespace WorldGeneration.Editor
 
         private Sprite PaintRivers()
         {
-            RiversGenerator riversGenerator = new(_generator, _progressParametersBuilder.LastBuilded.Noise);
+            RiversGeneratorParameters riversGeneratorParameters = new(_generator, 1646, 256, 0.8f, 0.75f, 2);
+            RiversGenerator riversGenerator = new(riversGeneratorParameters);
+            riversGenerator.PerlinWorms = new(new(_progressParametersBuilder.Build().Noise));
+
             riversGenerator.GenerateRivers();
 
             Texture2D texture = new((int)_generator.WorldWidth, (int)_generator.WorldHeight);

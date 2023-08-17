@@ -23,7 +23,6 @@ namespace WorldGeneration.Core
             return data.Worm.ToList();
         }
 
-
         public List<WormSegment> CreateWorm(DirectedPerlinWormData data)
         {
             while (data.Step())
@@ -32,20 +31,6 @@ namespace WorldGeneration.Core
             }
 
             return data.Worm.ToList();
-        }
-
-        private Vector2 Move(PerlinWormData data)
-        {
-            DirectWorm(data);
-            data.Step();
-            return data.Position;
-        }
-
-        private Vector2 Move(DirectedPerlinWormData data)
-        {
-            DirectWorm(data);
-            data.Step();
-            return data.Position;
         }
 
         private Vector2 DirectWorm(PerlinWormData data)
