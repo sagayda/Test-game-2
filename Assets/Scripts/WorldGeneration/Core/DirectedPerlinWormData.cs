@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.WorldGeneration.Core;
+using UniversalTools;
 using UnityEngine;
 
 namespace WorldGeneration.Core
@@ -13,31 +14,24 @@ namespace WorldGeneration.Core
             _endPoint = end;
         }
 
-        public DirectedPerlinWormData(Vector2 start, Vector2 end, float minThickness, float maxThickness) : base(start, minThickness, maxThickness)
+        public DirectedPerlinWormData(Vector2 start, Vector2 end, BoundedValue<float> thickness) : base(start, thickness)
         {
             _endPoint = end;
         }
 
-        public DirectedPerlinWormData(Vector2 start, Vector2 end, float minThickness, float maxThickness, float weight) : base(start, minThickness, maxThickness)
-        {
-            _endPoint = end;
-            _weight = weight;
-        }
-
-        public DirectedPerlinWormData(Vector2 start, Vector2 end, float minThickness, float maxThickness, float weight, uint length) : base(start, minThickness, maxThickness, length)
+        public DirectedPerlinWormData(Vector2 start, Vector2 end, BoundedValue<float> thickness, float weight) : base(start, thickness)
         {
             _endPoint = end;
             _weight = weight;
         }
 
-        public DirectedPerlinWormData(Vector2 start, Vector2 end, float minThickness, float maxThickness, float weight, uint length, IThickeningStrategy thickeningStrategy) : base(start, minThickness, maxThickness, length, thickeningStrategy)
+        public DirectedPerlinWormData(Vector2 start, Vector2 end, BoundedValue<float> thickness, float weight, uint length) : base(start, thickness, length)
         {
             _endPoint = end;
             _weight = weight;
         }
 
-        protected override float CurrentThickness => _thickening.Thicken(MaxThickness, MinThickness, 1f - Vector2.Distance(Position, _endPoint) / Vector2.Distance(StartPoint, _endPoint));
-
+        public override float Completeness => 1 - (Vector2.Distance(Position, _endPoint) / Vector2.Distance(StartPoint, _endPoint));
         public Vector2 EndPoint => _endPoint;
         public float Weight => _weight;
          

@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Seed: 
   SeedStep: 0
-  Zoom: 0.01
-  Octaves: 4
-  Persistance: 0.41
-  Lacunarity: 2.7
-  Easing: 1
-  WaterLevel: 0.335
+  Zoom: 0.0485
+  Octaves: 7
+  Amplitude: 5.6
+  Persistance: 1.23
+  Frequency: 0.0733
+  Lacunarity: 2.45
+  WaterLevel: 0.485

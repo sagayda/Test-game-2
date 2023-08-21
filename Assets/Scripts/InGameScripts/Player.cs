@@ -1,6 +1,6 @@
 ﻿using System;
 using Assets.Scripts.Model.InGameScripts.Interfaces;
-using Core;
+using UniversalTools;
 using UnityEngine;
 using WorldGeneration.Core.Locations;
 

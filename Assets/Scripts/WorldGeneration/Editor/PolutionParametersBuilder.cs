@@ -3,42 +3,52 @@ using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
 {
-    [CreateAssetMenu(fileName = "PolutionParams", menuName = "World generator/Create polution params")]
+    [CreateAssetMenu(fileName = "PolutionParams", menuName = "World generator/Create polution parameters")]
     [ExecuteInEditMode]
-    public class PolutionParametersBuilder : BaseParametersBuilder<PolutionNoiseParameters>
+    public class PolutionParametersBuilder : FractalNoiseParametersBuilder
     {
+        [Header("Polution parameters")]
         public float ProgressImpactStrength;
         public float ProgressImpactMultiplyer;
         public float ProgressImpactBottom;
         public float ProgressImpactTop;
 
-        public override PolutionNoiseParameters LastBuilded { get => _lastBuilded; set => _lastBuilded = value; }
-        private PolutionNoiseParameters _lastBuilded;
+        public PolutionGenerationParameters GenerationParameters => Build();
 
-        private void OnValidate()
+        private PolutionGenerationParameters Build()
         {
-            _lastBuilded = Build();
+            return new PolutionGenerationParameters(NoiseParameters, ProgressImpactStrength, ProgressImpactMultiplyer, ProgressImpactBottom, ProgressImpactTop);
         }
 
-        public override PolutionNoiseParameters Build()
+        protected override void Save()
         {
-            return new PolutionNoiseParameters(BuildBase(), ProgressImpactStrength, ProgressImpactMultiplyer, ProgressImpactBottom, ProgressImpactTop);
+            ParametersSave.SaveParameters(GenerationParameters, SaveSlot);
         }
 
-        public override void Load()
+        protected override void Load()
         {
-            NoiseParametersSave parametersSave = new NoiseParametersSave();
+            var loaded = ParametersSave.LoadParameters<PolutionGenerationParameters>(SaveSlot);
 
-            PolutionNoiseParameters loadedParams = parametersSave.LoadNoiseParameters<PolutionNoiseParameters>();
+            if (loaded.HasValue)
+            {
+                ProgressImpactStrength = loaded.Value.ProgressImpactStrength;
+                ProgressImpactMultiplyer = loaded.Value.ProgressImpactMultiplyer;
+                ProgressImpactBottom = loaded.Value.ProgressImpactBottom;
+                ProgressImpactTop = loaded.Value.ProgressImpactTop;
 
-            LoadBase(loadedParams.Noise);
+                XSeedStep = loaded.Value.Noise.XSeedStep;
+                YSeedStep = loaded.Value.Noise.YSeedStep;
+                Octaves = loaded.Value.Noise.Octaves;
+                Amplitude = loaded.Value.Noise.Amplitude;
+                Frequency = loaded.Value.Noise.Frequency;
+                Persistance = loaded.Value.Noise.Persistance;
+                Lacunarity = loaded.Value.Noise.Lacunarity;
+            }
+        }
 
-            ProgressImpactStrength = loadedParams.ProgressImpactStrength;
-            ProgressImpactMultiplyer = loadedParams.ProgressImpactMultiplyer;
-            ProgressImpactBottom = loadedParams.ProgressImpactBottom;
-            ProgressImpactTop = loadedParams.ProgressImpactTop;
-
-            _lastBuilded = loadedParams;
+        protected override Color GetColor(float noise)
+        {
+            return StepwiseColorLerp(Color.white, Color.green, 0, 1, noise);
         }
     }
 }

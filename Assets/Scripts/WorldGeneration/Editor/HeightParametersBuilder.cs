@@ -3,36 +3,59 @@ using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
 {
-    [CreateAssetMenu(fileName = "HeightParams", menuName = "World generator/Create hight params")]
+    [CreateAssetMenu(fileName = "HeightParams", menuName = "World generator/Create height parameters")]
     [ExecuteInEditMode]
-    public class HeightParametersBuilder : BaseParametersBuilder<HeightsNoiseParameters>
+    public class HeightParametersBuilder : FractalNoiseParametersBuilder
     {
+        [Header("Height parameters")]
         [Range(0, 1)] public float WaterLevel;
+        public HeightsGenerationParameters GenerationParameters => Build();
 
-        public override HeightsNoiseParameters LastBuilded { get => _lastBuilded; set => LastBuilded = value; }
-        private HeightsNoiseParameters _lastBuilded;
-
-        private void OnValidate()
+        private HeightsGenerationParameters Build()
         {
-            _lastBuilded = Build();
+            return new(NoiseParameters, WaterLevel);
         }
 
-        public override HeightsNoiseParameters Build()
+        protected override void Save()
         {
-            return new HeightsNoiseParameters(BuildBase(), WaterLevel);
+            ParametersSave.SaveParameters(GenerationParameters, SaveSlot);
         }
 
-        public override void Load()
+        protected override void Load()
         {
-            NoiseParametersSave parametersSave = new NoiseParametersSave();
+            var loaded = ParametersSave.LoadParameters<HeightsGenerationParameters>(SaveSlot);
 
-            HeightsNoiseParameters loadedParams = parametersSave.LoadNoiseParameters<HeightsNoiseParameters>();
+            if (loaded.HasValue)
+            {
+                WaterLevel = loaded.Value.WaterLevel;
 
-            LoadBase(loadedParams.Noise);
+                XSeedStep = loaded.Value.Noise.XSeedStep;
+                YSeedStep = loaded.Value.Noise.YSeedStep;
+                Octaves = loaded.Value.Noise.Octaves;
+                Amplitude = loaded.Value.Noise.Amplitude;
+                Frequency = loaded.Value.Noise.Frequency;
+                Persistance = loaded.Value.Noise.Persistance;
+                Lacunarity = loaded.Value.Noise.Lacunarity;
+            }
+        }
 
-            WaterLevel = loadedParams.WaterLevel;
+        protected override Color GetColor(float noise)
+        {
+            Color color;
 
-            _lastBuilded = loadedParams;
+            float landSize = 1 - WaterLevel;
+            float landStep = landSize / 3;
+
+            if (noise <= WaterLevel)
+                color = StepwiseColorLerp(Color.black, new Color(0f, 0.4f, 1f), 0, WaterLevel, noise);
+            else if (noise <= WaterLevel + landStep)
+                color = StepwiseColorLerp(new Color(0.5f, 0.95f, 0f), new Color(0, 0.4f, 0), WaterLevel, WaterLevel + landStep, noise);
+            else if (noise <= WaterLevel + landStep * 2)
+                color = StepwiseColorLerp(new Color(0, 0.4f, 0), new Color(0.55f, 0.55f, 0), WaterLevel + landStep, WaterLevel + landStep * 2, noise);
+            else
+                color = StepwiseColorLerp(new Color(0.55f, 0.55f, 0), new Color(0.45f, 0f, 0f), WaterLevel + landStep * 2, 1, noise);
+
+            return color;
         }
     }
 }

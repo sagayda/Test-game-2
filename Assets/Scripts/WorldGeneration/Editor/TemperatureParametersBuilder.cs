@@ -3,42 +3,63 @@ using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
 {
-    [CreateAssetMenu(fileName = "TemperatureParams", menuName = "World generator/Create temperature params")]
+    [CreateAssetMenu(fileName = "TemperatureParams", menuName = "World generator/Create temperature parameters")]
     [ExecuteInEditMode]
-    public class TemperatureParametersBuilder : BaseParametersBuilder<TemperatureNoiseParameters>
+    public class TemperatureParametersBuilder : FractalNoiseParametersBuilder
     {
+        [Header("Temperature parameters")]
         public float HeightImpactStrength;
         public float HeightImpactSmoothing;
         public float NoiseImpact;
         public float GlobalTemperature;
 
-        public override TemperatureNoiseParameters LastBuilded { get => _lastBuilded; set => _lastBuilded = value; }
-        private TemperatureNoiseParameters _lastBuilded;
+        public TemperatureGenerationParameters GenerationParameters => Build();
 
-        private void OnValidate()
+        private TemperatureGenerationParameters Build()
         {
-            _lastBuilded = Build();
+            return new TemperatureGenerationParameters(NoiseParameters, HeightImpactStrength, HeightImpactSmoothing, NoiseImpact, GlobalTemperature);
         }
 
-        public override TemperatureNoiseParameters Build()
+        protected override void Save()
         {
-            return new TemperatureNoiseParameters(BuildBase(), HeightImpactStrength, HeightImpactSmoothing, NoiseImpact, GlobalTemperature);
+            ParametersSave.SaveParameters(GenerationParameters, SaveSlot);
         }
 
-        public override void Load()
+        protected override void Load()
         {
-            NoiseParametersSave parametersSave = new NoiseParametersSave();
+            var loaded = ParametersSave.LoadParameters<TemperatureGenerationParameters>(SaveSlot);
 
-            TemperatureNoiseParameters loadedParams = parametersSave.LoadNoiseParameters<TemperatureNoiseParameters>();
+            if (loaded.HasValue)
+            {
+                HeightImpactStrength = loaded.Value.HeightImpactStrength;
+                HeightImpactSmoothing = loaded.Value.HeightImpactSmoothing;
+                NoiseImpact = loaded.Value.NoiseImpactStrength;
+                GlobalTemperature = loaded.Value.GlobalTemperature;
 
-            LoadBase(loadedParams.Noise);
+                XSeedStep = loaded.Value.Noise.XSeedStep;
+                YSeedStep = loaded.Value.Noise.YSeedStep;
+                Octaves = loaded.Value.Noise.Octaves;
+                Amplitude = loaded.Value.Noise.Amplitude;
+                Frequency = loaded.Value.Noise.Frequency;
+                Persistance = loaded.Value.Noise.Persistance;
+                Lacunarity = loaded.Value.Noise.Lacunarity;
+            }
+        }
 
-            HeightImpactStrength = loadedParams.HeightImpactStrength;
-            HeightImpactSmoothing = loadedParams.HeightImpactSmoothing;
-            NoiseImpact = loadedParams.NoiseImpact;
-            GlobalTemperature = loadedParams.GlobalTemperature;
+        protected override Color GetColor(float noise)
+        {
+            Color color;
 
-            _lastBuilded = loadedParams;
+            if (noise <= 0.25f)
+                color = StepwiseColorLerp(Color.white, Color.blue, 0, 0.25f, noise);
+            else if (noise <= 0.5f)
+                color = StepwiseColorLerp(Color.blue, Color.green, 0.25f, 0.5f, noise);
+            else if (noise <= 0.75f)
+                color = StepwiseColorLerp(Color.green, Color.yellow, 0.5f, 0.75f, noise);
+            else
+                color = StepwiseColorLerp(Color.yellow, Color.red, 0.75f, 1f, noise);
+
+            return color;
         }
     }
 }

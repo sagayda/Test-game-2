@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using Assets.Scripts.Model.InGameScripts;
 using WorldGeneration.Core.Locations;
 
-namespace Core
+namespace Resources
 {
     public static class SaveManager
     {

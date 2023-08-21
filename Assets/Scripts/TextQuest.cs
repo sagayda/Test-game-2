@@ -3,10 +3,11 @@ using Assets.Scripts.Model.InGameScripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UniversalTools;
 using WorldGeneration.Core;
 using WorldGeneration.Core.Locations;
 
-namespace Core
+namespace Resources
 {
     public class TextQuest : GenericSingleton<TextQuest>
     {

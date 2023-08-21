@@ -3542,14 +3542,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e063c54eff8e62240ac5fec0b81056c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthBar: {fileID: 20034687}
-  healthText: {fileID: 2087832629}
-  staminaBar: {fileID: 526343154}
-  staminaText: {fileID: 1854641257}
-  hungerBar: {fileID: 240558404}
-  hungerText: {fileID: 1632488691}
-  thirstBar: {fileID: 1059048322}
-  thirstText: {fileID: 1296716673}
 --- !u!4 &1308601657
 Transform:
   m_ObjectHideFlags: 0
@@ -3596,19 +3588,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 333faf2a3e44f2c43b5d05c61ee28604, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameText: {fileID: 1076966075}
-  _actionButtons:
-  - {fileID: 674040339}
-  - {fileID: 1608168218}
-  - {fileID: 524663614}
-  - {fileID: 858303369}
-  _actionButtonsText:
-  - {fileID: 436469281}
-  - {fileID: 1445527195}
-  - {fileID: 688755244}
-  - {fileID: 2020201185}
-  _statsController: {fileID: 1308601656}
-  _worldGenerator: {fileID: 1392665220}
 --- !u!4 &1392665217
 Transform:
   m_ObjectHideFlags: 0
@@ -3636,50 +3615,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81e24f589745abe4cbbe93da80e729f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TextSeed: sagayda
-  worldSeed: 898898
-  worldWidth: 256
-  worldHeight: 256
-  progressZoom: 70
-  progressSeedStep: 1000
-  progressDensity: 0.7
-  polutionZoom: 30
-  polutionSeedStep: 2000
-  polutionDensity: 1
-  PoPImpactStrength: 1
-  PoPImpactMultiplyer: 1
-  PoPImpactButtom: 0.1
-  PoPImpactTop: 2
-  heightZoom: 95
-  heightSeedStep: 5497
-  heightDensity: 1.05
-  additionalHeightZoom: 15
-  additionalHeightSeedStep: 4000
-  additionalHeightDensity: 1
-  layersMixStrength: 4
-  waterLevel: 0.45
-  riversSideLevel: 1.7
-  riversZoom: 33
-  riversSeedStep: 4000
-  riversDensity: 1
-  riversLevel: 0.461
-  riversSharpness: 4.6
-  temperatureZoom: 30
-  temperatureSeedStep: 3000
-  temperatureDensity: 1
-  HoTImpactStrength: 100
-  HoTImpactSmoothing: 3.2
-  NoiseOnTemperatureImpact: 0.26
-  Temperature: 0
-  testingZoomX: 50
-  testingZoomY: 50
-  testingSeedStep: 3000
-  testingDensity: 1.3
-  testingSmoothing: 8
-  testingMainLevel: 0.5
-  testing1Zoom: 30
-  testing1SeedStep: 3000
-  testing1Density: 1
 --- !u!114 &1392665221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3692,8 +3627,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6207d98ef27834849a1c4b0c3fc303ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _viev: {fileID: 132705019}
-  _playerMarkerData: {fileID: 0}
 --- !u!1 &1406387078
 GameObject:
   m_ObjectHideFlags: 0

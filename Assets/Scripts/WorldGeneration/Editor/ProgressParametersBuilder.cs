@@ -3,32 +3,41 @@ using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
 {
-    [CreateAssetMenu(fileName = "ProgressParams", menuName = "World generator/Create progress params")]
+    [CreateAssetMenu(fileName = "ProgressParams", menuName = "World generator/Create progress parameters")]
     [ExecuteInEditMode]
-    public class ProgressParametersBuilder : BaseParametersBuilder<ProgressNoiseParameters>
+    public class ProgressParametersBuilder : FractalNoiseParametersBuilder
     {
-        public override ProgressNoiseParameters LastBuilded { get => _lastBuilded; set => _lastBuilded = value; }
-        private ProgressNoiseParameters _lastBuilded;
+        public ProgressGenerationParameters GenerationParameters => Build();
 
-        private void OnValidate()
+        private ProgressGenerationParameters Build()
         {
-            _lastBuilded = Build();
+            return new ProgressGenerationParameters(NoiseParameters);
         }
 
-        public override ProgressNoiseParameters Build()
+        protected override void Save()
         {
-            return new ProgressNoiseParameters(BuildBase());
+            ParametersSave.SaveParameters(GenerationParameters, SaveSlot);
         }
 
-        public override void Load()
+        protected override void Load()
         {
-            NoiseParametersSave parametersSave = new NoiseParametersSave();
+            var loaded = ParametersSave.LoadParameters<ProgressGenerationParameters>(SaveSlot);
 
-            ProgressNoiseParameters loadedParams = parametersSave.LoadNoiseParameters<ProgressNoiseParameters>();
+            if (loaded.HasValue)
+            {
+                XSeedStep = loaded.Value.Noise.XSeedStep;
+                YSeedStep = loaded.Value.Noise.YSeedStep;
+                Octaves = loaded.Value.Noise.Octaves;
+                Amplitude = loaded.Value.Noise.Amplitude;
+                Frequency = loaded.Value.Noise.Frequency;
+                Persistance = loaded.Value.Noise.Persistance;
+                Lacunarity = loaded.Value.Noise.Lacunarity;
+            }
+        }
 
-            LoadBase(loadedParams.Noise);
-
-            _lastBuilded = loadedParams;
+        protected override Color GetColor(float noise)
+        {
+            return StepwiseColorLerp(Color.white, Color.red, 0, 1, noise);
         }
     }
 }

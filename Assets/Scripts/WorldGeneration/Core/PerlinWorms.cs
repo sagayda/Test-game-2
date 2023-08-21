@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
 {
@@ -15,6 +16,8 @@ namespace WorldGeneration.Core
 
         public List<WormSegment> CreateWorm(PerlinWormData data)
         {
+            DirectWorm(data);
+
             while (data.Step())
             {
                 DirectWorm(data);
@@ -25,6 +28,8 @@ namespace WorldGeneration.Core
 
         public List<WormSegment> CreateWorm(DirectedPerlinWormData data)
         {
+            DirectWorm(data);
+
             while (data.Step())
             {
                 DirectWorm(data);
@@ -35,8 +40,8 @@ namespace WorldGeneration.Core
 
         private Vector2 DirectWorm(PerlinWormData data)
         {
-            float noise = OctavePerlinNoise.Noise(data.Position, _parameters.Noise);
-            float degrees = RangeMap(noise, -90, 90);
+            float noise = FractalNoise.Generate(data.Position, _parameters.Noise);
+            float degrees = RangeMap((1f -noise), -90, 90);
             data.Direct((Quaternion.AngleAxis(degrees, Vector3.forward) * data.Direction).normalized);
 
             return data.Direction;

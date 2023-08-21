@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 using WorldGeneration.Core.Locations;
+using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
 {
@@ -10,30 +13,14 @@ namespace WorldGeneration.Core
 
         public WorldGenerator(GeneratorParameters parameters)
         {
-            Parameters = parameters;
+            _parameters = parameters;
         }
 
-        private GeneratorParameters Parameters
-        {
-            get
-            {
-                if (_parameters == null)
-                    throw new InvalidOperationException("World generator parameters is not set!");
-
-                return _parameters;
-            }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(Parameters), "World generator parameters can not be null!");
-
-                _parameters = value;
-            }
-        }
+        private GeneratorParameters Parameters => _parameters;
 
         public uint WorldWidth => Parameters.WorldWidth;
         public uint WorldHeight => Parameters.WorldHeight;
-        public float WaterLevel => Parameters.Height.WaterLevel;
+        public float WaterLevel => Parameters.Heights.WaterLevel;
 
         public float GetProgressValue(int x, int y)
         {
@@ -56,7 +43,21 @@ namespace WorldGeneration.Core
 
         public float GetHeightValue(int x, int y)
         {
-            float noise = GetBaseNoiseValue(x, y, Parameters.Height.Noise);
+            float noise = GetBaseNoiseValue(x, y, Parameters.Heights.Noise);
+
+            return noise;
+        }
+
+        public float GetHeightValue(Vector2 point)
+        {
+            float noise = GetBaseNoiseValue(point.x, point.y, Parameters.Heights.Noise);
+
+            return noise;
+        }
+
+        public float GetHeightValue(float x, float y)
+        {
+            float noise = GetBaseNoiseValue(x, y, Parameters.Heights.Noise);
 
             return noise;
         }
@@ -76,19 +77,19 @@ namespace WorldGeneration.Core
             float temperatureNoise = distanceFromEquator;
             temperatureNoise += Parameters.Temperature.GlobalTemperature;
 
-            temperatureNoise += rawNoiseTemperature * Parameters.Temperature.NoiseImpact;
+            temperatureNoise += rawNoiseTemperature * Parameters.Temperature.NoiseImpactStrength;
 
             temperatureNoise = 1 - temperatureNoise;
 
-            if (noiseHight > Parameters.Height.WaterLevel)
+            if (noiseHight > Parameters.Heights.WaterLevel)
             {
                 float temperatureChange;
 
                 //temperature change depending on distance from equator
-                temperatureChange = noiseHight - Parameters.Height.WaterLevel;
+                temperatureChange = noiseHight - Parameters.Heights.WaterLevel;
                 //smoothing
                 temperatureChange = Mathf.Pow(temperatureChange, Parameters.Temperature.HeightImpactSmoothing);
-                temperatureChange /= 1 - Parameters.Height.WaterLevel;
+                temperatureChange /= 1 - Parameters.Heights.WaterLevel;
                 //temperature 0..1 => 1..2 for better smoothing
                 temperatureNoise += 1;
                 //calculating temperature change strange
@@ -100,14 +101,23 @@ namespace WorldGeneration.Core
             return temperatureNoise;
         }
 
-        private float GetBaseNoiseValue(float x, float y, OctaveNoiseParameters parameters)
+        private static float GetBaseNoiseValue(float x, float y, FractalNoiseParameters parameters)
         {
-            return OctavePerlinNoise.Noise(x, y, parameters);
+            return FractalNoise.Generate(x, y, parameters);
         }
 
         public static GameWorld GetGameWorld()
         {
             return null;
+        }
+
+        public static int ComputeInt32Seed(string seed)
+        {
+            using SHA256 sha256 = SHA256.Create();
+
+            byte[] hashX = sha256.ComputeHash(Encoding.UTF8.GetBytes("x" + seed));
+
+            return BitConverter.ToInt32(hashX, 0);
         }
 
         //public Location[,] CreateWorld()

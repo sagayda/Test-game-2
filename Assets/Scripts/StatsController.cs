@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Assets.Scripts.Model.InGameScripts.Interfaces;
 
-namespace Core
+namespace Resources
 {
     public class StatsController : MonoBehaviour
     {

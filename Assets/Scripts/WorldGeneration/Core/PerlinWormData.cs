@@ -1,105 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Assets.Scripts.WorldGeneration.Core;
 using UnityEngine;
+using UniversalTools;
 
 namespace WorldGeneration.Core
 {
     public class PerlinWormData
     {
         private readonly Vector2 _startPoint;
-        private readonly float _minThickness;
-        private readonly float _maxThickness;
         private readonly uint _length;
-        protected readonly IThickeningStrategy _thickening;
-
         private readonly List<WormSegment> _worm = new();
+
+        private BoundedValue<float> _thickness;
 
         public PerlinWormData(Vector2 start)
         {
             _startPoint = start;
-            _minThickness = 1f;
-            _maxThickness = 2f;
+            _thickness = new(1f, 2f);
             _length = 256;
-            _thickening = new LinearThicken();
 
             Direction = Vector2.up;
             Position = start;
         }
 
-        public PerlinWormData(Vector2 start, float minThickness, float maxThickness)
+        public PerlinWormData(Vector2 start, BoundedValue<float> thickness)
         {
-            if (minThickness > maxThickness)
-                throw new ArgumentException("Thickness is invalid");
-
-            if (minThickness < 0f)
-                minThickness = 0f;
-
-            if (maxThickness < 0f)
-                maxThickness = 0f;
-
             _startPoint = start;
-            _minThickness = minThickness;
-            _maxThickness = maxThickness;
+            _thickness = thickness;
             _length = 256;
-            _thickening = new LinearThicken();
 
             Direction = Vector2.up;
             Position = start;
         }
 
-        public PerlinWormData(Vector2 start, float minThickness, float maxThickness, uint length)
+        public PerlinWormData(Vector2 start, BoundedValue<float> thickness, uint length)
         {
-            if (minThickness > maxThickness)
-                throw new ArgumentException("Thickness is invalid");
-
-            if (minThickness < 0f)
-                minThickness = 0f;
-
-            if (maxThickness < 0f)
-                maxThickness = 0f;
-
             _startPoint = start;
-            _minThickness = minThickness;
-            _maxThickness = maxThickness;
+            _thickness = thickness;
             _length = length;
-            _thickening = new LinearThicken();
 
             Direction = Vector2.up;
             Position = start;
-        }
-
-        public PerlinWormData(Vector2 start, float minThickness, float maxThickness, uint length, IThickeningStrategy thickeningStrategy)
-        {
-            if (minThickness > maxThickness)
-                throw new ArgumentException("Thickness is invalid");
-
-            if (minThickness < 0f)
-                minThickness = 0f;
-
-            if (maxThickness < 0f)
-                maxThickness = 0f;
-
-            _startPoint = start;
-            _minThickness = minThickness;
-            _maxThickness = maxThickness;
-            _length = length;
-            _thickening = thickeningStrategy;
-
-            Position = start;
-            Direction = Vector2.up;
         }
 
         public Vector2 Direction { get; private set; }
         public Vector2 Position { get; private set; }
 
         public Vector2 StartPoint => _startPoint;
-        public float MinThickness => _minThickness;
-        public float MaxThickness => _maxThickness;
+        public BoundedValue<float> Thickness => _thickness;
         public float Length => _length;
         public List<WormSegment> Worm => _worm;
-
-        protected virtual float CurrentThickness => _thickening.Thicken(_maxThickness, _minThickness, _worm.Count / (float)_length);
+        public virtual float Completeness => _worm.Count / _length;
 
         public virtual bool Step()
         {
@@ -108,8 +59,11 @@ namespace WorldGeneration.Core
                 return false;
             }
 
-            _worm.Add(new(Position, Direction, CurrentThickness));
+            _worm.Add(new(Position, Direction, _thickness.Value));
 
+            Debug.Log($"{Position}\t\t {_thickness.LowerBound} <= {_thickness} <= {_thickness.UpperBound} \t\t{Completeness}");
+
+            //_thickness.Value = _thickening.Thicken(_thickness.LowerBound, _thickness.UpperBound, Completeness);
             Position += Direction;
 
             return true;
