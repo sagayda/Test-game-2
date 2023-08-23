@@ -2,38 +2,69 @@
 
 namespace WorldGeneration.Core.Noise
 {
-    public static class FractalNoise
+    public class FractalNoise
     {
-        public static int Seed
+        private readonly SimplexNoise _simplexNoise;
+        private readonly FractalNoiseParameters _parameters;
+
+        public FractalNoise(FractalNoiseParameters parameters)
         {
-            get { return Noise.Seed; }
-            set { Noise.Seed = value; }
+            _simplexNoise = new SimplexNoise();
+            _parameters = parameters;
         }
 
-        public static float Generate(float x, float y, FractalNoiseParameters parameters)
+        public FractalNoise(FractalNoiseParameters parameters, int seed)
         {
-            float amplitude = parameters.Amplitude;
-            float frequency = parameters.Frequency;
+            _simplexNoise = new SimplexNoise(seed);
+            _parameters = parameters;
+        }
+
+        public int Seed
+        {
+            get { return _simplexNoise.Seed; }
+            set { _simplexNoise.Seed = value; }
+        }
+
+        public float Generate(float x, float y)
+        {
+            float amplitude = _parameters.Amplitude;
+            float frequency = _parameters.Frequency;
 
             float resultNoise = 0f;
 
-            for (int octave = 0; octave < parameters.Octaves; octave++)
+            for (int octave = 0; octave < _parameters.Octaves; octave++)
             {
-                resultNoise += Noise.Generate(
-                    (x + parameters.XSeedStep) * frequency,
-                    (y + parameters.YSeedStep) * frequency)
+                resultNoise += _simplexNoise.Generate(
+                    (x + _parameters.XSeedStep) * frequency,
+                    (y + _parameters.YSeedStep) * frequency)
                     * amplitude;
 
-                amplitude *= parameters.Persistance;
-                frequency *= parameters.Lacunarity;
+                amplitude *= _parameters.Persistance;
+                frequency *= _parameters.Lacunarity;
             }
 
-            return Mathf.Clamp(parameters.EasingFunction(0, 1, resultNoise), 0, 1);
+            return Mathf.Clamp(_parameters.EasingFunction(0, 1, resultNoise), 0, 1);
         }
 
-        public static float Generate(Vector2 position, FractalNoiseParameters parameters)
+        public float Generate(Vector2 position)
         {
-            return Generate(position.x, position.y, parameters);
+            float amplitude = _parameters.Amplitude;
+            float frequency = _parameters.Frequency;
+
+            float resultNoise = 0f;
+
+            for (int octave = 0; octave < _parameters.Octaves; octave++)
+            {
+                resultNoise += _simplexNoise.Generate(
+                    (position.x + _parameters.XSeedStep) * frequency,
+                    (position.y + _parameters.YSeedStep) * frequency)
+                    * amplitude;
+
+                amplitude *= _parameters.Persistance;
+                frequency *= _parameters.Lacunarity;
+            }
+
+            return Mathf.Clamp(_parameters.EasingFunction(0, 1, resultNoise), 0, 1);
         }
     }
 }

@@ -7,11 +7,13 @@ namespace WorldGeneration.Core
 {
     public class PerlinWorms
     {
-        PerlinWormsParameters _parameters;
+        private FractalNoise _noiseProvider;
+        private PerlinWormsParameters _parameters;
 
         public PerlinWorms(PerlinWormsParameters parameters)
         {
             _parameters = parameters;
+            _noiseProvider = new FractalNoise(_parameters.Noise);
         }
 
         public List<WormSegment> CreateWorm(PerlinWormData data)
@@ -40,7 +42,7 @@ namespace WorldGeneration.Core
 
         private Vector2 DirectWorm(PerlinWormData data)
         {
-            float noise = FractalNoise.Generate(data.Position, _parameters.Noise);
+            float noise = _noiseProvider.Generate(data.Position);
             float degrees = RangeMap((1f -noise), -90, 90);
             data.Direct((Quaternion.AngleAxis(degrees, Vector3.forward) * data.Direction).normalized);
 

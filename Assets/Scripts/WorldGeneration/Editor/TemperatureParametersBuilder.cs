@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
@@ -7,6 +8,11 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class TemperatureParametersBuilder : FractalNoiseParametersBuilder
     {
+        private WorldGenerator _worldGenerator;
+
+        [ShowIf("EnableVisualizing")]
+        [BoxGroup("Visualizing")]
+        public ParametersSave.SaveSlot SlotForGenerator;
         [Header("Temperature parameters")]
         public float HeightImpactStrength;
         public float HeightImpactSmoothing;
@@ -18,6 +24,22 @@ namespace WorldGeneration.Editor
         private TemperatureGenerationParameters Build()
         {
             return new TemperatureGenerationParameters(NoiseParameters, HeightImpactStrength, HeightImpactSmoothing, NoiseImpact, GlobalTemperature);
+        }
+
+        protected override float GetNoise(int x, int y)
+        {
+            return _worldGenerator.GetTemperatureValue(x, y);
+        }
+
+        protected override void SetPaintingParameters()
+        {
+            _worldGenerator = new(new(Seed,
+              Width,
+              Height,
+              ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(SlotForGenerator),
+              ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
+              ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
+              GenerationParameters));
         }
 
         protected override void Save()

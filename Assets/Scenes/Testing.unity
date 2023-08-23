@@ -1526,4 +1526,3 @@ MonoBehaviour:
   _minimasRenderer: {fileID: 444627506}
   _riversRenderer: {fileID: 984716544}
   _riversPointsRenderer: {fileID: 1690063030}
-  _progressParametersBuilder: {fileID: 11400000, guid: cd990a43e97c43c418968d727a48f341, type: 2}

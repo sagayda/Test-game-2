@@ -10,6 +10,9 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class FractalNoiseParametersBuilder : ScriptableObject
     {
+        private FractalNoise _noiseProvider;
+
+        #region Editor fields
         public ParametersSave.SaveSlot SaveSlot;
         public bool EnableVisualizing = false;
         [BoxGroup("Visualizing")]
@@ -26,11 +29,11 @@ namespace WorldGeneration.Editor
         [ShowIf("EnableVisualizing")]
         [BoxGroup("Visualizing")]
         [Range(16, 1024)]
-        public int Width = 16;
+        public uint Width = 16;
         [ShowIf("EnableVisualizing")]
         [BoxGroup("Visualizing")]
         [Range(16, 1024)]
-        public int Height = 16;
+        public uint Height = 16;
 
         [Header("NoiseSettings")]
         public float XSeedStep;
@@ -42,6 +45,7 @@ namespace WorldGeneration.Editor
         [Range(0.1f, 2f)] public float Persistance;
         [Range(1f, 4f)] public float Lacunarity;
         public EasingFunction.Ease EaseFunction;
+        #endregion
 
         public FractalNoiseParameters NoiseParameters => Build();
 
@@ -75,17 +79,15 @@ namespace WorldGeneration.Editor
 
         private Sprite Paint()
         {
-            Texture2D texture = new(Width, Height);
+            Texture2D texture = new((int)Width, (int)Height);
 
-            var parameters = NoiseParameters;
-            int seed = WorldGenerator.ComputeInt32Seed(Seed);
-            FractalNoise.Seed = seed;
+            SetPaintingParameters();
 
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    float noise = FractalNoise.Generate(x, y, parameters);
+                    float noise = GetNoise(x, y);
 
                     Color color = GetColor(noise);
 
@@ -119,6 +121,16 @@ namespace WorldGeneration.Editor
                 Persistance = loaded.Value.Persistance;
                 Lacunarity = loaded.Value.Lacunarity;
             }
+        }
+
+        protected virtual void SetPaintingParameters()
+        {
+            _noiseProvider = new(NoiseParameters, WorldGenerator.ComputeInt32Seed(Seed));
+        }
+
+        protected virtual float GetNoise(int x, int y)
+        {
+            return _noiseProvider.Generate(x,y);
         }
 
         protected virtual Color GetColor(float noise)

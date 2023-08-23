@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
@@ -7,7 +8,29 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class ProgressParametersBuilder : FractalNoiseParametersBuilder
     {
+        private WorldGenerator _worldGenerator;
+
+        [ShowIf("EnableVisualizing")]
+        [BoxGroup("Visualizing")]
+        public ParametersSave.SaveSlot SlotForGenerator;
+
         public ProgressGenerationParameters GenerationParameters => Build();
+
+        protected override float GetNoise(int x, int y)
+        {
+            return _worldGenerator.GetProgressValue(x, y);
+        }
+
+        protected override void SetPaintingParameters()
+        {
+            _worldGenerator = new(new(Seed,
+                          Width,
+                          Height,
+                          GenerationParameters,
+                          ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
+                          ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
+                          ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(SlotForGenerator)));
+        }
 
         private ProgressGenerationParameters Build()
         {

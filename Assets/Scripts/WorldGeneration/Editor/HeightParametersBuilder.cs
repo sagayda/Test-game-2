@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 using WorldGeneration.Core;
 
 namespace WorldGeneration.Editor
@@ -7,13 +8,36 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class HeightParametersBuilder : FractalNoiseParametersBuilder
     {
+        #region Editor fields
+        [ShowIf("EnableVisualizing")]
+        [BoxGroup("Visualizing")]
+        public ParametersSave.SaveSlot SlotForGenerator;
+
         [Header("Height parameters")]
         [Range(0, 1)] public float WaterLevel;
+        #endregion
+
         public HeightsGenerationParameters GenerationParameters => Build();
 
         private HeightsGenerationParameters Build()
         {
             return new(NoiseParameters, WaterLevel);
+        }
+
+        protected override float GetNoise(int x, int y)
+        {
+            return WorldGenerator.GetHeightValue(x, y);
+        }
+
+        protected override void SetPaintingParameters()
+        {
+            WorldGenerator.Parameters = new(Seed,
+                                      Width,
+                                      Height,
+                                      ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(SlotForGenerator),
+                                      ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
+                                      GenerationParameters,
+                                      ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(SlotForGenerator));
         }
 
         protected override void Save()

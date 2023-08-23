@@ -9,23 +9,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 962203e1c879d3f4a999f53e5fdfa917, type: 3}
-  m_Name: HeightParams
+  m_Script: {fileID: 11500000, guid: 67d9a258ed393b0468b0db9dd1f57b92, type: 3}
+  m_Name: PolutionParams
   m_EditorClassIdentifier: 
   SaveSlot: 0
   EnableVisualizing: 1
   Renderer: {fileID: 0}
   Seed: 
-  ColorLerpRate: 2
+  ColorLerpRate: 10
   Width: 256
   Height: 256
-  XSeedStep: 0
-  YSeedStep: 0
-  Octaves: 6
-  Amplitude: 0.565
-  Frequency: 0.01
-  Persistance: 0.5
+  XSeedStep: 1000
+  YSeedStep: -1000
+  Octaves: 1
+  Amplitude: 1.3
+  Frequency: 0.0142
+  Persistance: 1
   Lacunarity: 2
-  EaseFunction: 12
+  EaseFunction: 21
   SlotForGenerator: 0
-  WaterLevel: 0.244
+  ProgressImpactStrength: 1.66
+  ProgressImpactMultiplyer: 1.55
+  ProgressImpactBottom: 0.3
+  ProgressImpactTop: 2

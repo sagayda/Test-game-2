@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Security.Cryptography;
-using System.Text;
-using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
 {
     [Serializable]
-    public readonly struct GeneratorParameters
+    public struct GeneratorParameters
     {
         public readonly string Seed;
         public readonly int IntSeed;
         public readonly uint WorldWidth;
         public readonly uint WorldHeight;
-        public readonly ProgressGenerationParameters Progress;
-        public readonly PolutionGenerationParameters Polution;
-        public readonly HeightsGenerationParameters Heights;
-        public readonly TemperatureGenerationParameters Temperature;
+
+        public ProgressGenerationParameters Progress { get; set; }
+        public PolutionGenerationParameters Polution { get; set; }
+        public HeightsGenerationParameters Heights { get; set; }
+        public TemperatureGenerationParameters Temperature { get; set; }
 
         public GeneratorParameters(string seed, uint width, uint height, ProgressGenerationParameters progress, PolutionGenerationParameters polution, HeightsGenerationParameters heights, TemperatureGenerationParameters temperature)
         {
@@ -30,7 +28,7 @@ namespace WorldGeneration.Core
             Temperature = temperature;
         }
 
-        public GeneratorParameters(string seed, uint width, uint height)
+        public GeneratorParameters(string seed, uint width, uint height, ParametersSave.SaveSlot slotToLoad = ParametersSave.SaveSlot.Default)
         {
             Seed = seed;
             IntSeed = WorldGenerator.ComputeInt32Seed(Seed);
@@ -38,10 +36,10 @@ namespace WorldGeneration.Core
             WorldWidth = width;
             WorldHeight = height;
 
-            Progress = ParametersSave.LoadParameters<ProgressGenerationParameters>(ParametersSave.SaveSlot.Default).GetValueOrDefault();
-            Polution = ParametersSave.LoadParameters<PolutionGenerationParameters>(ParametersSave.SaveSlot.Default).GetValueOrDefault();
-            Temperature = ParametersSave.LoadParameters<TemperatureGenerationParameters>(ParametersSave.SaveSlot.Default).GetValueOrDefault();
-            Heights = ParametersSave.LoadParameters<HeightsGenerationParameters>(ParametersSave.SaveSlot.Default).GetValueOrDefault();
+            Progress = ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(slotToLoad);
+            Polution = ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(slotToLoad);
+            Temperature = ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(slotToLoad);
+            Heights = ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(slotToLoad);
         }
 
     }

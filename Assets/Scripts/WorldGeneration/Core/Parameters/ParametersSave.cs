@@ -47,7 +47,7 @@ namespace WorldGeneration.Core
 
             try
             {
-                using FileStream fileStream = new(path, FileMode.OpenOrCreate);
+                using FileStream fileStream = new(path, FileMode.Open);
 
                 return _formatter.Deserialize(fileStream) as T?;
             }
@@ -55,6 +55,23 @@ namespace WorldGeneration.Core
             {
                 UnityEngine.Debug.LogError(e.Message);
                 return null;
+            }
+        }
+
+        public static T LoadParametersOrDefault<T>(SaveSlot slot) where T : struct, IParameters
+        {
+            string path = GetPath(typeof(T), slot);
+
+            try
+            {
+                using FileStream fileStream = new(path, FileMode.Open);
+
+                return (T)_formatter.Deserialize(fileStream);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogWarning(e.Message);
+                return default;
             }
         }
 

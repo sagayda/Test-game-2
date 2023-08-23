@@ -12,15 +12,20 @@ namespace WorldGeneration.Core.Noise
     /// Implementation of the Perlin simplex noise, an improved Perlin noise algorithm.
     /// Based loosely on SimplexNoise1234 by Stefan Gustavson: http://staffwww.itn.liu.se/~stegu/aqsis/aqsis-newnoise/
     /// </summary>
-    public static class Noise
+    public class SimplexNoise
     {
-        static Noise()
+        public SimplexNoise()
         {
             _perm = new byte[PermOriginal.Length];
             PermOriginal.CopyTo(_perm, 0);
         }
 
-        public static int Seed
+        public SimplexNoise(int seed)
+        {
+            Seed = seed;
+        }
+
+        public int Seed
         {
             get => _seed;
             set
@@ -41,14 +46,14 @@ namespace WorldGeneration.Core.Noise
             }
         }
 
-        private static int _seed;
+        private int _seed;
 
         /// <summary>
         /// 1D simplex noise
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static float Generate(float x)
+        public float Generate(float x)
         {
             var i0 = FastFloor(x);
             var i1 = i0 + 1;
@@ -75,7 +80,7 @@ namespace WorldGeneration.Core.Noise
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public static float Generate(float x, float y)
+        public float Generate(float x, float y)
         {
             const float F2 = 0.366025403f; // F2 = 0.5*(sqrt(3.0)-1.0)
             const float G2 = 0.211324865f; // G2 = (3.0-Math.sqrt(3.0))/6.0
@@ -155,7 +160,7 @@ namespace WorldGeneration.Core.Noise
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <returns></returns>
-        public static float Generate(float x, float y, float z)
+        public float Generate(float x, float y, float z)
         {
             // Simple skewing factors for the 3D case
             const float F3 = 0.333333333f;
@@ -262,7 +267,7 @@ namespace WorldGeneration.Core.Noise
             // TODO: The scale factor is preliminary!
         }
 
-        private static byte[] _perm;
+        private byte[] _perm;
 
         private static readonly byte[] PermOriginal = {
             151,160,137,91,90,15,

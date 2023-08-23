@@ -7,31 +7,50 @@ using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
 {
-    public class WorldGenerator
+    public static class WorldGenerator
     {
-        private GeneratorParameters _parameters;
+        private static FractalNoise _heightsNoise;
+        private static FractalNoise _temperatureNoise;
+        private static FractalNoise _polutionNoise;
+        private static FractalNoise _progressNoise;
+        private static GeneratorParameters _parameters;
 
-        public WorldGenerator(GeneratorParameters parameters)
+        static WorldGenerator()
         {
-            _parameters = parameters;
+            _parameters = ParametersSave.Default;
+            _heightsNoise = new(_parameters.Heights.Noise, _parameters.IntSeed);
+            _temperatureNoise = new(_parameters.Temperature.Noise, _parameters.IntSeed);
+            _polutionNoise = new(_parameters.Polution.Noise, _parameters.IntSeed);
+            _progressNoise = new(_parameters.Progress.Noise, _parameters.IntSeed);
         }
 
-        private GeneratorParameters Parameters => _parameters;
-
-        public uint WorldWidth => Parameters.WorldWidth;
-        public uint WorldHeight => Parameters.WorldHeight;
-        public float WaterLevel => Parameters.Heights.WaterLevel;
-
-        public float GetProgressValue(int x, int y)
+        public static GeneratorParameters Parameters
         {
-            return GetBaseNoiseValue(x, y, Parameters.Progress.Noise);
+            get
+            {
+                return _parameters;
+            }
+            set
+            {
+                _parameters = value;
+                UpdateParameters();
+            }
         }
 
-        public float GetPolutionValue(int x, int y)
+        public static uint WorldWidth => Parameters.WorldWidth;
+        public static uint WorldHeight => Parameters.WorldHeight;
+        public static float WaterLevel => Parameters.Heights.WaterLevel;
+
+        public static float GetProgressValue(int x, int y)
+        {
+            return _progressNoise.Generate(x, y);
+        }
+
+        public static float GetPolutionValue(int x, int y)
         {
             float noiseProgress = GetProgressValue(x, y);
 
-            float noisePolution = GetBaseNoiseValue(x, y, Parameters.Polution.Noise);
+            float noisePolution = _polutionNoise.Generate(x, y);
 
             float polutionMultiplyer = Mathf.Pow(noiseProgress * Parameters.Polution.ProgressImpactMultiplyer, Parameters.Polution.ProgressImpactStrength);
             polutionMultiplyer = Mathf.Clamp(polutionMultiplyer, Parameters.Polution.ProgressImpactBottom, Parameters.Polution.ProgressImpactTop);
@@ -41,32 +60,18 @@ namespace WorldGeneration.Core
             return noisePolution;
         }
 
-        public float GetHeightValue(int x, int y)
+        public static float GetHeightValue(float x, float y)
         {
-            float noise = GetBaseNoiseValue(x, y, Parameters.Heights.Noise);
+            float noise = _heightsNoise.Generate(x, y);
 
             return noise;
         }
 
-        public float GetHeightValue(Vector2 point)
-        {
-            float noise = GetBaseNoiseValue(point.x, point.y, Parameters.Heights.Noise);
-
-            return noise;
-        }
-
-        public float GetHeightValue(float x, float y)
-        {
-            float noise = GetBaseNoiseValue(x, y, Parameters.Heights.Noise);
-
-            return noise;
-        }
-
-        public float GetTemperatureValue(int x, int y)
+        public static float GetTemperatureValue(int x, int y)
         {
             float noiseHight = GetHeightValue(x, y);
 
-            float rawNoiseTemperature = GetBaseNoiseValue(x, y, Parameters.Temperature.Noise);
+            float rawNoiseTemperature = _temperatureNoise.Generate(x, y);
 
             //adaptation to latitude
             rawNoiseTemperature -= 0.5f;
@@ -101,11 +106,6 @@ namespace WorldGeneration.Core
             return temperatureNoise;
         }
 
-        private static float GetBaseNoiseValue(float x, float y, FractalNoiseParameters parameters)
-        {
-            return FractalNoise.Generate(x, y, parameters);
-        }
-
         public static GameWorld GetGameWorld()
         {
             return null;
@@ -118,6 +118,14 @@ namespace WorldGeneration.Core
             byte[] hashX = sha256.ComputeHash(Encoding.UTF8.GetBytes("x" + seed));
 
             return BitConverter.ToInt32(hashX, 0);
+        }
+
+        private static void UpdateParameters()
+        {
+            _heightsNoise = new(_parameters.Heights.Noise, _parameters.IntSeed);
+            _temperatureNoise = new(_parameters.Temperature.Noise, _parameters.IntSeed);
+            _polutionNoise = new(_parameters.Polution.Noise, _parameters.IntSeed);
+            _progressNoise = new(_parameters.Progress.Noise, _parameters.IntSeed);
         }
 
         //public Location[,] CreateWorld()
