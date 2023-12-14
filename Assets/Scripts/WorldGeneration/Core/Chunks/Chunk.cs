@@ -11,13 +11,11 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
 
 #nullable enable
 
-        private ValueMapPoint? _values;
-        private WaterMapPoint? _water;
 
         public readonly RectInt Rect;
         public GenerationStage GenerationStage { get; private set; }
-        public ValueMapPoint? Values { get; private set; }
-        public WaterMapPoint? Water { get; set; }
+        public ValueMapPoint? Values { get; internal set; }
+        public WaterMapPoint? Water { get; internal set; }
         public Vector2Int Position => Rect.position;
         public bool IsWaterChunk => Water != null;
 
@@ -52,15 +50,17 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             }
         }
 
-        //--
-        public void GenerateToStage(WorldGenerator worldGenerator, GenerationStage stage)
+        internal bool TrySetGenerationStage(GenerationStage stage)
         {
-            if (GenerationStage >= stage)
-                return;
-
-            while (GenerationStage < stage)
+            switch(stage)
             {
-                GenerateNextStage(worldGenerator);
+                case GenerationStage.Pre:
+                    if (Values == null)
+                        return false;
+                    GenerationStage = stage;
+                    return true;
+                default:
+                    return false;
             }
         }
 

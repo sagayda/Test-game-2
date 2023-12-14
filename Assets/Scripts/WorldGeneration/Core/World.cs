@@ -60,21 +60,6 @@ namespace Assets.Scripts.WorldGeneration.Core
             }
         }
 
-        //--
-        public void GenerateAllChunksToStage(GenerationStage stage)
-        {
-            foreach (var chunk in _chunks)
-            {
-                chunk.Value.GenerateToStage(_generator, stage);
-            }
-        }
-
-        //--
-        public void GenerateChunkToStage(GenerationStage stage, Vector2Int position)
-        {
-            _chunks[position].GenerateToStage(_generator, stage);
-        }
-
         public Chunk GetChunk(Vector2Int coordinates)
         {
             Vector2Int chunkCoords = Chunk.GetChunkCoorinates(coordinates);

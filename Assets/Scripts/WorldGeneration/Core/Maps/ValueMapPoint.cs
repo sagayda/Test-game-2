@@ -57,16 +57,40 @@ namespace WorldGeneration.Core
 
     public class ValueMapPoint
     {
-        private static readonly int MAPS_COUNT = 4;
+        private static readonly int MAPS_COUNT = Enum.GetValues(typeof(MapValueType)).Length;
         private readonly float[] _values;
 
         public float this[MapValueType type]
         {
             get
             {
-                float value = _values[(int)type];
+                return _values[(int)type];
 
-                return float.IsNaN(value) ? throw new InvalidOperationException($"Selected type {type} is not set!") : value;
+                //return float.IsNaN(value) ? throw new InvalidOperationException($"Selected type {type} is not set!") : value;
+            }
+
+            set
+            {
+                _values[(int)type] = value;
+            }
+        }
+
+        public float this[int mapValueTypeCode]
+        {
+            get
+            {
+                if (Enum.IsDefined(typeof(MapValueType), mapValueTypeCode) == false)
+                    throw new ArgumentException($"MapValueType with code {mapValueTypeCode} does not exist.", nameof(mapValueTypeCode));
+
+                return _values[mapValueTypeCode];
+            }
+
+            set
+            {
+                if (Enum.IsDefined(typeof(MapValueType), mapValueTypeCode) == false)
+                    throw new ArgumentException($"MapValueType with code {mapValueTypeCode} does not exist.", nameof(mapValueTypeCode));
+
+                _values[mapValueTypeCode] = value;
             }
         }
 
@@ -99,4 +123,5 @@ namespace WorldGeneration.Core
         Progress = 2,
         Polution = 3,
     }
+
 }

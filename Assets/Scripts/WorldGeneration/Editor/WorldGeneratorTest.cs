@@ -94,16 +94,12 @@ namespace Assets.Scripts.WorldGeneration.Editor
             _mapVisualiser = new(Width, Height);
         }
 
-        [Button("Create world")]
+        [Button("Init world")]
         public void CreateEmptyWorld()
         {
-            _world = new(_worldGenerator, "_", "_");
-        }
+            _worldGenerator.InitWorld("_", "_");
 
-        [Button("Init world chunks")]
-        public void InitWorldChunks()
-        {
-            _world.InitChunks();
+            _world = _worldGenerator.World;
 
             _chunkVisualiser = new(_worldGenerator.Width / Chunk.ChunkWidth, _worldGenerator.Height / Chunk.ChunkHeight, ChunkWidth);
         }
@@ -111,7 +107,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Pre-generate all world")]
         public void PreGenerateAllWorldChunks()
         {
-            _world.GenerateAllChunksToStage(Core.Chunks.GenerationStage.Pre);
+            _worldGenerator.InitWorldMapValues();
         }
 
         [Button("Create ocean")]

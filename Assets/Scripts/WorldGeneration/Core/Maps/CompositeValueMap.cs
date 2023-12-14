@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NaughtyAttributes;
 using UnityEngine;
 using WorldGeneration.Core.Maps;
 
@@ -68,6 +69,31 @@ namespace WorldGeneration.Core
         {
             ValueMapPoint mapPoint = new();
             return ComputeValueUpTo(mapPoint, position, lastValueToCompute);
+        }
+
+        public static ValueMapPoint GetAvarageValue(params ValueMapPoint[] points)
+        {
+            ValueMapPoint avarageValue = new ();
+
+            foreach (int valueType in Enum.GetValues(typeof(MapValueType)))
+            {
+                float currentValue = 0;
+
+                int initializedValuesCount = 0;
+
+                foreach (var point in points)
+                {
+                    if (float.IsNaN(point[valueType]))
+                        continue;
+
+                    currentValue += point[valueType];
+                    initializedValuesCount++;
+                }
+
+                avarageValue[valueType] = currentValue / initializedValuesCount;
+            }
+
+            return avarageValue;
         }
 
         public static CompositeValueMap CreateDefault(int seed)

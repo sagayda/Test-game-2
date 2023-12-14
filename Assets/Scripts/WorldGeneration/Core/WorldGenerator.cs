@@ -6,7 +6,6 @@ using Assets.Scripts.WorldGeneration.Core.Chunks;
 using Assets.Scripts.WorldGeneration.Core.WaterBehavior;
 using UnityEngine;
 using WorldGeneration.Core.Locations;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace WorldGeneration.Core
 {
@@ -35,6 +34,7 @@ namespace WorldGeneration.Core
         public float OceanLevel => _waterBehavior.OceanLevel;
         public CompositeValueMap CompositeValueMap => _compositeMap;
         public WaterBehaviour WaterBehavior => _waterBehavior;
+        public World World => _world;
 
         private void SetSeed(string seed)
         {
@@ -57,16 +57,48 @@ namespace WorldGeneration.Core
 
         public void InitWorldMapValues()
         {
-            //foreach (var chunk in _world.Chunks)
-            //{
-            //    chunk.
-            //}
+            foreach (var chunk in _world.Chunks)
+            {
+                //ValueMapPoint[] chunkPoints =
+                //{ 
+                //    //center
+                //    _compositeMap.ComputeValues(new(chunk.Key.x + Chunk.ChunkWidth / 2, chunk.Key.y + Chunk.ChunkHeight / 2)),
+                //    //top left
+                //    _compositeMap.ComputeValues(chunk.Key),
+                //    //top right
+                //    _compositeMap.ComputeValues(new(chunk.Key.x + Chunk.ChunkWidth, chunk.Key.y)),
+                //    //bottom left
+                //    _compositeMap.ComputeValues(new(chunk.Key.x, chunk.Key.y + Chunk.ChunkHeight)),
+                //    //bottom right
+                //    _compositeMap.ComputeValues(new(chunk.Key.x + Chunk.ChunkWidth, chunk.Key.y + Chunk.ChunkHeight)),
+                //};
 
-            //Values = worldGenerator.CompositeValueMap.ComputeValue(Rect.center);
-            ////no water now
-            //Water = null;
-            //GenerationStage = GenerationStage.Pre;
-            //break;
+                Vector2 center = new(chunk.Key.x + Chunk.ChunkWidth / 2, chunk.Key.y + Chunk.ChunkHeight / 2);
+
+                ValueMapPoint[] chunkPoints =
+                { 
+                    //center
+                    _compositeMap.ComputeValues(center),
+                    //top left
+                    _compositeMap.ComputeValues(new(center.x - Chunk.ChunkWidth / 4f, center.y - Chunk.ChunkHeight / 4f)),
+                    //top right
+                    _compositeMap.ComputeValues(new(center.x + Chunk.ChunkWidth / 4f, center.y - Chunk.ChunkHeight / 4f)),
+                    //bottom left
+                    _compositeMap.ComputeValues(new(center.x - Chunk.ChunkWidth / 4f, center.y + Chunk.ChunkHeight / 4f)),
+                    //bottom right
+                    _compositeMap.ComputeValues(new(center.x + Chunk.ChunkWidth / 4f, center.y + Chunk.ChunkHeight / 4f)),
+                };
+
+
+                ValueMapPoint chunkAvarageValues = CompositeValueMap.GetAvarageValue(chunkPoints);
+
+                chunk.Value.Values = chunkAvarageValues;
+
+                //chunk.Value.Values = _compositeMap.ComputeValues(chunk.Key);
+
+                if (chunk.Value.TrySetGenerationStage(GenerationStage.Pre) == false)
+                    Debug.LogWarning($"Failed to initialize chunk at {chunk.Key}");
+            }
         }
 
         public static int ComputeInt32Seed(string seed)
