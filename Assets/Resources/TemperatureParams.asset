@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TemperatureParams
   m_EditorClassIdentifier: 
   SaveSlot: 0
-  EnableVisualizing: 1
+  EnableVisualizing: 0
   Renderer: {fileID: 0}
   Seed: 
   ColorLerpRate: 5
@@ -23,11 +23,13 @@ MonoBehaviour:
   YSeedStep: 0
   Octaves: 1
   Amplitude: 1
-  Frequency: 0.005
+  Frequency: 0.0151
   Persistance: 1
   Lacunarity: 1
-  EaseFunction: 0
+  EaseFunction: 21
+  SlotForGenerator: 0
   HeightImpactStrength: 1
   HeightImpactSmoothing: 1
-  NoiseImpact: 1
-  GlobalTemperature: 1
+  NoiseImpact: 0.25
+  EquatorCoordinate: 128
+  GlobalTemperature: 0

@@ -8,33 +8,36 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class ProgressParametersBuilder : FractalNoiseParametersBuilder
     {
-        private WorldGenerator _worldGenerator;
+        private CompositeValueMap _compositeMap;
 
         [ShowIf("EnableVisualizing")]
         [BoxGroup("Visualizing")]
         public ParametersSave.SaveSlot SlotForGenerator;
 
-        public ProgressGenerationParameters GenerationParameters => Build();
+        public ProgressMapParameters GenerationParameters => Build();
 
         protected override float GetNoise(int x, int y)
         {
-            return _worldGenerator.GetProgressValue(x, y);
+            return _compositeMap.ComputeValue(x, y)[MapValueType.Progress];
+            //return _worldGenerator.GetProgressValue(x, y);
         }
 
         protected override void SetPaintingParameters()
         {
-            _worldGenerator = new(new(Seed,
-                          Width,
-                          Height,
-                          GenerationParameters,
-                          ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
-                          ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
-                          ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(SlotForGenerator)));
+            _compositeMap = new(new ProgressValueMap(GenerationParameters));
+
+            //_worldGenerator = new(new(Seed,
+            //              Width,
+            //              Height,
+            //              GenerationParameters,
+            //              ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
+            //              ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
+            //              ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(SlotForGenerator)));
         }
 
-        private ProgressGenerationParameters Build()
+        private ProgressMapParameters Build()
         {
-            return new ProgressGenerationParameters(NoiseParameters);
+            return new ProgressMapParameters(NoiseParameters);
         }
 
         protected override void Save()
@@ -44,7 +47,7 @@ namespace WorldGeneration.Editor
 
         protected override void Load()
         {
-            var loaded = ParametersSave.LoadParameters<ProgressGenerationParameters>(SaveSlot);
+            var loaded = ParametersSave.LoadParameters<ProgressMapParameters>(SaveSlot);
 
             if (loaded.HasValue)
             {

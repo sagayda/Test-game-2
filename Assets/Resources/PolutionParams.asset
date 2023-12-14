@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PolutionParams
   m_EditorClassIdentifier: 
   SaveSlot: 0
-  EnableVisualizing: 1
+  EnableVisualizing: 0
   Renderer: {fileID: 0}
   Seed: 
   ColorLerpRate: 10

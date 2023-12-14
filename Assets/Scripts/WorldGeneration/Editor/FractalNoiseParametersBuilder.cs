@@ -12,6 +12,9 @@ namespace WorldGeneration.Editor
     {
         private FractalNoise _noiseProvider;
 
+        private float _lastPaintTime;
+        private const float _minTimeBetweenPaint = 0.25f;
+
         #region Editor fields
         public ParametersSave.SaveSlot SaveSlot;
         public bool EnableVisualizing = false;
@@ -53,7 +56,11 @@ namespace WorldGeneration.Editor
         {
             if (EnableVisualizing)
             {
-                Renderer = Paint();
+                if (Time.timeSinceLevelLoad - _lastPaintTime >= _minTimeBetweenPaint)
+                {
+                    _lastPaintTime = Time.timeSinceLevelLoad;
+                    Renderer = Paint();
+                }
             }
         }
 

@@ -1,0 +1,11 @@
+﻿namespace WorldGeneration.Core
+{
+    public interface IValueMap
+    {
+        public int Seed { get; set; }
+        public int Priority { get; }
+        public MapValueType ValueType { get; }
+
+        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint);
+    }
+}

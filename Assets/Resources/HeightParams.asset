@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 962203e1c879d3f4a999f53e5fdfa917, type: 3}
   m_Name: HeightParams
   m_EditorClassIdentifier: 
-  SaveSlot: 0
+  SaveSlot: 1
   EnableVisualizing: 1
   Renderer: {fileID: 0}
   Seed: 
-  ColorLerpRate: 2
-  Width: 256
-  Height: 256
+  ColorLerpRate: 10
+  Width: 512
+  Height: 512
   XSeedStep: 0
   YSeedStep: 0
   Octaves: 6
   Amplitude: 0.565
-  Frequency: 0.01
-  Persistance: 0.5
-  Lacunarity: 2
+  Frequency: 0.0054
+  Persistance: 0.55
+  Lacunarity: 1.97
   EaseFunction: 12
   SlotForGenerator: 0
-  WaterLevel: 0.244
+  WaterLevel: 0.282

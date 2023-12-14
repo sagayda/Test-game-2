@@ -1,6 +1,5 @@
-﻿using Assets.Scripts.WorldGeneration.Core;
+﻿using UnityEngine;
 using UniversalTools;
-using UnityEngine;
 
 namespace WorldGeneration.Core
 {
@@ -34,7 +33,7 @@ namespace WorldGeneration.Core
         public override float Completeness => 1 - (Vector2.Distance(Position, _endPoint) / Vector2.Distance(StartPoint, _endPoint));
         public Vector2 EndPoint => _endPoint;
         public float Weight => _weight;
-         
+
         public override bool Step()
         {
             if (Vector2.Distance(Position, _endPoint) < 3)

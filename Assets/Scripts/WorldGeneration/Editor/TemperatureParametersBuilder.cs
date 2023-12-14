@@ -8,7 +8,7 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class TemperatureParametersBuilder : FractalNoiseParametersBuilder
     {
-        private WorldGenerator _worldGenerator;
+        private CompositeValueMap _compositeMap;
 
         [ShowIf("EnableVisualizing")]
         [BoxGroup("Visualizing")]
@@ -17,29 +17,37 @@ namespace WorldGeneration.Editor
         public float HeightImpactStrength;
         public float HeightImpactSmoothing;
         public float NoiseImpact;
+        public float EquatorCoordinate;
         public float GlobalTemperature;
 
-        public TemperatureGenerationParameters GenerationParameters => Build();
+        public TemperatureMapParameters GenerationParameters => Build();
 
-        private TemperatureGenerationParameters Build()
+        private TemperatureMapParameters Build()
         {
-            return new TemperatureGenerationParameters(NoiseParameters, HeightImpactStrength, HeightImpactSmoothing, NoiseImpact, GlobalTemperature);
+            return new TemperatureMapParameters(NoiseParameters, HeightImpactStrength, HeightImpactSmoothing, NoiseImpact, EquatorCoordinate, GlobalTemperature);
         }
 
         protected override float GetNoise(int x, int y)
         {
-            return _worldGenerator.GetTemperatureValue(x, y);
+            return _compositeMap.ComputeValue(x, y)[MapValueType.Temperature];
+
+            //return _worldGenerator.GetTemperatureValue(x, y);
         }
 
         protected override void SetPaintingParameters()
         {
-            _worldGenerator = new(new(Seed,
-              Width,
-              Height,
-              ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(SlotForGenerator),
-              ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
-              ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
-              GenerationParameters));
+            HeightsValueMap heightsMap = new(ParametersSave.LoadParametersOrDefault<HeightsMapParameters>(SlotForGenerator));
+            TemperatureValueMap temperatureMap = new(GenerationParameters);
+
+            _compositeMap = new(heightsMap, temperatureMap);
+
+            //_worldGenerator = new(new(Seed,
+            //  Width,
+            //  Height,
+            //  ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(SlotForGenerator),
+            //  ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(SlotForGenerator),
+            //  ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
+            //  GenerationParameters));
         }
 
         protected override void Save()
@@ -49,7 +57,7 @@ namespace WorldGeneration.Editor
 
         protected override void Load()
         {
-            var loaded = ParametersSave.LoadParameters<TemperatureGenerationParameters>(SaveSlot);
+            var loaded = ParametersSave.LoadParameters<TemperatureMapParameters>(SaveSlot);
 
             if (loaded.HasValue)
             {

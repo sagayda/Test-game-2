@@ -1,114 +1,77 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using Assets.Scripts.WorldGeneration.Core;
+using Assets.Scripts.WorldGeneration.Core.Chunks;
+using Assets.Scripts.WorldGeneration.Core.WaterBehavior;
 using UnityEngine;
 using WorldGeneration.Core.Locations;
-using WorldGeneration.Core.Noise;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace WorldGeneration.Core
 {
-    public static class WorldGenerator
+    public class WorldGenerator
     {
-        private static FractalNoise _heightsNoise;
-        private static FractalNoise _temperatureNoise;
-        private static FractalNoise _polutionNoise;
-        private static FractalNoise _progressNoise;
-        private static GeneratorParameters _parameters;
+        private World _world;
 
-        static WorldGenerator()
+        private CompositeValueMap _compositeMap;
+        private WaterBehaviour _waterBehavior;
+
+        public WorldGenerator(string seed, int width, int height, float waterLevel, CompositeValueMap compositeMap)
         {
-            _parameters = ParametersSave.Default;
-            _heightsNoise = new(_parameters.Heights.Noise, _parameters.IntSeed);
-            _temperatureNoise = new(_parameters.Temperature.Noise, _parameters.IntSeed);
-            _polutionNoise = new(_parameters.Polution.Noise, _parameters.IntSeed);
-            _progressNoise = new(_parameters.Progress.Noise, _parameters.IntSeed);
+            Seed = seed;
+            Width = width;
+            Height = height;
+
+            _compositeMap = compositeMap;
+            _waterBehavior = new WaterBehaviour(waterLevel);
+
+            SetSeed(seed);
         }
 
-        public static GeneratorParameters Parameters
+        public string Seed { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public float OceanLevel => _waterBehavior.OceanLevel;
+        public CompositeValueMap CompositeValueMap => _compositeMap;
+        public WaterBehaviour WaterBehavior => _waterBehavior;
+
+        private void SetSeed(string seed)
         {
-            get
-            {
-                return _parameters;
-            }
-            set
-            {
-                _parameters = value;
-                UpdateParameters();
-            }
+            int intSeed = ComputeInt32Seed(seed);
+
+            _compositeMap.SetSeed(intSeed);
         }
 
-        public static uint WorldWidth => Parameters.WorldWidth;
-        public static uint WorldHeight => Parameters.WorldHeight;
-        public static float WaterLevel => Parameters.Heights.WaterLevel;
-
-        public static float GetProgressValue(int x, int y)
+        public float GetMapValue(Vector2 position, MapValueType valueType)
         {
-            return _progressNoise.Generate(x, y);
+            return _compositeMap.ComputeValueUpTo(position, valueType)[valueType];
         }
 
-        public static float GetPolutionValue(int x, int y)
+        public float GetMapValue(float x, float y, MapValueType valueType)
         {
-            float noiseProgress = GetProgressValue(x, y);
-
-            float noisePolution = _polutionNoise.Generate(x, y);
-
-            float polutionMultiplyer = Mathf.Pow(noiseProgress * Parameters.Polution.ProgressImpactMultiplyer, Parameters.Polution.ProgressImpactStrength);
-            polutionMultiplyer = Mathf.Clamp(polutionMultiplyer, Parameters.Polution.ProgressImpactBottom, Parameters.Polution.ProgressImpactTop);
-
-            noisePolution *= polutionMultiplyer;
-
-            return noisePolution;
+            return _compositeMap.ComputeValueUpTo(x, y, valueType)[valueType];
         }
 
-        public static float GetHeightValue(float x, float y)
+        public void InitWorld(string worldName, string worldDesc)
         {
-            float noise = _heightsNoise.Generate(x, y);
+            _world = new(this, worldName, worldDesc);
 
-            return noise;
+            _world.InitChunks();
         }
 
-        public static float GetTemperatureValue(int x, int y)
+        public void InitWorldMapValues()
         {
-            float noiseHight = GetHeightValue(x, y);
+            //foreach (var chunk in _world.Chunks)
+            //{
+            //    chunk.
+            //}
 
-            float rawNoiseTemperature = _temperatureNoise.Generate(x, y);
-
-            //adaptation to latitude
-            rawNoiseTemperature -= 0.5f;
-
-            float distanceFromEquator = Mathf.Abs((Parameters.WorldHeight / 2f) - y);
-            distanceFromEquator /= Parameters.WorldHeight / 2f;
-
-            float temperatureNoise = distanceFromEquator;
-            temperatureNoise += Parameters.Temperature.GlobalTemperature;
-
-            temperatureNoise += rawNoiseTemperature * Parameters.Temperature.NoiseImpactStrength;
-
-            temperatureNoise = 1 - temperatureNoise;
-
-            if (noiseHight > Parameters.Heights.WaterLevel)
-            {
-                float temperatureChange;
-
-                //temperature change depending on distance from equator
-                temperatureChange = noiseHight - Parameters.Heights.WaterLevel;
-                //smoothing
-                temperatureChange = Mathf.Pow(temperatureChange, Parameters.Temperature.HeightImpactSmoothing);
-                temperatureChange /= 1 - Parameters.Heights.WaterLevel;
-                //temperature 0..1 => 1..2 for better smoothing
-                temperatureNoise += 1;
-                //calculating temperature change strange
-                temperatureChange = Mathf.Pow(Parameters.Temperature.HeightImpactStrength, temperatureChange);
-
-                temperatureNoise -= temperatureChange;
-            }
-
-            return temperatureNoise;
-        }
-
-        public static GameWorld GetGameWorld()
-        {
-            return null;
+            //Values = worldGenerator.CompositeValueMap.ComputeValue(Rect.center);
+            ////no water now
+            //Water = null;
+            //GenerationStage = GenerationStage.Pre;
+            //break;
         }
 
         public static int ComputeInt32Seed(string seed)
@@ -120,100 +83,9 @@ namespace WorldGeneration.Core
             return BitConverter.ToInt32(hashX, 0);
         }
 
-        private static void UpdateParameters()
+        public static GameWorld GetGameWorld()
         {
-            _heightsNoise = new(_parameters.Heights.Noise, _parameters.IntSeed);
-            _temperatureNoise = new(_parameters.Temperature.Noise, _parameters.IntSeed);
-            _polutionNoise = new(_parameters.Polution.Noise, _parameters.IntSeed);
-            _progressNoise = new(_parameters.Progress.Noise, _parameters.IntSeed);
+            return null;
         }
-
-        //public Location[,] CreateWorld()
-        //{
-        //    Location[,] map = new Location[WorldWidth, WorldHeight];
-
-        //    for (int x = 0; x < WorldWidth; x++)
-        //    {
-        //        for (int y = 0; y < WorldHeight; y++)
-        //        {
-        //            if (x == 0 && y == 0)
-        //            {
-        //                map[x, y] = new Location_Wasteland(x, y);
-        //                continue;
-        //            }
-
-        //            map[x, y] = GetLocation(x, y);
-        //        }
-        //    }
-
-        //    return map;
-        //}
-
-        //#region Map generation methods
-        //private Location GetLocation(int x, int y)
-        //{
-        //    float height = GetHeightValue(x, y);
-
-
-        //    if (height < WaterLevel)
-        //    {
-        //        return GetWaterLocation(x, y, height);
-        //    }
-        //    else
-        //    {
-        //        return GetLandLocation(x, y, height);
-        //    }
-        //}
-
-        //private Location GetWaterLocation(int x, int y, float height)
-        //{
-        //    float temperature = GetTemperatureValue(x, y);
-
-        //    if (temperature < 0.15f)
-        //    {
-        //        return new Location_ArcticDesert(x, y);
-        //    }
-
-        //    if (height > WaterLevel / 2f)
-        //    {
-        //        return new Location_Ocean(x, y);
-        //    }
-        //    else
-        //    {
-        //        return new Location_DeepOcean(x, y);
-        //    }
-        //}
-
-        //private Location GetLandLocation(int x, int y, float height)
-        //{
-        //    float temperature = GetTemperatureValue(x, y);
-
-        //    if (temperature < 0.15f)
-        //    {
-        //        return new Location_ArcticDesert(x, y);
-        //    }
-
-        //    if (height < WaterLevel + 0.02f)
-        //    {
-        //        return new Location_SandBeach(x, y);
-        //    }
-
-        //    float heightStep = (1f - WaterLevel) / 4f;
-
-        //    if (height < WaterLevel + heightStep * 2)
-        //    {
-        //        return new Location_Plain(x, y);
-        //    }
-        //    else if (height < WaterLevel + heightStep * 3)
-        //    {
-        //        return new Location_Foothills(x, y);
-        //    }
-        //    else
-        //    {
-        //        return new Location_Mountains(x, y);
-        //    }
-        //}
-        //#endregion
-
     }
 }

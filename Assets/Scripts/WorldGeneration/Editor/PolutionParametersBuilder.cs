@@ -1,6 +1,8 @@
-﻿using NaughtyAttributes;
+﻿using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 using WorldGeneration.Core;
+using WorldGeneration.Core.Maps;
 
 namespace WorldGeneration.Editor
 {
@@ -8,7 +10,7 @@ namespace WorldGeneration.Editor
     [ExecuteInEditMode]
     public class PolutionParametersBuilder : FractalNoiseParametersBuilder
     {
-        private WorldGenerator _worldGenerator;
+        private CompositeValueMap _compositeMap;
 
         #region Editor fields
         [ShowIf("EnableVisualizing")]
@@ -21,25 +23,31 @@ namespace WorldGeneration.Editor
         public float ProgressImpactTop;
         #endregion
 
-        public PolutionGenerationParameters GenerationParameters => Build();
+        public PolutionMapParameters GenerationParameters => Build();
 
-        private PolutionGenerationParameters Build()
+        private PolutionMapParameters Build()
         {
-            return new PolutionGenerationParameters(NoiseParameters, ProgressImpactStrength, ProgressImpactMultiplyer, ProgressImpactBottom, ProgressImpactTop);
+            return new PolutionMapParameters(NoiseParameters, ProgressImpactStrength, ProgressImpactMultiplyer, ProgressImpactBottom, ProgressImpactTop);
         }
 
         protected override float GetNoise(int x, int y)
         {
-            return _worldGenerator.GetPolutionValue(x, y);
+            return _compositeMap.ComputeValue(x, y)[MapValueType.Polution];
+            //return _worldGenerator.GetPolutionValue(x, y);
         }
 
         protected override void SetPaintingParameters()
         {
-            _worldGenerator = new(new(Seed, Width, Height,
-                ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(SlotForGenerator),
-                GenerationParameters,
-                ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
-                ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(SlotForGenerator)));
+            ProgressValueMap progressMap = new(ParametersSave.LoadParametersOrDefault<ProgressMapParameters>(SlotForGenerator));
+            PolutionValueMap polutionMap = new(GenerationParameters);
+
+            _compositeMap = new(progressMap, polutionMap);
+
+            //_worldGenerator = new(new(Seed, Width, Height,
+            //    ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(SlotForGenerator),
+            //    GenerationParameters,
+            //    ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(SlotForGenerator),
+            //    ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(SlotForGenerator)));
         }
 
         protected override void Save()
@@ -49,7 +57,7 @@ namespace WorldGeneration.Editor
 
         protected override void Load()
         {
-            var loaded = ParametersSave.LoadParameters<PolutionGenerationParameters>(SaveSlot);
+            var loaded = ParametersSave.LoadParameters<PolutionMapParameters>(SaveSlot);
 
             if (loaded.HasValue)
             {

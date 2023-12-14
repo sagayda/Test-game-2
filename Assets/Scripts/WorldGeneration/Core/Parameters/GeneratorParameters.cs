@@ -10,12 +10,12 @@ namespace WorldGeneration.Core
         public readonly uint WorldWidth;
         public readonly uint WorldHeight;
 
-        public ProgressGenerationParameters Progress { get; set; }
-        public PolutionGenerationParameters Polution { get; set; }
-        public HeightsGenerationParameters Heights { get; set; }
-        public TemperatureGenerationParameters Temperature { get; set; }
+        public ProgressMapParameters Progress { get; set; }
+        public PolutionMapParameters Polution { get; set; }
+        public HeightsMapParameters Heights { get; set; }
+        public TemperatureMapParameters Temperature { get; set; }
 
-        public GeneratorParameters(string seed, uint width, uint height, ProgressGenerationParameters progress, PolutionGenerationParameters polution, HeightsGenerationParameters heights, TemperatureGenerationParameters temperature)
+        public GeneratorParameters(string seed, uint width, uint height, ProgressMapParameters progress, PolutionMapParameters polution, HeightsMapParameters heights, TemperatureMapParameters temperature)
         {
             Seed = seed;
             IntSeed = WorldGenerator.ComputeInt32Seed(Seed);
@@ -36,10 +36,10 @@ namespace WorldGeneration.Core
             WorldWidth = width;
             WorldHeight = height;
 
-            Progress = ParametersSave.LoadParametersOrDefault<ProgressGenerationParameters>(slotToLoad);
-            Polution = ParametersSave.LoadParametersOrDefault<PolutionGenerationParameters>(slotToLoad);
-            Temperature = ParametersSave.LoadParametersOrDefault<TemperatureGenerationParameters>(slotToLoad);
-            Heights = ParametersSave.LoadParametersOrDefault<HeightsGenerationParameters>(slotToLoad);
+            Progress = ParametersSave.LoadParametersOrDefault<ProgressMapParameters>(slotToLoad);
+            Polution = ParametersSave.LoadParametersOrDefault<PolutionMapParameters>(slotToLoad);
+            Temperature = ParametersSave.LoadParametersOrDefault<TemperatureMapParameters>(slotToLoad);
+            Heights = ParametersSave.LoadParametersOrDefault<HeightsMapParameters>(slotToLoad);
         }
 
     }
