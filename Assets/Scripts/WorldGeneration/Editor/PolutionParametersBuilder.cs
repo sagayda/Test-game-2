@@ -32,7 +32,7 @@ namespace WorldGeneration.Editor
 
         protected override float GetNoise(int x, int y)
         {
-            return _compositeMap.ComputeValue(x, y)[MapValueType.Polution];
+            return _compositeMap.ComputeValues(new(x,y))[MapValueType.Polution];
             //return _worldGenerator.GetPolutionValue(x, y);
         }
 

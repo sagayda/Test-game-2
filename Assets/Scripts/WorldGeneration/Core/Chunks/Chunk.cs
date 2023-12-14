@@ -36,7 +36,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             switch (GenerationStage)
             {
                 case GenerationStage.Empty:
-                    Values = worldGenerator.CompositeValueMap.ComputeValue(Rect.center);
+                    Values = worldGenerator.CompositeValueMap.ComputeValues(Rect.center);
                     //no water now
                     Water = null;
                     GenerationStage = GenerationStage.Pre;

@@ -172,10 +172,10 @@ namespace WorldGeneration.Core.Outdate
             float x = point.x;
             float y = point.y;
 
-            float left = WorldGenerator.GetMapValue(x - epsilon, y, MapValueType.Height);
-            float top = WorldGenerator.GetMapValue(x, y - epsilon, MapValueType.Height);
-            float right = WorldGenerator.GetMapValue(x + epsilon, y, MapValueType.Height);
-            float bottom = WorldGenerator.GetMapValue(x, y + epsilon, MapValueType.Height);
+            float left = WorldGenerator.GetMapValue(new(x - epsilon, y), MapValueType.Height);
+            float top = WorldGenerator.GetMapValue(new(x, y - epsilon), MapValueType.Height);
+            float right = WorldGenerator.GetMapValue(new(x + epsilon, y), MapValueType.Height);
+            float bottom = WorldGenerator.GetMapValue(new(x, y + epsilon), MapValueType.Height);
 
             return new Vector3()
             {
@@ -200,10 +200,10 @@ namespace WorldGeneration.Core.Outdate
             int x = point.x;
             int y = point.y;
 
-            float left = WorldGenerator.GetMapValue(x - epsilon, y, MapValueType.Height) + GetSettledWater(x - epsilon, y);
-            float top = WorldGenerator.GetMapValue(x, y - epsilon, MapValueType.Height) + GetSettledWater(x, y - epsilon);
-            float right = WorldGenerator.GetMapValue(x + epsilon, y, MapValueType.Height) + GetSettledWater(x + epsilon, y);
-            float bottom = WorldGenerator.GetMapValue(x, y + epsilon, MapValueType.Height) + GetSettledWater(x, y + epsilon);
+            float left = WorldGenerator.GetMapValue(new(x - epsilon, y), MapValueType.Height) + GetSettledWater(x - epsilon, y);
+            float top = WorldGenerator.GetMapValue(new(x, y - epsilon), MapValueType.Height) + GetSettledWater(x, y - epsilon);
+            float right = WorldGenerator.GetMapValue(new(x + epsilon, y), MapValueType.Height) + GetSettledWater(x + epsilon, y);
+            float bottom = WorldGenerator.GetMapValue(new(x, y + epsilon), MapValueType.Height) + GetSettledWater(x, y + epsilon);
 
             return new Vector3()
             {

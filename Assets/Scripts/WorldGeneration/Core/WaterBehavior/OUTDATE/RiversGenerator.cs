@@ -492,7 +492,7 @@ namespace WorldGeneration.Core.Outdate
             {
                 for (int j = 0; j < _parameters.WorldHeight; j++)
                 {
-                    float height = _parameters.WorldGenerator.GetMapValue(i, j, MapValueType.Height);
+                    float height = _parameters.WorldGenerator.GetMapValue(new(i, j), MapValueType.Height);
 
                     if (height < buttom || height > top)
                         continue;
@@ -513,7 +513,7 @@ namespace WorldGeneration.Core.Outdate
             {
                 for (int j = 0; j < _parameters.WorldHeight; j++)
                 {
-                    float height = _parameters.WorldGenerator.GetMapValue(i, j, MapValueType.Height);
+                    float height = _parameters.WorldGenerator.GetMapValue(new(i, j), MapValueType.Height);
 
                     if (height < buttom || height > top)
                         continue;
@@ -537,7 +537,7 @@ namespace WorldGeneration.Core.Outdate
                 if (CheckEntryIntoMap(neighbourPosition) == false)
                     continue;
 
-                float neighbourHeight = _parameters.WorldGenerator.GetMapValue(neighbourPosition.x, neighbourPosition.y, MapValueType.Height);
+                float neighbourHeight = _parameters.WorldGenerator.GetMapValue(new(neighbourPosition.x, neighbourPosition.y), MapValueType.Height);
 
                 if (failCondition(neighbourHeight))
                     return false;

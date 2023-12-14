@@ -48,11 +48,6 @@ namespace WorldGeneration.Core
             return _compositeMap.ComputeValueUpTo(position, valueType)[valueType];
         }
 
-        public float GetMapValue(float x, float y, MapValueType valueType)
-        {
-            return _compositeMap.ComputeValueUpTo(x, y, valueType)[valueType];
-        }
-
         public void InitWorld(string worldName, string worldDesc)
         {
             _world = new(this, worldName, worldDesc);

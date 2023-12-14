@@ -70,23 +70,12 @@ namespace WorldGeneration.Core
             }
         }
 
-        public ValueMapPoint(Vector2 position)
+        public ValueMapPoint()
         {
-            Position = position;
             _values = new float[MAPS_COUNT];
 
             InitializeValues();
         }
-
-        public ValueMapPoint(float x, float y)
-        {
-            Position = new(x, y);
-            _values = new float[MAPS_COUNT];
-
-            InitializeValues();
-        }
-
-        public readonly Vector2 Position;
 
         private void InitializeValues()
         {

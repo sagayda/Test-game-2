@@ -123,7 +123,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Paint heights")]
         public void PaintHeights()
         {
-            float GetHeight(int x, int y) => _worldGenerator.GetMapValue(x, y, MapValueType.Height);
+            float GetHeight(int x, int y) => _worldGenerator.GetMapValue(new(x, y), MapValueType.Height);
 
             float landSize = 1 - WaterLevel;
             float landStep = landSize / 3;

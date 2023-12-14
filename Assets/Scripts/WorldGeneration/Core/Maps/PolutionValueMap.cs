@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core.Maps
@@ -28,11 +29,14 @@ namespace WorldGeneration.Core.Maps
             _noiseProvider = new(_parameters.Noise);
         }
 
-        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint)
+        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint, Vector2 position)
         {
             float progress = mapPoint[MapValueType.Progress];
 
-            float polution = _noiseProvider.Generate(mapPoint.Position);
+            if (float.IsNaN(progress))
+                throw new ArgumentException("Trying to generate a pollution value for a point without a progress value", nameof(mapPoint));
+
+            float polution = _noiseProvider.Generate(position);
 
             float polutionMultiplyer = Mathf.Pow(progress * _parameters.ProgressImpactMultiplyer, _parameters.ProgressImpactStrength);
             polutionMultiplyer = Mathf.Clamp(polutionMultiplyer, _parameters.ProgressImpactBottom, _parameters.ProgressImpactTop);

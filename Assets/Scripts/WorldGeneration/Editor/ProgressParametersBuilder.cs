@@ -18,7 +18,7 @@ namespace WorldGeneration.Editor
 
         protected override float GetNoise(int x, int y)
         {
-            return _compositeMap.ComputeValue(x, y)[MapValueType.Progress];
+            return _compositeMap.ComputeValues(new(x,y))[MapValueType.Progress];
             //return _worldGenerator.GetProgressValue(x, y);
         }
 

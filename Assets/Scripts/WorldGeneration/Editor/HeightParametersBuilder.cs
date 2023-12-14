@@ -28,7 +28,7 @@ namespace WorldGeneration.Editor
 
         protected override float GetNoise(int x, int y)
         {
-            return _compositeMap.ComputeValue(x, y)[MapValueType.Height];
+            return _compositeMap.ComputeValues(new(x,y))[MapValueType.Height];
 
             //return WorldGenerator.GetHeightValue(x, y);
         }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
@@ -28,15 +29,18 @@ namespace WorldGeneration.Core
             _noiseProvider = new(_parameters.Noise);
         }
 
-        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint)
+        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint, Vector2 position)
         {
-            float temperatureNoise = _noiseProvider.Generate(mapPoint.Position);
+            float temperatureNoise = _noiseProvider.Generate(position);
+
+            if (float.IsNaN(temperatureNoise))
+                throw new ArgumentException("Trying to generate a temperature value for a point without a height value", nameof(mapPoint));
 
             //adaptation to latitude
             temperatureNoise -= 0.5f;
 
             //distance scaled to [0,1]
-            float distanceFromEquator = Mathf.Abs((_parameters.EquatorCoordinate) - mapPoint.Position.y) / _parameters.EquatorCoordinate;
+            float distanceFromEquator = Mathf.Abs((_parameters.EquatorCoordinate) - position.y) / _parameters.EquatorCoordinate;
 
             float temperature = distanceFromEquator;
             temperature += _parameters.GlobalTemperature;

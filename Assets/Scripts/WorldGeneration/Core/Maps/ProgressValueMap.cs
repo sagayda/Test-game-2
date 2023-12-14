@@ -1,4 +1,5 @@
-﻿using WorldGeneration.Core.Noise;
+﻿using UnityEngine;
+using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
 {
@@ -27,9 +28,9 @@ namespace WorldGeneration.Core
             _noiseProvider = new(_parameters.Noise);
         }
 
-        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint)
+        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint, Vector2 position)
         {
-            float progress = _noiseProvider.Generate(mapPoint.Position);
+            float progress = _noiseProvider.Generate(position);
 
             return mapPoint.SetValue(MapValueType.Progress, progress);
         }

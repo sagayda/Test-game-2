@@ -39,7 +39,7 @@ namespace WorldGeneration.Editor
             {
                 for (int y = 0; y < _generator.Height; y++)
                 {
-                    float noise = _generator.GetMapValue(x, y, MapValueType.Height);
+                    float noise = _generator.GetMapValue(new(x, y), MapValueType.Height);
 
                     Color color = GetColor(noise);
 

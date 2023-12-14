@@ -13,7 +13,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
         public Cell(Vector2Int position)
         {
             Position = position;
-            Values = new(position.x, position.y);
+            Values = new();
         }
     }
 }

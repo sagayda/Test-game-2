@@ -1,4 +1,6 @@
-﻿namespace WorldGeneration.Core
+﻿using UnityEngine;
+
+namespace WorldGeneration.Core
 {
     public interface IValueMap
     {
@@ -6,6 +8,6 @@
         public int Priority { get; }
         public MapValueType ValueType { get; }
 
-        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint);
+        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint, Vector2 position);
     }
 }

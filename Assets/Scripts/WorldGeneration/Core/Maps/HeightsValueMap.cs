@@ -1,4 +1,5 @@
-﻿using WorldGeneration.Core.Noise;
+﻿using UnityEngine;
+using WorldGeneration.Core.Noise;
 
 namespace WorldGeneration.Core
 {
@@ -27,9 +28,9 @@ namespace WorldGeneration.Core
             _noiseProvider = new(_parameters.Noise);
         }
 
-        public ValueMapPoint ComputeValue(ValueMapPoint point)
+        public ValueMapPoint ComputeValue(ValueMapPoint point, Vector2 position)
         {
-            float noise = _noiseProvider.Generate(point.Position);
+            float noise = _noiseProvider.Generate(position);
             return point.SetValue(MapValueType.Height, noise);
         }
     }

@@ -29,7 +29,7 @@ namespace WorldGeneration.Editor
 
         protected override float GetNoise(int x, int y)
         {
-            return _compositeMap.ComputeValue(x, y)[MapValueType.Temperature];
+            return _compositeMap.ComputeValues(new Vector2(x, y))[MapValueType.Temperature];
 
             //return _worldGenerator.GetTemperatureValue(x, y);
         }

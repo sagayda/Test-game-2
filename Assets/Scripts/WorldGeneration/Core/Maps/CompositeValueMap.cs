@@ -34,35 +34,28 @@ namespace WorldGeneration.Core
             }
         }
 
-        public ValueMapPoint ComputeValue(ValueMapPoint mapPoint)
+        public ValueMapPoint ComputeValues(ValueMapPoint mapPoint, Vector2 position)
         {
             foreach (IValueMap map in _maps)
             {
-                map.ComputeValue(mapPoint);
+                map.ComputeValue(mapPoint, position);
             }
 
             return mapPoint;
         }
 
-        public ValueMapPoint ComputeValue(Vector2 position)
+        public ValueMapPoint ComputeValues(Vector2 position)
         {
-            ValueMapPoint mapPoint = new(position);
+            ValueMapPoint mapPoint = new();
 
-            return ComputeValue(mapPoint);
+            return ComputeValues(mapPoint, position);
         }
 
-        public ValueMapPoint ComputeValue(float x, float y)
-        {
-            ValueMapPoint mapPoint = new(x, y);
-
-            return ComputeValue(mapPoint);
-        }
-
-        public ValueMapPoint ComputeValueUpTo(ValueMapPoint mapPoint, MapValueType lastValueToCompute)
+        public ValueMapPoint ComputeValueUpTo(ValueMapPoint mapPoint, Vector2 position, MapValueType lastValueToCompute)
         {
             foreach (IValueMap map in _maps)
             {
-                map.ComputeValue(mapPoint);
+                map.ComputeValue(mapPoint, position);
 
                 if (map.ValueType == lastValueToCompute)
                     return mapPoint;
@@ -73,14 +66,8 @@ namespace WorldGeneration.Core
 
         public ValueMapPoint ComputeValueUpTo(Vector2 position, MapValueType lastValueToCompute)
         {
-            ValueMapPoint mapPoint = new(position);
-            return ComputeValueUpTo(mapPoint, lastValueToCompute);
-        }
-
-        public ValueMapPoint ComputeValueUpTo(float x, float y, MapValueType lastValueToCompute)
-        {
-            ValueMapPoint mapPoint = new(x, y);
-            return ComputeValueUpTo(mapPoint, lastValueToCompute);
+            ValueMapPoint mapPoint = new();
+            return ComputeValueUpTo(mapPoint, position, lastValueToCompute);
         }
 
         public static CompositeValueMap CreateDefault(int seed)
