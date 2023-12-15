@@ -14,5 +14,14 @@ namespace WorldGeneration.Core.WaterBehavior
         {
             _includedArea = includedArea;
         }
+
+        public bool Contains(IMapArea area)
+        {
+            foreach (var item in _includedArea)
+                if(item.Position == area.Position)
+                    return true;
+            
+            return false;
+        }
     }
 }

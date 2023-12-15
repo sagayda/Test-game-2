@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Assets.Scripts.WorldGeneration.Core;
 using Assets.Scripts.WorldGeneration.Core.Chunks;
 using NaughtyAttributes;
+using Newtonsoft.Json.Bson;
+using Unity.Burst;
 using UnityEngine;
 using WorldGeneration.Core;
 using WorldGeneration.Core.Maps;
@@ -154,7 +157,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Paint chunk heights")]
         public void PaintChunkHeights()
         {
-            float GetHeight(int x, int y) => _world.GetChunk(x * ChunkWidth, y * ChunkHeight).Values[MapValueType.Height];
+            float GetHeight(int x, int y) => _world.GetChunkByGlobalCoordinates(x * ChunkWidth, y * ChunkHeight).Values[MapValueType.Height];
 
             float landSize = 1 - WaterLevel;
             float landStep = landSize / 3;
@@ -192,19 +195,31 @@ namespace Assets.Scripts.WorldGeneration.Editor
             HeightChunkRenderer = _chunkVisualiser.Overpaint(IsOcean, Color.magenta);
         }
 
+        [Button("Paint river chunks")]
+        public void AddRiversToPaintedMap()
+        {
+            bool IsRiver(int x, int y)
+            {
+                Vector2 chunkCoords = Chunk.WorldToLocalCoordinates(x * ChunkWidth, y * ChunkHeight);
+
+                foreach (var item in _worldGenerator.WaterBehavior.Rivers.First().Chunks)
+                    if(item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
+                        return true;
+
+                return false;
+            }
+
+            HeightChunkRenderer = _chunkVisualiser.Overpaint(IsRiver, Color.cyan);
+        }
+
         [Button("Test")]
         public void Test()
         {
-            int x = 1;
-            int y = -23;
+            Chunk source = _world.GetChunkByGlobalCoordinates(56, 40);
 
-            float xf = 1.8f;
-            float yf = -23.1f;
+            _worldGenerator.WaterBehavior.CreateSource(source, 1);
 
-            Debug.Log(Chunk.GetChunkCoorinates(xf, yf));
-            Debug.Log(Chunk.GetChunkCoorinates(new Vector2(xf, yf)));
-            Debug.Log(Chunk.GetChunkCoorinates(x, y));
-            Debug.Log(Chunk.GetChunkCoorinates(new Vector2Int(x, y)));
+            _worldGenerator.WaterBehavior.CreateRiver(source, _world);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
         }
 
         public float OceanLevel => _oceanLevel;
+        public IEnumerable<River> Rivers => _rivers;
 
         public void CreateSource(Chunk chunk, float strength)
         {
@@ -36,20 +37,62 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
             };
         }
 
-        public void CreateRiver(Chunk sourceChunk)
+        public void CreateRiver(Chunk sourceChunk, World world)
         {
-            _rivers.Add(new(sourceChunk));
+            River river = new(sourceChunk);
+
+            _rivers.Add(river);
+
+            int iterations = 0;
+
+            while (IterateRiver(river, world))
+            {
+                iterations++;
+                Debug.Log($"Iteration {iterations}");
+
+                if( iterations > 256)
+                {
+                    break;
+                }
+            }
         }
 
-        private void IterateRiver(River river)
+        private bool IterateRiver(River river, World world)
         {
             if (river.HasLeakage)
             {
                 Debug.Log("Try to iterate river with leakege");
-                return;
+                return false;
             }
 
+            Vector3 normal = GetNormal(river.LastSegment.Position, 1, world);
 
+            if(normal.z == 1)
+            {
+                Debug.Log($"Got z = 1 normal");
+                return false;
+            }
+
+            normal *= Chunk.ChunkWidth;
+
+            Vector2Int intNormal = new Vector2Int(Mathf.FloorToInt(normal.x), Mathf.FloorToInt(normal.y));
+
+            Chunk nextSegment = world.GetChunkByGlobalCoordinates(river.LastSegment.Position + intNormal);
+
+            if(world.Ocean.Contains(nextSegment))
+            {
+                Debug.Log($"Finished river at {nextSegment.Position}");
+
+                river.TryAddSegment(nextSegment, true);
+
+                return false;
+            }
+
+            nextSegment.Water = new(0.2f, normal);
+
+            river.TryAddSegment(nextSegment);
+
+            return true;
         }
 
         public void CreateOcean(World world)
@@ -61,6 +104,31 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
                     oceanChunks.Add(chunk.Value);
 
             world.TrySetOcean(new(oceanChunks));
+        }
+
+        private Vector3 GetNormal(Vector2Int point, int epsilon, World world)
+        {
+            int doubleRadius = -(epsilon * 2);
+
+            int x = point.x;
+            int y = point.y;
+
+            //float left = _worldGenerator.GetMapValue(x - epsilon, y, MapValueType.Height);
+            //float top = _worldGenerator.GetMapValue(x, y - epsilon, MapValueType.Height);
+            //float right = _worldGenerator.GetMapValue(x + epsilon, y, MapValueType.Height);
+            //float bottom = _worldGenerator.GetMapValue(x, y + epsilon, MapValueType.Height);
+
+            float left = world.GetChunkByGlobalCoordinates(x - epsilon, y).Values[MapValueType.Height];
+            float top = world.GetChunkByGlobalCoordinates(x, y - epsilon).Values[MapValueType.Height];
+            float right = world.GetChunkByGlobalCoordinates(x + epsilon, y).Values[MapValueType.Height];
+            float bottom = world.GetChunkByGlobalCoordinates(x, y + epsilon).Values[MapValueType.Height];
+
+            return new Vector3()
+            {
+                x = doubleRadius * (right - left),
+                y = doubleRadius * (bottom - top),
+                z = doubleRadius * doubleRadius,
+            }.normalized;
         }
 
     }

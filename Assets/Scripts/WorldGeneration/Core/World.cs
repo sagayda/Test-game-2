@@ -60,41 +60,50 @@ namespace Assets.Scripts.WorldGeneration.Core
             }
         }
 
-        public Chunk GetChunk(Vector2Int coordinates)
+        public Chunk GetChunkByGlobalCoordinates(Vector2 coordinates)
         {
-            Vector2Int chunkCoords = Chunk.GetChunkCoorinates(coordinates);
+            return _chunks[Chunk.WorldToLocalCoordinates(coordinates)];
 
-            if (_chunks[chunkCoords].Rect.Contains(coordinates))
-                return _chunks[chunkCoords];
+            //Vector2Int chunkCoords = Chunk.GetChunkCoorinates(coordinates);
 
-            Debug.LogWarning("Failed to found chunk via formula. Used full traversal");
+            //if (_chunks[chunkCoords].Rect.Contains(coordinates))
+            //    return _chunks[chunkCoords];
+
+            //Debug.LogWarning("Failed to found chunk via formula. Used full traversal");
 
 
-            foreach (var chunk in _chunks)
-            {
-                if (chunk.Value.Rect.Contains(coordinates))
-                    return chunk.Value;
-            }
+            //foreach (var chunk in _chunks)
+            //{
+            //    if (chunk.Value.Rect.Contains(coordinates))
+            //        return chunk.Value;
+            //}
 
-            return null;
+            //return null;
         }
 
-        public Chunk GetChunk(int x, int y)
+        public Chunk GetChunkByGlobalCoordinates(float x, float y)
         {
-            Vector2Int chunkCoords = Chunk.GetChunkCoorinates(x, y);
+            return _chunks[Chunk.WorldToLocalCoordinates(x,y)];
 
-            if (_chunks[chunkCoords].Rect.Contains(new(x,y)))
-                return _chunks[chunkCoords];
+            //Vector2Int chunkCoords = Chunk.GetChunkCoorinates(x, y);
 
-            Debug.LogWarning("Failed to found chunk via formula. Used full traversal");
+            //if (_chunks[chunkCoords].Rect.Contains(new(x,y)))
+            //    return _chunks[chunkCoords];
 
-            Vector2Int coordinates = new(x, y);
+            //Debug.LogWarning("Failed to found chunk via formula. Used full traversal");
 
-            foreach (var chunk in _chunks)
-                if (chunk.Value.Rect.Contains(coordinates))
-                    return chunk.Value;
+            //Vector2Int coordinates = new(x, y);
 
-            return null;
+            //foreach (var chunk in _chunks)
+            //    if (chunk.Value.Rect.Contains(coordinates))
+            //        return chunk.Value;
+
+            //return null;
+        }
+
+        public Chunk GetChunkByLocalCoordinates(Vector2Int coordinates)
+        {
+            return _chunks.ContainsKey(coordinates) ? _chunks[coordinates] : null;
         }
 
         public bool TrySetOcean(Pool ocean)

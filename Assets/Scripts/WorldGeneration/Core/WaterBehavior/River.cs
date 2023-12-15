@@ -27,6 +27,7 @@ namespace WorldGeneration.Core.WaterBehavior
         public Chunk LastSegment => _chunks.Last.Value;
         public Chunk Leakage => HasLeakage ? _chunks.Last.Value : null;
         public bool HasLeakage { get; private set; }
+        public IEnumerable<Chunk> Chunks => _chunks;
 
         public bool TryAddSegment(Chunk chunk, bool markAsLeakage = false)
         {

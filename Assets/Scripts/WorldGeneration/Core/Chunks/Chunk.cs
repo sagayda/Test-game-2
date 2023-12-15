@@ -64,7 +64,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             }
         }
 
-        public static Vector2Int GetChunkCoorinates(float x, float y)
+        public static Vector2Int WorldToLocalCoordinates(float x, float y)
         {
             int chunkX = Mathf.FloorToInt(x / ChunkWidth) * ChunkWidth;
             int chunkY = Mathf.FloorToInt(y / ChunkHeight) * ChunkHeight;
@@ -72,7 +72,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             return new Vector2Int(chunkX, chunkY);
         }
 
-        public static Vector2Int GetChunkCoorinates(int x, int y)
+        public static Vector2Int WorldToLocalCoordinates(int x, int y)
         {
             int chunkX = Mathf.FloorToInt((float)x / ChunkWidth) * ChunkWidth;
             int chunkY = Mathf.FloorToInt((float)y / ChunkHeight) * ChunkHeight;
@@ -81,7 +81,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             return new Vector2Int(chunkX, chunkY);
         }
 
-        public static Vector2Int GetChunkCoorinates(Vector2 coordinates)
+        public static Vector2Int WorldToLocalCoordinates(Vector2 coordinates)
         {
             int chunkX = Mathf.FloorToInt(coordinates.x / ChunkWidth) * ChunkWidth;
             int chunkY = Mathf.FloorToInt(coordinates.y / ChunkHeight) * ChunkHeight;
@@ -89,7 +89,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             return new Vector2Int(chunkX, chunkY);
         }
 
-        public static Vector2Int GetChunkCoorinates(Vector2Int coordinates)
+        public static Vector2Int WorldToLocalCoordinates(Vector2Int coordinates)
         {
             int chunkX = Mathf.FloorToInt((float)coordinates.x / ChunkWidth) * ChunkWidth;
             int chunkY = Mathf.FloorToInt((float)coordinates.y / ChunkHeight) * ChunkHeight;
