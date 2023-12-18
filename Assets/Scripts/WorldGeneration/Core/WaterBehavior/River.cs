@@ -34,6 +34,8 @@ namespace WorldGeneration.Core.WaterBehavior
             if (chunk.IsWaterChunk == false)
                 return false;
 
+            _chunks.Last.Value.Water.Stream = chunk.Position - _chunks.Last.Value.Position;
+
             _chunks.AddLast(chunk);
             
             if(markAsLeakage)
@@ -42,6 +44,10 @@ namespace WorldGeneration.Core.WaterBehavior
             return true;
         }
 
+        public void CreateLeakage()
+        {
+            HasLeakage = true;
+        }
 
     }
 }

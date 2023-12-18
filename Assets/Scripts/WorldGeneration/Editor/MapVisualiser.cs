@@ -10,6 +10,9 @@ namespace Assets.Scripts.WorldGeneration.Editor
         private int _height;
         private int _pixelSize;
 
+        private Texture2D _map;
+        private Texture2D _overpaintedMap;
+
         public MapVisualiser(int width, int height, int pixelSize = 1)
         {
             _width = width;
@@ -17,8 +20,6 @@ namespace Assets.Scripts.WorldGeneration.Editor
             _pixelSize = pixelSize;
         }
 
-        public Sprite LastSprite { get; private set; }
-        public Texture2D LastTexture { get; private set; }
 
         public Sprite Paint(ValueDelegate valueDelegate, ColorMap colorMap)
         {
@@ -43,8 +44,8 @@ namespace Assets.Scripts.WorldGeneration.Editor
             texture.Apply();
 
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, _width * _pixelSize, _height * _pixelSize), new Vector2(0, 0));
-            LastSprite = sprite;
-            LastTexture = texture;
+            _map = texture;
+            _overpaintedMap = texture;
             return sprite;
         }
 
@@ -57,18 +58,38 @@ namespace Assets.Scripts.WorldGeneration.Editor
                     if (boolDelegate(x, y) == false)
                         continue;
 
-                    PaintPixel(x, y, color, LastTexture);
+                    PaintPixel(x, y, color, _overpaintedMap);
 
                 }
             }
 
 
-            LastTexture.Apply();
+            _overpaintedMap.Apply();
 
-            Sprite sprite = Sprite.Create(LastTexture, new Rect(0, 0, _width * _pixelSize, _height * _pixelSize), new Vector2(0, 0));
-            LastSprite = sprite;
+            Sprite sprite = Sprite.Create(_overpaintedMap, new Rect(0, 0, _width * _pixelSize, _height * _pixelSize), new Vector2(0, 0));
 
             return sprite;
+        }
+
+        public Sprite Overpaint(Vector2Int[] pixels, Color color)
+        {
+            foreach (var pixel in pixels)
+            {
+                PaintPixel(pixel.x, pixel.y, color, _overpaintedMap);
+            }
+
+            _overpaintedMap.Apply();
+
+            Sprite sprite = Sprite.Create(_overpaintedMap, new Rect(0, 0, _width * _pixelSize, _height * _pixelSize), new Vector2(0, 0));
+
+            return sprite;
+        }
+
+        public void ClearOverpaint()
+        {
+            _overpaintedMap = new(_map.width, _map.height);
+            _overpaintedMap.filterMode = FilterMode.Point;
+            _overpaintedMap.LoadRawTextureData(_map.GetRawTextureData());
         }
 
         private void PaintPixel(int x, int y, Color color, Texture2D texture)

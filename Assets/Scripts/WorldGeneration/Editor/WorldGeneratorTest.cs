@@ -9,6 +9,7 @@ using Unity.Burst;
 using UnityEngine;
 using WorldGeneration.Core;
 using WorldGeneration.Core.Maps;
+using WorldGeneration.Core.WaterBehavior;
 using Debug = UnityEngine.Debug;
 
 namespace Assets.Scripts.WorldGeneration.Editor
@@ -23,11 +24,10 @@ namespace Assets.Scripts.WorldGeneration.Editor
         #region Editor fields
         public string Seed = string.Empty;
         public int Width = 256;
-        [Range(4, 256)]
-        public int ChunkWidth = 32;
         public int Height = 256;
         [Range(4, 256)]
-        public int ChunkHeight = 32;
+        public int ChunkSize = 32;
+        public Vector2 ChunkPivot = new(0.5f, 0.5f);
         [Range(0, 1)]
         public float WaterLevel = 0.4f;
 
@@ -46,8 +46,25 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [BoxGroup("Renderers")]
         [ShowAssetPreview(2048, 2048)]
         public Sprite HeightChunkRenderer;
+        public bool ShowGenerationSteps = false;
         #endregion
 
+        private void Awake()
+        {
+            HeightChunkRenderer = null;
+            HeightRenderer = null;
+        }
+
+        private void OnValidate()
+        {
+            if(HeightChunkRenderer != null && _chunkVisualiser != null)
+            {
+                _chunkVisualiser.ClearOverpaint();
+                HeightChunkRenderer = _chunkVisualiser.Overpaint(new Vector2Int[] { SourceCoords }, Color.red);
+            }
+        }
+
+        [ShowIf("ShowGenerationSteps")]
         [Button("Create generator")]
         public void CreateGenerator()
         {
@@ -85,8 +102,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
                 return;
             }
 
-            Chunk.ChunkWidth = ChunkWidth;
-            Chunk.ChunkHeight = ChunkHeight;
+            Chunk.Size = ChunkSize;
 
             ProgressValueMap progress = new(progressMapParameters.Value);
 
@@ -97,6 +113,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
             _mapVisualiser = new(Width, Height);
         }
 
+        [ShowIf("ShowGenerationSteps")]
         [Button("Init world")]
         public void CreateEmptyWorld()
         {
@@ -104,19 +121,31 @@ namespace Assets.Scripts.WorldGeneration.Editor
 
             _world = _worldGenerator.World;
 
-            _chunkVisualiser = new(_worldGenerator.Width / Chunk.ChunkWidth, _worldGenerator.Height / Chunk.ChunkHeight, ChunkWidth);
+            _chunkVisualiser = new(_worldGenerator.Width / Chunk.Size, _worldGenerator.Height / Chunk.Size, ChunkSize);
         }
 
+        [ShowIf("ShowGenerationSteps")]
         [Button("Pre-generate all world")]
         public void PreGenerateAllWorldChunks()
         {
             _worldGenerator.InitWorldMapValues();
         }
 
+        [ShowIf("ShowGenerationSteps")]
         [Button("Create ocean")]
         public void CreateOcean()
         {
             _worldGenerator.WaterBehavior.CreateOcean(_world);
+        }
+
+        [HideIf("ShowGenerationSteps")]
+        [Button("Generate")]
+        public void Generate()
+        {
+            CreateGenerator();
+            CreateEmptyWorld();
+            PreGenerateAllWorldChunks();
+            CreateOcean();
         }
 
         [Button("Paint heights")]
@@ -157,7 +186,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Paint chunk heights")]
         public void PaintChunkHeights()
         {
-            float GetHeight(int x, int y) => _world.GetChunkByGlobalCoordinates(x * ChunkWidth, y * ChunkHeight).Values[MapValueType.Height];
+            float GetHeight(int x, int y) => _world.GetChunkByLocalCoordinates(new(x, y)).Values[MapValueType.Height];
 
             float landSize = 1 - WaterLevel;
             float landStep = landSize / 3;
@@ -190,7 +219,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Paint chunk ocean")]
         public void AddOceanToPaintedMap()
         {
-            bool IsOcean(int x, int y) => _world.Ocean.IncludedArea.Exists((segment) => segment.Position.x == x * ChunkWidth && segment.Position.y == y * ChunkHeight);
+            bool IsOcean(int x, int y) => _world.Ocean.IncludedArea.Exists((segment) => segment.Position.x == x && segment.Position.y == y);
 
             HeightChunkRenderer = _chunkVisualiser.Overpaint(IsOcean, Color.magenta);
         }
@@ -200,7 +229,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         {
             bool IsRiver(int x, int y)
             {
-                Vector2 chunkCoords = Chunk.WorldToLocalCoordinates(x * ChunkWidth, y * ChunkHeight);
+                Vector2 chunkCoords = new(x, y);
 
                 foreach (var item in _worldGenerator.WaterBehavior.Rivers.First().Chunks)
                     if(item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
@@ -212,14 +241,45 @@ namespace Assets.Scripts.WorldGeneration.Editor
             HeightChunkRenderer = _chunkVisualiser.Overpaint(IsRiver, Color.cyan);
         }
 
+        [Button("Paint pools chunks")]
+        public void AddPoolsToPaintedMap()
+        {
+            bool isPool(int x, int y)
+            {
+                Vector2 chunkCoords = new(x, y);
+
+                foreach (var item in _worldGenerator.WaterBehavior.Pools.First().IncludedArea)
+                    if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
+                        return true;
+                return false;
+            }
+
+            HeightChunkRenderer = _chunkVisualiser.Overpaint(isPool, Color.magenta);
+
+        }
+
+        [BoxGroup("Rivers")]
+        public Vector2Int SourceCoords;
+
         [Button("Test")]
         public void Test()
         {
-            Chunk source = _world.GetChunkByGlobalCoordinates(56, 40);
+            Chunk source = _world.GetChunkByLocalCoordinates(SourceCoords);
 
             _worldGenerator.WaterBehavior.CreateSource(source, 1);
 
             _worldGenerator.WaterBehavior.CreateRiver(source, _world);
         }
+
+        [Button("Test2")]
+        public void Test2()
+        {
+            List<Vector2Int> leakages;
+
+            _worldGenerator.WaterBehavior.Flood(SourceCoords, _world, out leakages);
+
+            _chunkVisualiser.Overpaint(leakages.ToArray(), Color.black);
+        }
+
     }
 }

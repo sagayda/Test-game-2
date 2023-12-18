@@ -74,20 +74,18 @@ namespace WorldGeneration.Core
                 //    _compositeMap.ComputeValues(new(chunk.Key.x + Chunk.ChunkWidth, chunk.Key.y + Chunk.ChunkHeight)),
                 //};
 
-                Vector2 center = new(chunk.Key.x + Chunk.ChunkWidth / 2, chunk.Key.y + Chunk.ChunkHeight / 2);
-
                 ValueMapPoint[] chunkPoints =
                 { 
                     //center
-                    _compositeMap.ComputeValues(center),
+                    _compositeMap.ComputeValues(Chunk.LocalToGlobalCoordinates(chunk.Value.Position, new(0.5f,0.5f))),
                     //top left
-                    _compositeMap.ComputeValues(new(center.x - Chunk.ChunkWidth / 4f, center.y - Chunk.ChunkHeight / 4f)),
+                    _compositeMap.ComputeValues(Chunk.LocalToGlobalCoordinates(chunk.Value.Position, new(0.25f,0.25f))),
                     //top right
-                    _compositeMap.ComputeValues(new(center.x + Chunk.ChunkWidth / 4f, center.y - Chunk.ChunkHeight / 4f)),
+                    _compositeMap.ComputeValues(Chunk.LocalToGlobalCoordinates(chunk.Value.Position, new(0.75f,0.25f))),
                     //bottom left
-                    _compositeMap.ComputeValues(new(center.x - Chunk.ChunkWidth / 4f, center.y + Chunk.ChunkHeight / 4f)),
+                    _compositeMap.ComputeValues(Chunk.LocalToGlobalCoordinates(chunk.Value.Position, new(0.25f,0.75f))),
                     //bottom right
-                    _compositeMap.ComputeValues(new(center.x + Chunk.ChunkWidth / 4f, center.y + Chunk.ChunkHeight / 4f)),
+                    _compositeMap.ComputeValues(Chunk.LocalToGlobalCoordinates(chunk.Value.Position, new(0.75f,0.75f))),
                 };
 
 

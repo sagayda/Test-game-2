@@ -12,6 +12,8 @@ namespace Assets.Scripts.WorldGeneration.Core
         private readonly string _seed;
         private readonly int _width;
         private readonly int _height;
+        private readonly int _widthByChunks;
+        private readonly int _heightByChunks;
         private readonly float _oceanLevel;
 
         private Dictionary<Vector2Int, Chunk> _chunks;
@@ -29,6 +31,8 @@ namespace Assets.Scripts.WorldGeneration.Core
             _seed = generator.Seed;
             _width = generator.Width;
             _height = generator.Height;
+            _widthByChunks = generator.Width / Chunk.Size;
+            _heightByChunks = generator.Height / Chunk.Size;
             _oceanLevel = generator.OceanLevel;
 
         }
@@ -38,6 +42,8 @@ namespace Assets.Scripts.WorldGeneration.Core
         public string Seed => _seed;
         public int Width => _width;
         public int Height => _height;
+        public int WidthByChunks => _widthByChunks;
+        public int HeightByChunks => _heightByChunks;
         public float OceanLevel => _oceanLevel;
 
         public IReadOnlyDictionary<Vector2Int, Chunk> Chunks => _chunks;
@@ -45,16 +51,13 @@ namespace Assets.Scripts.WorldGeneration.Core
 
         public void InitChunks()
         {
-            int widthByChunks = _width / Chunk.ChunkWidth;
-            int heightByChunks = _height / Chunk.ChunkHeight;
-
             _chunks = new Dictionary<Vector2Int, Chunk>();
 
-            for (int i = 0; i < widthByChunks; i++)
+            for (int i = 0; i < _widthByChunks; i++)
             {
-                for (int j = 0; j < heightByChunks; j++)
+                for (int j = 0; j < _heightByChunks; j++)
                 {
-                    Chunk chunk = new(i * Chunk.ChunkWidth, j * Chunk.ChunkHeight);
+                    Chunk chunk = new(i, j);
                     _chunks.Add(chunk.Rect.position, chunk);
                 }
             }
@@ -62,7 +65,7 @@ namespace Assets.Scripts.WorldGeneration.Core
 
         public Chunk GetChunkByGlobalCoordinates(Vector2 coordinates)
         {
-            return _chunks[Chunk.WorldToLocalCoordinates(coordinates)];
+            return _chunks[Chunk.GlobalToLocalCoordinates(coordinates)];
 
             //Vector2Int chunkCoords = Chunk.GetChunkCoorinates(coordinates);
 
@@ -83,7 +86,7 @@ namespace Assets.Scripts.WorldGeneration.Core
 
         public Chunk GetChunkByGlobalCoordinates(float x, float y)
         {
-            return _chunks[Chunk.WorldToLocalCoordinates(x,y)];
+            return _chunks[Chunk.GlobalToLocalCoordinates(x,y)];
 
             //Vector2Int chunkCoords = Chunk.GetChunkCoorinates(x, y);
 

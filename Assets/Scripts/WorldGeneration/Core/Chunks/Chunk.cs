@@ -6,8 +6,8 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
 {
     public class Chunk : IMapArea
     {
-        public static int ChunkWidth = 32;
-        public static int ChunkHeight = 32;
+        public static int Size = 32;
+        public static Vector2 Pivot = new(0.5f, 0.5f);
 
 #nullable enable
 
@@ -21,7 +21,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
 
         public Chunk(int x, int y)
         {
-            Rect = new(x, y, ChunkWidth, ChunkHeight);
+            Rect = new(x, y, Size, Size);
 
             GenerationStage = GenerationStage.Empty;
             Values = null;
@@ -64,37 +64,54 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             }
         }
 
-        public static Vector2Int WorldToLocalCoordinates(float x, float y)
+        public static Vector2Int GlobalToLocalCoordinates(float x, float y)
         {
-            int chunkX = Mathf.FloorToInt(x / ChunkWidth) * ChunkWidth;
-            int chunkY = Mathf.FloorToInt(y / ChunkHeight) * ChunkHeight;
+            int chunkX = Mathf.FloorToInt(x / Size);
+            int chunkY = Mathf.FloorToInt(y / Size);
 
             return new Vector2Int(chunkX, chunkY);
         }
 
-        public static Vector2Int WorldToLocalCoordinates(int x, int y)
+        public static Vector2Int GlobalToLocalCoordinates(int x, int y)
         {
-            int chunkX = Mathf.FloorToInt((float)x / ChunkWidth) * ChunkWidth;
-            int chunkY = Mathf.FloorToInt((float)y / ChunkHeight) * ChunkHeight;
+            int chunkX = Mathf.FloorToInt((float)x / Size);
+            int chunkY = Mathf.FloorToInt((float)y / Size);
 
 
             return new Vector2Int(chunkX, chunkY);
         }
 
-        public static Vector2Int WorldToLocalCoordinates(Vector2 coordinates)
+        public static Vector2Int GlobalToLocalCoordinates(Vector2 coordinates)
         {
-            int chunkX = Mathf.FloorToInt(coordinates.x / ChunkWidth) * ChunkWidth;
-            int chunkY = Mathf.FloorToInt(coordinates.y / ChunkHeight) * ChunkHeight;
+            int chunkX = Mathf.FloorToInt(coordinates.x / Size);
+            int chunkY = Mathf.FloorToInt(coordinates.y / Size);
 
             return new Vector2Int(chunkX, chunkY);
         }
 
-        public static Vector2Int WorldToLocalCoordinates(Vector2Int coordinates)
+        public static Vector2Int GlobalToLocalCoordinates(Vector2Int coordinates)
         {
-            int chunkX = Mathf.FloorToInt((float)coordinates.x / ChunkWidth) * ChunkWidth;
-            int chunkY = Mathf.FloorToInt((float)coordinates.y / ChunkHeight) * ChunkHeight;
+            int chunkX = Mathf.FloorToInt((float)coordinates.x / Size);
+            int chunkY = Mathf.FloorToInt((float)coordinates.y / Size);
 
             return new Vector2Int(chunkX, chunkY);
+        }
+
+        public static Vector2 LocalToGlobalCoordinates(Vector2Int coordinates)
+        {
+            return new(coordinates.x * Size + (Size * Pivot.x), coordinates.y * Size + (Size * Pivot.y));
+        }
+
+        /// <summary>
+        /// Returns global coordinates of realtive point in chunk
+        /// </summary>
+        /// <param name="coordinates">Local chunk coordinates</param>
+        /// <param name="realtivePosition">Position of point in chunk.
+        /// For example, (0,1) will return the coordinates of the bottom left corner of the chunk.</param>
+        /// <returns></returns>
+        public static Vector2 LocalToGlobalCoordinates(Vector2Int coordinates, Vector2 realtivePosition)
+        {
+            return new(coordinates.x * Size + (Size * realtivePosition.x), coordinates.y * Size + (Size * realtivePosition.y));
         }
     }
 }
