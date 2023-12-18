@@ -227,35 +227,45 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Paint river chunks")]
         public void AddRiversToPaintedMap()
         {
-            bool IsRiver(int x, int y)
+            foreach (var river in _worldGenerator.WaterBehavior.Rivers)
             {
-                Vector2 chunkCoords = new(x, y);
+                bool IsRiver(int x, int y)
+                {
+                    Vector2 chunkCoords = new(x, y);
 
-                foreach (var item in _worldGenerator.WaterBehavior.Rivers.First().Chunks)
-                    if(item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
-                        return true;
+                    foreach (var item in river.Chunks)
+                        if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
+                            return true;
 
-                return false;
+                    return false;
+                }
+
+                _chunkVisualiser.Overpaint(IsRiver, Color.cyan);
             }
 
-            HeightChunkRenderer = _chunkVisualiser.Overpaint(IsRiver, Color.cyan);
+            HeightChunkRenderer = _chunkVisualiser.OverpaintedSprite;
         }
 
         [Button("Paint pools chunks")]
         public void AddPoolsToPaintedMap()
         {
-            bool isPool(int x, int y)
+            foreach (var pool in _worldGenerator.WaterBehavior.Pools)
             {
-                Vector2 chunkCoords = new(x, y);
+                bool isPool(int x, int y)
+                {
+                    Vector2 chunkCoords = new(x, y);
 
-                foreach (var item in _worldGenerator.WaterBehavior.Pools.First().IncludedArea)
-                    if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
-                        return true;
-                return false;
+                    foreach (var item in pool.IncludedArea)
+                        if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
+                            return true;
+
+                    return false;
+                }
+
+                _chunkVisualiser.Overpaint(isPool, Color.magenta);
             }
 
-            HeightChunkRenderer = _chunkVisualiser.Overpaint(isPool, Color.magenta);
-
+            HeightChunkRenderer = _chunkVisualiser.OverpaintedSprite;
         }
 
         [BoxGroup("Rivers")]
@@ -274,11 +284,18 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Test2")]
         public void Test2()
         {
-            List<Vector2Int> leakages;
+            IEnumerable<Vector2Int> leakages;
 
             _worldGenerator.WaterBehavior.Flood(SourceCoords, _world, out leakages);
 
             _chunkVisualiser.Overpaint(leakages.ToArray(), Color.black);
+        }
+
+        [Button("Clear pool and rivers")]
+        public void ClearPoolsAndRivers()
+        {
+            _worldGenerator.WaterBehavior.ClearPools();
+            _worldGenerator.WaterBehavior.ClearRivers();
         }
 
     }

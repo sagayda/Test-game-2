@@ -20,6 +20,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
             _pixelSize = pixelSize;
         }
 
+        public Sprite OverpaintedSprite => Sprite.Create(_overpaintedMap, new Rect(0, 0, _width * _pixelSize, _height * _pixelSize), new Vector2(0, 0));
 
         public Sprite Paint(ValueDelegate valueDelegate, ColorMap colorMap)
         {
