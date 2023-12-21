@@ -249,6 +249,10 @@ namespace Assets.Scripts.WorldGeneration.Editor
         [Button("Paint pools chunks")]
         public void AddPoolsToPaintedMap()
         {
+            Debug.Log($"Pools count: {_worldGenerator.WaterBehavior.Pools.Count()}");
+
+            Color color = Color.magenta;
+
             foreach (var pool in _worldGenerator.WaterBehavior.Pools)
             {
                 bool isPool(int x, int y)
@@ -262,7 +266,21 @@ namespace Assets.Scripts.WorldGeneration.Editor
                     return false;
                 }
 
-                _chunkVisualiser.Overpaint(isPool, Color.magenta);
+                bool isLeakage(int x, int y)
+                {
+                    Vector2 chunkCoords = new(x, y);
+
+                    foreach (var item in pool.Leakages)
+                        if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
+                            return true;
+
+                    return false;
+                }
+
+                _chunkVisualiser.Overpaint(isPool, color);
+                _chunkVisualiser.Overpaint(isLeakage, Color.black);
+
+                color = Color.Lerp(color, Color.black, 0.2f);
             }
 
             HeightChunkRenderer = _chunkVisualiser.OverpaintedSprite;
@@ -276,7 +294,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         {
             Chunk source = _world.GetChunkByLocalCoordinates(SourceCoords);
 
-            _worldGenerator.WaterBehavior.CreateSource(source, 1);
+            _worldGenerator.WaterBehavior.CreateSource(source, 0.1f);
 
             _worldGenerator.WaterBehavior.CreateRiver(source, _world);
         }
@@ -286,7 +304,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         {
             IEnumerable<Vector2Int> leakages;
 
-            _worldGenerator.WaterBehavior.Flood(SourceCoords, _world, out leakages);
+            _worldGenerator.WaterBehavior.Flood(SourceCoords, _world, 1f, out leakages);
 
             _chunkVisualiser.Overpaint(leakages.ToArray(), Color.black);
         }
@@ -296,6 +314,27 @@ namespace Assets.Scripts.WorldGeneration.Editor
         {
             _worldGenerator.WaterBehavior.ClearPools();
             _worldGenerator.WaterBehavior.ClearRivers();
+        }
+
+        [Button("Print info")]
+        public void PrintInfoAboutCell()
+        {
+            Chunk chunk = _world.GetChunkByLocalCoordinates(SourceCoords);
+
+            string message = $"Land:\n\tHeight: {chunk.Values[MapValueType.Height]}";
+
+            if (chunk.HasWater)
+            {
+                message += $"\nWater:\n\tOverallheight: {chunk.Water.Volume + chunk.Values[MapValueType.Height]}\n\tVolume: {chunk.Water.Volume}\n\tStream: {chunk.Water.Stream}";
+
+                if (chunk.Water.IsSource)
+                {
+                    message += $"\nSource: \n\tStrength: {chunk.Water.Source.Strength}\n\t";
+                }
+            }
+
+            Debug.Log(message);
+
         }
 
     }

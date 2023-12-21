@@ -17,7 +17,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
         public ValueMapPoint? Values { get; internal set; }
         public WaterMapPoint? Water { get; internal set; }
         public Vector2Int Position => Rect.position;
-        public bool IsWaterChunk => Water != null;
+        public bool HasWater => Water != null;
 
         public Chunk(int x, int y)
         {
@@ -26,28 +26,6 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
             GenerationStage = GenerationStage.Empty;
             Values = null;
             Water = null;
-        }
-
-        //--
-        public void GenerateNextStage(WorldGenerator worldGenerator)
-        {
-            switch (GenerationStage)
-            {
-                case GenerationStage.Empty:
-                    Values = worldGenerator.CompositeValueMap.ComputeValues(Rect.center);
-                    //no water now
-                    Water = null;
-                    GenerationStage = GenerationStage.Pre;
-                    break;
-                case GenerationStage.Pre:
-                    //not implemented
-                    GenerationStage = GenerationStage.Full;
-                    break;
-                case GenerationStage.Full:
-                    break;
-                default:
-                    break;
-            }
         }
 
         internal bool TrySetGenerationStage(GenerationStage stage)

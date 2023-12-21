@@ -6,13 +6,37 @@ namespace WorldGeneration.Core.WaterBehavior
 {
     public class Pool : IWaterPool
     {
+        private const float EVAPORATING_STRENGTH = 0.02f;
+
         private readonly List<IMapArea> _includedArea;
+        private readonly List<IMapArea> _leakages;
 
-        public List<IMapArea> IncludedArea => _includedArea;
-
-        public Pool(List<IMapArea> includedArea)
+        public Pool()
         {
-            _includedArea = includedArea;
+            _includedArea = new();
+            _leakages = new();
+        }
+        
+        public List<IMapArea> IncludedArea => _includedArea;
+        public IEnumerable<IMapArea> Leakages => _leakages;
+        public float EvaporatingVolume => _includedArea.Count * EVAPORATING_STRENGTH;
+
+        public bool TryAddSegment(params IMapArea[] areas)
+        {
+            foreach (var item in areas)
+                if(item.HasWater == false)
+                    return false;
+
+            _includedArea.AddRange(areas);
+
+            return true;
+        }
+
+        //need neighbour check
+        public bool TryAddLeakage(params IMapArea[] areas)
+        {
+            _leakages.AddRange(areas);
+            return true;
         }
 
         public bool Contains(IMapArea area)

@@ -11,7 +11,7 @@ namespace WorldGeneration.Core.WaterBehavior
 
         public River(Chunk source)
         {
-            if (source.IsWaterChunk == false)
+            if (source.HasWater == false)
                 throw new ArgumentException("The chunk given as a river source has no water!", nameof(source));
 
             if (source.Water.IsSource == false)
@@ -26,12 +26,13 @@ namespace WorldGeneration.Core.WaterBehavior
         public Chunk Source => _chunks.First.Value;
         public Chunk LastSegment => _chunks.Last.Value;
         public Chunk Leakage => HasLeakage ? _chunks.Last.Value : null;
+        public float Strength => Source.Water.Source.Strength;
         public bool HasLeakage { get; private set; }
         public IEnumerable<Chunk> Chunks => _chunks;
 
         public bool TryAddSegment(Chunk chunk, bool markAsLeakage = false)
         {
-            if (chunk.IsWaterChunk == false)
+            if (chunk.HasWater == false)
                 return false;
 
             _chunks.Last.Value.Water.Stream = chunk.Position - _chunks.Last.Value.Position;

@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.WorldGeneration.Core.Chunks;
-using Codice.CM.Client.Differences;
 using UnityEngine;
 using WorldGeneration.Core;
-using WorldGeneration.Core.Locations;
 using WorldGeneration.Core.WaterBehavior;
 
 namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
@@ -27,7 +25,7 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
 
         public void CreateSource(Chunk chunk, float strength)
         {
-            if (chunk.IsWaterChunk)
+            if (chunk.HasWater)
             {
                 if (chunk.Water.IsSource)
                     return;
@@ -44,39 +42,66 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
 
         public void CreateRiver(Chunk sourceChunk, World world)
         {
+            //if (sourceChunk.Water.Source.Strength <= 0.001f)
+            //    return;
+
             River river = new(sourceChunk);
 
             _rivers.Add(river);
 
             int iterations = 0;
 
-            while (IterateRiver(river, world))
+            Pool flowsInto;
+
+            while (IterateRiver(river, world, out flowsInto))
             {
                 iterations++;
-                Debug.LogError($"Too many river iterations (256) at {sourceChunk.Position}. River generation stopped");
 
-                if ( iterations > 256)
+                if (iterations > 256)
                 {
+                    Debug.LogError($"Too many river iterations (256) at {sourceChunk.Position}. River generation stopped");
                     break;
+                }
+            }
+
+            if(flowsInto.EvaporatingVolume < river.Strength)
+            {
+                foreach (var leakage in flowsInto.Leakages)
+                {
+                    CreateSource(leakage as Chunk, river.Strength - flowsInto.EvaporatingVolume);
+                    CreateRiver(leakage as Chunk, world);
                 }
             }
         }
 
-        private bool IterateRiver(River river, World world)
+        private bool IterateRiver(River river, World world, out Pool flowsInto)
         {
+            flowsInto = null;
+
             if (river.HasLeakage)
             {
-                Debug.Log("Try to iterate river with leakege");
+                Debug.Log("Tried to iterate river with leakege");
                 return false;
             }
 
-            Vector2 normal = GetNormal(river.LastSegment.Position, world);
+            //Vector2 normal = GetNormal(river.LastSegment.Position, world);
+
+            Vector2 normal = GetNormalIncludingWater(river.LastSegment.Position, world);
 
             Vector2Int intNormal = new(Mathf.RoundToInt(normal.x), Mathf.RoundToInt(normal.y));
 
+            //
+            if (intNormal == Vector2Int.zero)
+            {
+                flowsInto = Flood(river.LastSegment.Position, world, river.Strength, out _);
+                river.CreateLeakage();
+                return false;
+            }
+            //
+
             Vector2Int nextSegmentPosition = river.LastSegment.Position + intNormal;
 
-            if(nextSegmentPosition.x > world.WidthByChunks || nextSegmentPosition.x < 0 || nextSegmentPosition.y > world.HeightByChunks || nextSegmentPosition.y < 0)
+            if (nextSegmentPosition.x > world.WidthByChunks || nextSegmentPosition.x < 0 || nextSegmentPosition.y > world.HeightByChunks || nextSegmentPosition.y < 0)
             {
                 Debug.Log("World bounds");
                 river.CreateLeakage();
@@ -85,54 +110,84 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
 
             Chunk nextSegment = world.GetChunkByLocalCoordinates(river.LastSegment.Position + intNormal);
 
-            if(world.Ocean.Contains(nextSegment))
+            if (world.Ocean.Contains(nextSegment))
             {
                 Debug.Log($"Finished river at {nextSegment.Position}");
+
+                flowsInto = world.Ocean;
 
                 river.TryAddSegment(nextSegment, true);
 
                 return false;
             }
 
-            nextSegment.Water = new(0.2f, normal);
+            nextSegment.Water = new(river.Strength, normal);
 
             river.TryAddSegment(nextSegment);
 
             return true;
         }
 
-        public void Flood(Vector2Int startPosition, World world, out IEnumerable<Vector2Int> leakages)
+        public Pool Flood(Vector2Int startPosition, World world, float maxVolume, out IEnumerable<Vector2Int> leakages)
         {
             float step = 0.001f;
             float waterVolume = step;
             int stepsCount = 0;
 
-            IEnumerable<Vector2Int> flooded;
+            Dictionary<Vector2Int, float> flooded;
 
             while (FloodStep(startPosition, world, waterVolume, out flooded, out leakages) == false)
             {
                 stepsCount++;
                 waterVolume += step;
 
-                if(stepsCount > 512)
+                if (waterVolume >= maxVolume)
+                    break;
+
+                if (stepsCount > 512)
                 {
                     Debug.LogError($"Too many flood steps (512) at {startPosition}. Flooding stopped");
-                    return;
+                    return null;
                 }
             }
 
-            List<IMapArea> poolCells = new List<IMapArea>();
+            List<IMapArea> poolCells = new();
 
             foreach (var item in flooded)
             {
-                poolCells.Add(world.GetChunkByLocalCoordinates(item));
+                Chunk chunk = world.GetChunkByLocalCoordinates(item.Key);
+
+                if (chunk.HasWater)
+                    chunk.Water.Volume += item.Value;
+                else
+                    chunk.Water = new(item.Value, new());
+
+                poolCells.Add(chunk);
             }
 
-            Pool pool = new(poolCells);
+            List<IMapArea> poolLeakageCells = new();
+
+            if (leakages != null)
+            {
+                foreach (var item in leakages)
+                {
+                    poolLeakageCells.Add(world.GetChunkByLocalCoordinates(item));
+                }
+            }
+
+
+
+            Pool pool = new();
+
+            pool.TryAddSegment(poolCells.ToArray());
+            pool.TryAddLeakage(poolLeakageCells.ToArray());
+
             _pools.Add(pool);
+
+            return pool;
         }
 
-        private bool FloodStep(Vector2Int position, World world, float volume, out IEnumerable<Vector2Int> flooded, out IEnumerable<Vector2Int> leakages)
+        private bool FloodStep(Vector2Int position, World world, float volume, out Dictionary<Vector2Int, float> flooded, out IEnumerable<Vector2Int> leakages)
         {
             flooded = null;
             leakages = null;
@@ -142,15 +197,18 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
             float mainHeight = startChunk.Values[MapValueType.Height];
             float mainWaterHeight = startChunk.Values[MapValueType.Height] + volume;
 
-            List<Vector2Int> lastIterationVisited = new() { position };
-            List<Vector2Int> currentFlooded = new();
+            Dictionary<Vector2Int, float> lastIterationVisited = new()
+            {
+                { position, volume }
+            };
+            Dictionary<Vector2Int, float> currentFlooded = new();
             HashSet<Vector2Int> foundedLeakages = new();
 
             bool leakageFound = false;
 
             while (leakageFound == false && lastIterationVisited.Count > 0)
             {
-                List<Vector2Int> visited = new();
+                Dictionary<Vector2Int, float> visited = new();
 
                 foreach (var cell in lastIterationVisited)
                 {
@@ -158,12 +216,18 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
                     {
                         for (int j = -1; j <= 1; j++)
                         {
-                            Vector2Int pos = new(cell.x + i, cell.y + j);
+                            Vector2Int pos = new(cell.Key.x + i, cell.Key.y + j);
 
-                            if (lastIterationVisited.Contains(pos))
+                            if (lastIterationVisited.ContainsKey(pos))
                                 continue;
 
-                            if (currentFlooded.Contains(pos))
+                            if (currentFlooded.ContainsKey(pos))
+                                continue;
+
+                            if (visited.ContainsKey(pos))
+                                continue;
+
+                            if (pos.x < 0 || pos.y < 0 || pos.x >= world.WidthByChunks || pos.y >= world.HeightByChunks)
                                 continue;
 
                             Chunk neighbourCell = world.GetChunkByLocalCoordinates(pos);
@@ -172,6 +236,10 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
                             if (neighbourCell.Values[MapValueType.Height] >= mainWaterHeight)
                                 continue;
 
+                            if(neighbourCell.HasWater)
+                                if (neighbourCell.Values[MapValueType.Height] + neighbourCell.Water.Volume >= mainWaterHeight)
+                                    continue;
+
                             //leakage
                             if (neighbourCell.Values[MapValueType.Height] < mainHeight)
                             {
@@ -179,12 +247,15 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
                                 leakageFound = true;
                             }
 
-                            visited.Add(pos);
+                            visited.Add(pos, mainWaterHeight - neighbourCell.Values[MapValueType.Height]);
                         }
                     }
                 }
 
-                currentFlooded.AddRange(lastIterationVisited);
+                foreach (var item in lastIterationVisited)
+                {
+                    currentFlooded.Add(item.Key, item.Value);
+                }
 
                 lastIterationVisited = visited;
             }
@@ -196,6 +267,7 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
                 return true;
             }
 
+            flooded = currentFlooded;
             return false;
         }
 
@@ -204,10 +276,19 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
             List<IMapArea> oceanChunks = new();
 
             foreach (var chunk in world.Chunks)
+            {
                 if (chunk.Value.Values[MapValueType.Height] <= world.OceanLevel)
+                {
+                    chunk.Value.Water = new(world.OceanLevel - chunk.Value.Values[MapValueType.Height], new());
                     oceanChunks.Add(chunk.Value);
+                }
+            }
 
-            world.TrySetOcean(new(oceanChunks));
+            Pool ocean = new Pool();
+
+            ocean.TryAddSegment(oceanChunks.ToArray());
+
+            world.TrySetOcean(ocean);
         }
 
         private Vector3 GetNormal(Vector2Int point, int epsilon, World world)
@@ -219,7 +300,7 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
             int x = point.x;
             int y = point.y;
 
-            if(x >= 31 || x <= 0 || y>= 31 || y <= 0)
+            if (x >= 31 || x <= 0 || y >= 31 || y <= 0)
             {
                 return new Vector3(0, 0, 1);
             }
@@ -276,18 +357,19 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
         private Vector2 GetNormal(Vector2Int point, World world)
         {
             Vector2 direction = Vector2.zero;
+
             float height = world.GetChunkByLocalCoordinates(point).Values[MapValueType.Height];
 
-            if(point.x == world.WidthByChunks)
+            if (point.x == world.WidthByChunks)
                 return new(1, 0);
 
-            if(point.x == 0)
+            if (point.x == 0)
                 return new(-1, 0);
 
             if (point.y == world.HeightByChunks)
                 return new(0, 1);
 
-            if(point.y == 0)
+            if (point.y == 0)
                 return new(0, -1);
 
             Vector2Int[] directions =
@@ -327,10 +409,59 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
             return direction.normalized;
         }
 
+        private Vector2 GetNormalIncludingWater(Vector2Int point, World world)
+        {
+
+            Vector2 direction = Vector2.zero;
+
+            float height = world.GetChunkByLocalCoordinates(point).Values[MapValueType.Height];
+
+            if (point.x == world.WidthByChunks)
+                return new(1, 0);
+
+            if (point.x == 0)
+                return new(-1, 0);
+
+            if (point.y == world.HeightByChunks)
+                return new(0, 1);
+
+            if (point.y == 0)
+                return new(0, -1);
+
+            Vector2Int[] directions =
+            {
+                new(0,1),
+                new(0,-1),
+                new(1,0),
+                new(-1,0),
+            };
+
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    Chunk chunk = world.GetChunkByLocalCoordinates(new(point.x + i, point.y + j));
+
+                    float currentHeight = chunk.Values[MapValueType.Height];
+
+                    if (chunk.HasWater)
+                        currentHeight += chunk.Water.Volume;
+
+                    if (currentHeight < height)
+                    {
+                        direction = new(i, j);
+
+                        height = currentHeight;
+                    }
+                }
+            }
+
+            return direction.normalized;
+        }
         //
         public void ClearRivers()
         {
-            if(_rivers.Count == 0) 
+            if (_rivers.Count == 0)
                 return;
 
             foreach (var river in _rivers)

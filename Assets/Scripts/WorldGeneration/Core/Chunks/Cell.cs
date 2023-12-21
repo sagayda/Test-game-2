@@ -10,6 +10,8 @@ namespace Assets.Scripts.WorldGeneration.Core.Chunks
         public ValueMapPoint Values { get; }
         public WaterMapPoint Water { get; }
 
+        public bool HasWater => Water != null;
+
         public Cell(Vector2Int position)
         {
             Position = position;

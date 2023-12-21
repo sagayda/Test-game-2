@@ -6,7 +6,7 @@ namespace Assets.Scripts.WorldGeneration.Core.Maps
 {
     public class WaterMapPoint
     {
-        public float Volume { get; private set; }
+        public float Volume { get; internal set; }
         public Vector2 Stream { get; internal set; }
 #nullable enable
         public WaterSource? Source { get; internal set; }
