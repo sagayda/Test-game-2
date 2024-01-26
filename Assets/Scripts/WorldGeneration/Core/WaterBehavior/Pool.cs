@@ -16,7 +16,7 @@ namespace WorldGeneration.Core.WaterBehavior
             _includedArea = new();
             _leakages = new();
         }
-        
+
         public List<IMapArea> IncludedArea => _includedArea;
         public IEnumerable<IMapArea> Leakages => _leakages;
         public float EvaporatingVolume => _includedArea.Count * EVAPORATING_STRENGTH;
@@ -24,7 +24,7 @@ namespace WorldGeneration.Core.WaterBehavior
         public bool TryAddSegment(params IMapArea[] areas)
         {
             foreach (var item in areas)
-                if(item.HasWater == false)
+                if (item.HasWater == false)
                     return false;
 
             _includedArea.AddRange(areas);
@@ -42,9 +42,9 @@ namespace WorldGeneration.Core.WaterBehavior
         public bool Contains(IMapArea area)
         {
             foreach (var item in _includedArea)
-                if(item.Position == area.Position)
+                if (item.Position == area.Position)
                     return true;
-            
+
             return false;
         }
     }
