@@ -4,7 +4,7 @@ using System.Linq;
 using Assets.Scripts.WorldGeneration.Core;
 using Assets.Scripts.WorldGeneration.Core.Chunks;
 using NaughtyAttributes;
-/* using Newtonsoft.Json.Bson; */
+using Newtonsoft.Json.Bson;
 using Unity.Burst;
 using UnityEngine;
 using WorldGeneration.Core;
@@ -251,7 +251,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
         {
             Debug.Log($"Pools count: {_worldGenerator.WaterBehavior.Pools.Count()}");
 
-            Color color = Color.black;
+            Color color = Color.magenta;
 
             foreach (var pool in _worldGenerator.WaterBehavior.Pools)
             {
@@ -280,50 +280,14 @@ namespace Assets.Scripts.WorldGeneration.Editor
                 _chunkVisualiser.Overpaint(isPool, color);
                 _chunkVisualiser.Overpaint(isLeakage, Color.black);
 
-                color = Color.Lerp(color, Color.white, 0.2f);
+                color = Color.Lerp(color, Color.black, 0.2f);
             }
-
-            HeightChunkRenderer = _chunkVisualiser.OverpaintedSprite;
-        }
-        [Button("Paint pool by id")]
-        public void AddPoolToPaintedMap()
-        {
-            Color color = Color.magenta;
-
-            var pool = _worldGenerator.WaterBehavior.Pools.ElementAt(PoolId);
-
-            bool isPool(int x, int y)
-            {
-                Vector2 chunkCoords = new(x, y);
-
-                foreach (var item in pool.IncludedArea)
-                    if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
-                        return true;
-
-                return false;
-            }
-
-            bool isLeakage(int x, int y)
-            {
-                Vector2 chunkCoords = new(x, y);
-
-                foreach (var item in pool.Leakages)
-                    if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
-                        return true;
-
-                return false;
-            }
-
-            _chunkVisualiser.Overpaint(isPool, color);
-            _chunkVisualiser.Overpaint(isLeakage, Color.black);
 
             HeightChunkRenderer = _chunkVisualiser.OverpaintedSprite;
         }
 
         [BoxGroup("Rivers")]
         public Vector2Int SourceCoords;
-        [BoxGroup("Rivers")]
-        public int PoolId = 0;
 
         [Button("Test")]
         public void Test()

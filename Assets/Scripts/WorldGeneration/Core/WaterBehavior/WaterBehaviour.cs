@@ -77,7 +77,7 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
         private bool IterateRiver(River river, World world, out Pool flowsInto)
         {
             flowsInto = null;
-            
+
             if (river.HasLeakage)
             {
                 Debug.Log("Tried to iterate river with leakege");
@@ -268,19 +268,6 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
             }
 
             flooded = currentFlooded;
-            return false;
-        }
-
-        private bool FloodPool(Pool pool, World world, float volume)
-        {
-/*             List<IMapArea> current
-
-            bool leakageFound = false;
-
-            while (true)
-            {
-                List<Chunk> visited = new(); 
-            } */
             return false;
         }
 

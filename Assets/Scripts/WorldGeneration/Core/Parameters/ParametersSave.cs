@@ -7,8 +7,8 @@ namespace WorldGeneration.Core
 {
     public static class ParametersSave
     {
-        private const string PARAMETERS_PATH = @"Assets/Resources/";
-        private const string DEFAULT_GENERATOR_PARAMETERS_PATH = @"Assets/Resources/GeneratorParameters.bs";
+        private const string PARAMETERS_PATH = @"Assets\Resources\";
+        private const string DEFAULT_GENERATOR_PARAMETERS_PATH = @"Assets\Resources\GeneratorParameters.bs";
 
         private static readonly IFormatter _formatter = new BinaryFormatter();
 
