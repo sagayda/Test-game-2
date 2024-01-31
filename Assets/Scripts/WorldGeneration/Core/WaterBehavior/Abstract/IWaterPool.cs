@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Assets.Scripts.WorldGeneration.Core.Chunks;
+using WorldGeneration.Core.Chunks;
 
-namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior.Abstract
+namespace WorldGeneration.Core.WaterBehavior.Abstract
 {
-    public interface IWaterPool
-    {
-        public List<IMapArea> IncludedArea { get; }
-    }
+	public interface IWaterPool : IWaterStructure
+	{
+		
+	}
 }

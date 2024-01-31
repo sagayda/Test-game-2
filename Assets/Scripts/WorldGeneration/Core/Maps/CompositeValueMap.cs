@@ -5,7 +5,7 @@ using NaughtyAttributes;
 using UnityEngine;
 using WorldGeneration.Core.Maps;
 
-namespace WorldGeneration.Core
+namespace WorldGeneration.Core.Maps
 {
     public class CompositeValueMap
     {

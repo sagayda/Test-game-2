@@ -1,6 +1,7 @@
 ﻿using NaughtyAttributes;
 using UnityEngine;
 using WorldGeneration.Core;
+using WorldGeneration.Core.Maps;
 
 namespace WorldGeneration.Editor
 {

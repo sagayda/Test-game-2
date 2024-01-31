@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
 
-namespace WorldGeneration.Core
+namespace WorldGeneration.Core.Maps
 {
     //public class MapPoint
     //{

@@ -1,8 +1,8 @@
-﻿using Assets.Scripts.WorldGeneration.Core.Chunks;
+﻿using WorldGeneration.Core.Chunks;
 
-namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior.Abstract
+namespace WorldGeneration.Core.WaterBehavior.Abstract
 {
-	public interface IWaterStream
+	public interface IWaterStream : IWaterStructure
 	{
 		public Chunk Source { get; }
 		public Chunk Leakage { get; }

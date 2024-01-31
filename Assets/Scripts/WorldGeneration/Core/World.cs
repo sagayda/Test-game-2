@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Scripts.WorldGeneration.Core.Chunks;
+using WorldGeneration.Core.Chunks;
 using UnityEngine;
-using WorldGeneration.Core;
 using WorldGeneration.Core.WaterBehavior;
 
-namespace Assets.Scripts.WorldGeneration.Core
+namespace WorldGeneration.Core
 {
     public class World
     {

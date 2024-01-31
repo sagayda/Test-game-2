@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.WorldGeneration.Core;
-using Assets.Scripts.WorldGeneration.Core.Chunks;
+using WorldGeneration.Core;
+using WorldGeneration.Core.Chunks;
 using NaughtyAttributes;
 // using Newtonsoft.Json.Bson;
 using Unity.Burst;
 using UnityEngine;
-using WorldGeneration.Core;
 using WorldGeneration.Core.Maps;
 using WorldGeneration.Core.WaterBehavior;
 using Debug = UnityEngine.Debug;
@@ -233,7 +232,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
 				{
 					Vector2 chunkCoords = new(x, y);
 
-					foreach (var item in river.Chunks)
+					foreach (var item in river.IncludedArea)
 						if (item.Position.x == chunkCoords.x && item.Position.y == chunkCoords.y)
 							return true;
 
@@ -335,7 +334,7 @@ namespace Assets.Scripts.WorldGeneration.Editor
 
 			_worldGenerator.WaterBehavior.CreateSource(source, 0.1f);
 
-			_worldGenerator.WaterBehavior.CreateRiver(source, _world, null);
+			_worldGenerator.WaterBehavior.CreateRiver(source, _world);
 		}
 
 		[Button("Test2")]

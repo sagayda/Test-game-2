@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using WorldGeneration.Core.Noise;
 
-namespace WorldGeneration.Core
+namespace WorldGeneration.Core.Maps
 {
     public class ProgressValueMap : IValueMap
     {

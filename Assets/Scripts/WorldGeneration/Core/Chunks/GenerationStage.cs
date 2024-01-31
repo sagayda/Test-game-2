@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.WorldGeneration.Core.Chunks
+﻿namespace WorldGeneration.Core.Chunks
 {
     public enum GenerationStage
     {

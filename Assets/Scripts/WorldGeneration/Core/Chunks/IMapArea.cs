@@ -1,15 +1,14 @@
-﻿using Assets.Scripts.WorldGeneration.Core.Maps;
-using UnityEngine;
-using WorldGeneration.Core;
+﻿using UnityEngine;
+using WorldGeneration.Core.Maps;
 
-namespace Assets.Scripts.WorldGeneration.Core.Chunks
+namespace WorldGeneration.Core.Chunks
 {
-    public interface IMapArea
-    {
-        public Vector2Int Position { get; }
+	public interface IMapArea
+	{
+		public Vector2Int Position { get; }
 #nullable enable
-        public ValueMapPoint? Values { get; }
-        public WaterMapPoint? Water { get; }
-        public bool HasWater { get; }
-    }
+		public ValueMapPoint? Values { get; }
+		public WaterMapPoint? Water { get; }
+		public bool HasWater { get; }
+	}
 }

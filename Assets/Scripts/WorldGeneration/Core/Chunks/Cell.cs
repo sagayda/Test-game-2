@@ -1,8 +1,7 @@
-﻿using Assets.Scripts.WorldGeneration.Core.Maps;
+﻿using WorldGeneration.Core.Maps;
 using UnityEngine;
-using WorldGeneration.Core;
 
-namespace Assets.Scripts.WorldGeneration.Core.Chunks
+namespace WorldGeneration.Core.Chunks
 {
     public class Cell : IMapArea
     {

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Assets.Scripts.WorldGeneration.Core.Chunks;
-using Assets.Scripts.WorldGeneration.Core.WaterBehavior.Abstract;
+using System;
 using UnityEngine;
-using WorldGeneration.Core;
-using WorldGeneration.Core.WaterBehavior;
+using System.Collections.Generic;
+using WorldGeneration.Core.Chunks;
+using WorldGeneration.Core.Maps;
+using WorldGeneration.Core.WaterBehavior.Abstract;
 
-namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
+namespace WorldGeneration.Core.WaterBehavior
 {
 	public class WaterBehaviour
 	{
@@ -41,7 +40,264 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
 				Source = new(strength)
 			};
 		}
+		
+		//f
+		public void CreateRiver(Chunk sourceChunk, World world)
+		{
+			InflowWaterDistributor sourceInflow = new(sourceChunk.Water.Source);
+			
+			River river = new(sourceInflow, sourceChunk);
+			_rivers.Add(river);
+			
+			int iterations = 0;
+			
+			while (IterateRiver(river, world))
+			{
+				iterations++;
 
+				if (iterations > 256)
+				{
+					Debug.LogError($"Too many river iterations (256) at {sourceChunk.Position}. River generation stopped");
+					break;
+				}
+			}
+		}
+		
+		//f
+		public void CreateRiver(IInflowWaterDistributor tributary,IMapArea tributaryArea, World world)
+		{
+			River river = new(tributary, tributaryArea);
+			_rivers.Add(river);
+			
+						int iterations = 0;
+			
+			while (IterateRiver(river, world))
+			{
+				iterations++;
+
+				if (iterations > 256)
+				{
+					Debug.LogError($"Too many river iterations (256) at {tributaryArea.Position}. River generation stopped");
+					break;
+				}
+			}
+		}
+		
+		//fn
+		public bool IterateRiver(River river, World world)
+		{
+			//needs check for leakage
+			
+			Vector2 normal = GetNormalIncludingWater(river.LastSegment.Position, world);
+			Vector2Int intNormal = new(Mathf.RoundToInt(normal.x), Mathf.RoundToInt(normal.y));
+			
+			if(intNormal == Vector2Int.zero)
+			{
+				Debug.Log($"Creating pool at {river.LastSegment.Position}");
+
+				//create lake
+				CombinedWaterDistributor riverOutlet = river.CreateOutlet();
+				CreatePool(riverOutlet, river.LastSegment, world);
+
+				return false;
+			}
+			
+			Vector2Int nextSegmentPosition = river.LastSegment.Position + intNormal;
+			
+			if (nextSegmentPosition.x > world.WidthByChunks || nextSegmentPosition.x < 0 || nextSegmentPosition.y > world.HeightByChunks || nextSegmentPosition.y < 0)
+			{
+				Debug.Log("World bounds");
+				river.CreateVirtualOutlet();
+				return false;
+			}
+			
+			
+			Chunk nextSegment = world.GetChunkByLocalCoordinates(river.LastSegment.Position + intNormal);
+
+			if (world.Ocean.Contains(nextSegment))
+			{
+				Debug.Log($"River reached ocean at {nextSegment.Position}");
+				//inflow into ocean (combine with pool?)
+				river.CreateVirtualOutlet();
+				return false;
+			}
+			
+			foreach (var pool in Pools)
+			{
+				if(pool.Contains(nextSegment))
+				{
+					Debug.Log($"River reached pool at {nextSegment.Position} \tNOT IMPLEMENTED");
+					//inflow into pool
+					
+					if(pool == river?.PoolSource)
+					{
+						Debug.Log("River flows into its source \tNOT IMPLEMENTED");
+						//do smth)
+						return false;						
+					}
+					
+					return false;
+				}
+			}
+
+			nextSegment.Water = new(river.Strength, normal);
+			river.TryAddSegment(nextSegment);
+
+			return true;
+		}
+		
+		//f
+		public void CreatePool(IInflowWaterDistributor inflowDistributor, IMapArea inflowArea, World world)
+		{
+			Pool pool = new(inflowDistributor, inflowArea);
+			
+			_pools.Add(pool);
+			
+			IteratePool(pool, inflowArea.Position, world);
+		}
+		
+		//f
+		public void IteratePool(Pool pool, Vector2Int floodStartPosition, World world)
+		{
+			float step = 0.001f;
+			float waterVolume = pool.Volume + step;
+			int stepsCount = 1;
+
+			while (Flood(pool,floodStartPosition,waterVolume, world) == false && pool.IsEvaporatingSatisfied)
+			{
+				stepsCount++;
+				waterVolume += step;
+
+				// if (pool.IsEvaporatingSatisfied == false)
+				// 	break;
+
+				if (stepsCount > 512)
+				{
+					Debug.LogError($"Too many flood steps (512) for water pool at {floodStartPosition}. Flooding stopped");
+					return;
+				}
+			}
+		}
+		
+		//f
+		public bool Flood(Pool pool, Vector2Int startPosition, float volume, World world)
+		{
+			Chunk startChunk = world.GetChunkByLocalCoordinates(startPosition);
+
+			float mainHeight = startChunk.Values[MapValueType.Height];
+			float mainWaterHeight = startChunk.Values[MapValueType.Height] + volume;
+
+			Dictionary<Vector2Int, float> lastIterationVisited = new()
+			{
+				{ startPosition, volume }
+			};
+			Dictionary<Vector2Int, float> currentFlooded = new();
+			HashSet<Vector2Int> foundedLeakages = new();
+			Dictionary<Vector2Int, float> visited = new();
+
+			bool leakageFound = false;
+
+			while (leakageFound == false && lastIterationVisited.Count > 0)
+			{
+				visited = new();
+				
+				foreach (var cell in lastIterationVisited)
+				{
+					for (int i = -1; i <= 1; i++)
+					{
+						for (int j = -1; j <= 1; j++)
+						{
+							Vector2Int pos = new(cell.Key.x + i, cell.Key.y + j);
+
+							if (lastIterationVisited.ContainsKey(pos))
+								continue;
+
+							if (currentFlooded.ContainsKey(pos))
+								continue;
+
+							if (visited.ContainsKey(pos))
+								continue;
+
+							if (pos.x < 0 || pos.y < 0 || pos.x >= world.WidthByChunks || pos.y >= world.HeightByChunks)
+								continue;
+
+							Chunk neighbourCell = world.GetChunkByLocalCoordinates(pos);
+
+							//border
+							if (neighbourCell.Values[MapValueType.Height] >= mainWaterHeight)
+								continue;
+
+							if(neighbourCell.HasWater)
+								if (neighbourCell.Values[MapValueType.Height] + neighbourCell.Water.Volume >= mainWaterHeight)
+									continue;
+
+							//leakage
+							if (neighbourCell.Values[MapValueType.Height] < mainHeight)
+							{
+								foundedLeakages.Add(pos);
+								leakageFound = true;
+							}
+
+							visited.Add(pos, mainWaterHeight - neighbourCell.Values[MapValueType.Height]);
+						}
+					}
+				}
+
+				foreach (var item in lastIterationVisited)
+				{
+					currentFlooded.Add(item.Key, item.Value);
+				}
+
+				lastIterationVisited = visited;
+			}
+
+			foreach (var item in visited)
+			{
+				currentFlooded.Add(item.Key, item.Value);
+			}
+
+
+			//apply results to pool
+			pool.SetVolume(volume);
+			
+			List<IMapArea> poolCells = new();
+
+			foreach (var item in currentFlooded)
+			{
+				Chunk chunk = world.GetChunkByLocalCoordinates(item.Key);
+
+				if (chunk.HasWater)
+					chunk.Water.Volume += item.Value;
+				else
+					chunk.Water = new(item.Value, new());
+
+				poolCells.Add(chunk);
+			}
+			
+			pool.AddArea(poolCells.ToArray());
+
+			if(leakageFound)
+			{
+				Dictionary<CombinedWaterDistributor, IMapArea> outflows = new(foundedLeakages.Count);
+		
+				foreach (var item in foundedLeakages)
+				{
+					IMapArea leakageArea = world.GetChunkByLocalCoordinates(item);
+					
+					outflows.Add(pool.CreateOutflowAt(leakageArea), leakageArea);
+				}
+				
+				foreach(var outflow in outflows)
+				{
+					//create river at outflow
+					CreateRiver(outflow.Key, outflow.Value, world);
+				}
+			}
+			
+			return false;
+		}
+		
+		
 		public River CreateRiver(Chunk sourceChunk, World world, IWaterPool sourcePool)
 		{
 			//if (sourceChunk.Water.Source.Strength <= 0.001f)
@@ -451,10 +707,13 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
 					oceanChunks.Add(chunk.Value);
 				}
 			}
+			
+			Chunk oceanSource = oceanChunks[0] as Chunk;
+			CreateSource(oceanSource, 1);
+			InflowWaterDistributor oceanInflow = new(oceanSource.Water.Source);
+			Pool ocean = new Pool(oceanInflow, oceanSource);
 
-			Pool ocean = new Pool();
-
-			ocean.TryAddSegment(oceanChunks.ToArray());
+			ocean.AddArea(oceanChunks.ToArray());
 
 			world.TrySetOcean(ocean);
 		}
@@ -629,18 +888,20 @@ namespace Assets.Scripts.WorldGeneration.Core.WaterBehavior
 		//
 		public void ClearRivers()
 		{
-			if (_rivers.Count == 0)
-				return;
+			// if (_rivers.Count == 0)
+			// 	return;
 
-			foreach (var river in _rivers)
-			{
-				foreach (var chunk in river.Chunks)
-				{
-					chunk.Water = null;
-				}
-			}
+			// foreach (var river in _rivers)
+			// {
+			// 	foreach (var chunk in river.IncludedArea)
+			// 	{
+			// 		chunk.Water = null;
+			// 	}
+			// }
 
-			_rivers.Clear();
+			// _rivers.Clear();
+			
+			throw new NotImplementedException();
 		}
 
 		public void ClearPools()

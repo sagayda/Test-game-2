@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace WorldGeneration.Core
+namespace WorldGeneration.Core.Maps
 {
     public interface IValueMap
     {
